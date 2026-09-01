@@ -3,18 +3,21 @@ import {
   Product,
   Category,
   Collection,
+  ShoppableVideo,
+  Review,
+  NavigationItem,
+  NotificationBarConfig,
+  HomepageCMS,
+  SiteSettings,
   Order,
   OrderStatus,
   Customer,
   Coupon,
-  NotificationBarConfig,
-  HomepageCMS,
-  CraftsmanshipCMS,
-  LookbookItem,
-  FAQItem,
   MediaAsset,
-  SiteSettings,
   AdminUser,
+  FAQItem,
+  LookbookItem,
+  CraftsmanshipCMS,
 } from "../types";
 import {
   initialSiteSettings,
@@ -23,13 +26,17 @@ import {
   initialCategories,
   initialCollections,
   initialProducts,
+  initialShoppableVideos,
+  initialReviews,
+  initialNavigationItems,
   initialCoupons,
   initialOrders,
   initialCustomers,
+  initialMediaAssets,
+  initialAdminUser,
+  initialFAQs,
   initialLookbookItems,
   initialCraftsmanshipCMS,
-  initialFAQs,
-  initialMediaAssets,
 } from "../data/initialData";
 
 interface DataContextType {
@@ -55,6 +62,25 @@ interface DataContextType {
   updateCollection: (id: string, updates: Partial<Collection>) => void;
   deleteCollection: (id: string) => void;
 
+  // Shoppable Videos
+  shoppableVideos: ShoppableVideo[];
+  publishedVideos: ShoppableVideo[];
+  addShoppableVideo: (video: Omit<ShoppableVideo, "id"> & { id?: string }) => ShoppableVideo;
+  updateShoppableVideo: (id: string, updates: Partial<ShoppableVideo>) => void;
+  deleteShoppableVideo: (id: string) => void;
+
+  // Reviews
+  reviews: Review[];
+  approvedReviews: Review[];
+  featuredReviews: Review[];
+  addReview: (review: Omit<Review, "id" | "date"> & { id?: string }) => Review;
+  updateReview: (id: string, updates: Partial<Review>) => void;
+  deleteReview: (id: string) => void;
+
+  // Navigation Items
+  navigationItems: NavigationItem[];
+  updateNavigationItems: (items: NavigationItem[]) => void;
+
   // Orders
   orders: Order[];
   addOrder: (order: Omit<Order, "id" | "orderNumber" | "date" | "timeline">) => Order;
@@ -70,7 +96,10 @@ interface DataContextType {
   addCoupon: (coupon: Omit<Coupon, "id"> & { id?: string }) => Coupon;
   updateCoupon: (id: string, updates: Partial<Coupon>) => void;
   deleteCoupon: (id: string) => void;
-  validateCoupon: (code: string, subtotal: number) => { isValid: boolean; discountAmount: number; message: string; coupon?: Coupon };
+  validateCoupon: (
+    code: string,
+    subtotal: number
+  ) => { isValid: boolean; discountAmount: number; message: string; coupon?: Coupon };
 
   // Content / CMS
   notificationBar: NotificationBarConfig;
@@ -109,89 +138,141 @@ interface DataContextType {
   resetToDefaultData: () => void;
 }
 
+const STORAGE_KEYS = {
+  SITE_SETTINGS: "evara_v3_settings",
+  NOTIFICATION_BAR: "evara_v3_notif",
+  HOMEPAGE_CMS: "evara_v3_home_cms",
+  CATEGORIES: "evara_v3_categories",
+  COLLECTIONS: "evara_v3_collections",
+  PRODUCTS: "evara_v3_products",
+  VIDEOS: "evara_v3_videos",
+  REVIEWS: "evara_v3_reviews",
+  NAVIGATION: "evara_v3_nav",
+  COUPONS: "evara_v3_coupons",
+  ORDERS: "evara_v3_orders",
+  CUSTOMERS: "evara_v3_customers",
+  MEDIA: "evara_v3_media",
+  FAQS: "evara_v3_faqs",
+  LOOKBOOK: "evara_v3_lookbook",
+  CRAFTSMANSHIP: "evara_v3_craft",
+  AUTH: "evara_v3_auth",
+};
+
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-const loadStored = <T,>(key: string, fallback: T): T => {
-  try {
-    const item = localStorage.getItem(`evara_v2_${key}`);
-    return item ? JSON.parse(item) : fallback;
-  } catch {
-    return fallback;
-  }
-};
-
-const saveStored = <T,>(key: string, data: T) => {
-  try {
-    localStorage.setItem(`evara_v2_${key}`, JSON.stringify(data));
-  } catch (e) {
-    console.error(e);
-  }
-};
-
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // State variables with local storage persistence
-  const [products, setProducts] = useState<Product[]>(() => loadStored("products", initialProducts));
-  const [categories, setCategories] = useState<Category[]>(() => loadStored("categories", initialCategories));
-  const [collections, setCollections] = useState<Collection[]>(() => loadStored("collections", initialCollections));
-  const [orders, setOrders] = useState<Order[]>(() => loadStored("orders", initialOrders));
-  const [customers, setCustomers] = useState<Customer[]>(() => loadStored("customers", initialCustomers));
-  const [coupons, setCoupons] = useState<Coupon[]>(() => loadStored("coupons", initialCoupons));
+  const loadStored = <T,>(key: string, fallback: T): T => {
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : fallback;
+    } catch {
+      return fallback;
+    }
+  };
+
+  const saveStored = <T,>(key: string, data: T) => {
+    try {
+      localStorage.setItem(key, JSON.stringify(data));
+    } catch (e) {
+      console.warn("Storage quota exceeded or error:", e);
+    }
+  };
+
+  // State initialization
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(() =>
+    loadStored(STORAGE_KEYS.SITE_SETTINGS, initialSiteSettings)
+  );
   const [notificationBar, setNotificationBar] = useState<NotificationBarConfig>(() =>
-    loadStored("notification", initialNotificationBar)
+    loadStored(STORAGE_KEYS.NOTIFICATION_BAR, initialNotificationBar)
   );
   const [homepageCMS, setHomepageCMS] = useState<HomepageCMS>(() =>
-    loadStored("homepage_cms", initialHomepageCMS)
+    loadStored(STORAGE_KEYS.HOMEPAGE_CMS, initialHomepageCMS)
   );
   const [craftsmanshipCMS, setCraftsmanshipCMS] = useState<CraftsmanshipCMS>(() =>
-    loadStored("craftsmanship_cms", initialCraftsmanshipCMS)
+    loadStored(STORAGE_KEYS.CRAFTSMANSHIP, initialCraftsmanshipCMS)
   );
   const [lookbookItems, setLookbookItems] = useState<LookbookItem[]>(() =>
-    loadStored("lookbook", initialLookbookItems)
+    loadStored(STORAGE_KEYS.LOOKBOOK, initialLookbookItems)
   );
-  const [faqs, setFaqs] = useState<FAQItem[]>(() => loadStored("faqs", initialFAQs));
+  const [faqs, setFaqs] = useState<FAQItem[]>(() =>
+    loadStored(STORAGE_KEYS.FAQS, initialFAQs)
+  );
+  const [categories, setCategories] = useState<Category[]>(() =>
+    loadStored(STORAGE_KEYS.CATEGORIES, initialCategories)
+  );
+  const [collections, setCollections] = useState<Collection[]>(() =>
+    loadStored(STORAGE_KEYS.COLLECTIONS, initialCollections)
+  );
+  const [products, setProducts] = useState<Product[]>(() =>
+    loadStored(STORAGE_KEYS.PRODUCTS, initialProducts)
+  );
+  const [shoppableVideos, setShoppableVideos] = useState<ShoppableVideo[]>(() =>
+    loadStored(STORAGE_KEYS.VIDEOS, initialShoppableVideos)
+  );
+  const [reviews, setReviews] = useState<Review[]>(() =>
+    loadStored(STORAGE_KEYS.REVIEWS, initialReviews)
+  );
+  const [navigationItems, setNavigationItems] = useState<NavigationItem[]>(() =>
+    loadStored(STORAGE_KEYS.NAVIGATION, initialNavigationItems)
+  );
+  const [coupons, setCoupons] = useState<Coupon[]>(() =>
+    loadStored(STORAGE_KEYS.COUPONS, initialCoupons)
+  );
+  const [orders, setOrders] = useState<Order[]>(() =>
+    loadStored(STORAGE_KEYS.ORDERS, initialOrders)
+  );
+  const [customers, setCustomers] = useState<Customer[]>(() =>
+    loadStored(STORAGE_KEYS.CUSTOMERS, initialCustomers)
+  );
   const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>(() =>
-    loadStored("media", initialMediaAssets)
+    loadStored(STORAGE_KEYS.MEDIA, initialMediaAssets)
   );
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>(() =>
-    loadStored("settings", initialSiteSettings)
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(() =>
+    loadStored(STORAGE_KEYS.AUTH, initialAdminUser)
   );
 
-  // Admin session
-  const [adminUser, setAdminUser] = useState<AdminUser | null>(() => loadStored("admin_user", null));
+  // Sync to localStorage
+  useEffect(() => saveStored(STORAGE_KEYS.SITE_SETTINGS, siteSettings), [siteSettings]);
+  useEffect(() => saveStored(STORAGE_KEYS.NOTIFICATION_BAR, notificationBar), [notificationBar]);
+  useEffect(() => saveStored(STORAGE_KEYS.HOMEPAGE_CMS, homepageCMS), [homepageCMS]);
+  useEffect(() => saveStored(STORAGE_KEYS.CRAFTSMANSHIP, craftsmanshipCMS), [craftsmanshipCMS]);
+  useEffect(() => saveStored(STORAGE_KEYS.LOOKBOOK, lookbookItems), [lookbookItems]);
+  useEffect(() => saveStored(STORAGE_KEYS.FAQS, faqs), [faqs]);
+  useEffect(() => saveStored(STORAGE_KEYS.CATEGORIES, categories), [categories]);
+  useEffect(() => saveStored(STORAGE_KEYS.COLLECTIONS, collections), [collections]);
+  useEffect(() => saveStored(STORAGE_KEYS.PRODUCTS, products), [products]);
+  useEffect(() => saveStored(STORAGE_KEYS.VIDEOS, shoppableVideos), [shoppableVideos]);
+  useEffect(() => saveStored(STORAGE_KEYS.REVIEWS, reviews), [reviews]);
+  useEffect(() => saveStored(STORAGE_KEYS.NAVIGATION, navigationItems), [navigationItems]);
+  useEffect(() => saveStored(STORAGE_KEYS.COUPONS, coupons), [coupons]);
+  useEffect(() => saveStored(STORAGE_KEYS.ORDERS, orders), [orders]);
+  useEffect(() => saveStored(STORAGE_KEYS.CUSTOMERS, customers), [customers]);
+  useEffect(() => saveStored(STORAGE_KEYS.MEDIA, mediaAssets), [mediaAssets]);
+  useEffect(() => saveStored(STORAGE_KEYS.AUTH, adminUser), [adminUser]);
 
-  // Sync to local storage
-  useEffect(() => saveStored("products", products), [products]);
-  useEffect(() => saveStored("categories", categories), [categories]);
-  useEffect(() => saveStored("collections", collections), [collections]);
-  useEffect(() => saveStored("orders", orders), [orders]);
-  useEffect(() => saveStored("customers", customers), [customers]);
-  useEffect(() => saveStored("coupons", coupons), [coupons]);
-  useEffect(() => saveStored("notification", notificationBar), [notificationBar]);
-  useEffect(() => saveStored("homepage_cms", homepageCMS), [homepageCMS]);
-  useEffect(() => saveStored("craftsmanship_cms", craftsmanshipCMS), [craftsmanshipCMS]);
-  useEffect(() => saveStored("lookbook", lookbookItems), [lookbookItems]);
-  useEffect(() => saveStored("faqs", faqs), [faqs]);
-  useEffect(() => saveStored("media", mediaAssets), [mediaAssets]);
-  useEffect(() => saveStored("settings", siteSettings), [siteSettings]);
-  useEffect(() => saveStored("admin_user", adminUser), [adminUser]);
-
-  // Derived filtered views for customer storefront
+  // Derived Views
   const publishedProducts = products.filter((p) => p.status === "published");
   const activeCategories = categories.filter((c) => c.isEnabled);
   const activeCollections = collections.filter((c) => c.isPublished);
+  const publishedVideos = shoppableVideos.filter((v) => v.isPublished);
+  const approvedReviews = reviews.filter((r) => r.status === "approved");
+  const featuredReviews = approvedReviews.filter((r) => r.isFeaturedOnHome);
   const publishedLookbookItems = lookbookItems.filter((l) => l.isPublished);
-  const activeFAQs = faqs.filter((f) => f.isEnabled).sort((a, b) => a.order - b.order);
+  const activeFAQs = faqs.filter((f) => f.isPublished);
 
-  // PRODUCT CRUD
-  const addProduct = (prodData: Omit<Product, "id"> & { id?: string }): Product => {
-    const newProd: Product = {
-      ...prodData,
-      id: prodData.id || `prod-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+  // PRODUCT ACTIONS
+  const addProduct = (newProduct: Omit<Product, "id"> & { id?: string }): Product => {
+    const id = newProduct.id || `ev-${Date.now()}`;
+    const product: Product = {
+      ...newProduct,
+      id,
+      inventoryCount: newProduct.inventoryCount || newProduct.inventory || 15,
+      inStock: newProduct.inStock !== undefined ? newProduct.inStock : true,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    setProducts((prev) => [newProd, ...prev]);
-    return newProd;
+    setProducts((prev) => [product, ...prev]);
+    return product;
   };
 
   const updateProduct = (id: string, updates: Partial<Product>) => {
@@ -209,10 +290,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!original) return undefined;
     const duplicated: Product = {
       ...original,
-      id: `prod-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      id: `ev-${Date.now()}`,
       title: `${original.title} (Copy)`,
-      code: `${original.code}-COPY`,
-      slug: `${original.slug}-copy-${Math.floor(Math.random() * 1000)}`,
+      slug: `${original.slug}-copy-${Date.now().toString().slice(-4)}`,
+      sku: `${original.sku}-COPY`,
       status: "draft",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -221,15 +302,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return duplicated;
   };
 
-  // CATEGORY CRUD
-  const addCategory = (catData: Omit<Category, "id"> & { id?: string }): Category => {
-    const newCat: Category = {
-      ...catData,
-      id: catData.id || `cat-${Date.now()}`,
-      isEnabled: catData.isEnabled ?? true,
-    };
-    setCategories((prev) => [...prev, newCat]);
-    return newCat;
+  // CATEGORY ACTIONS
+  const addCategory = (newCat: Omit<Category, "id"> & { id?: string }): Category => {
+    const id = newCat.id || `cat-${Date.now()}`;
+    const cat: Category = { ...newCat, id };
+    setCategories((prev) => [...prev, cat]);
+    return cat;
   };
 
   const updateCategory = (id: string, updates: Partial<Category>) => {
@@ -240,15 +318,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCategories((prev) => prev.filter((c) => c.id !== id));
   };
 
-  // COLLECTION CRUD
-  const addCollection = (colData: Omit<Collection, "id"> & { id?: string }): Collection => {
-    const newCol: Collection = {
-      ...colData,
-      id: colData.id || `col-${Date.now()}`,
-      isPublished: colData.isPublished ?? true,
-    };
-    setCollections((prev) => [...prev, newCol]);
-    return newCol;
+  // COLLECTION ACTIONS
+  const addCollection = (newCol: Omit<Collection, "id"> & { id?: string }): Collection => {
+    const id = newCol.id || `col-${Date.now()}`;
+    const col: Collection = { ...newCol, id };
+    setCollections((prev) => [...prev, col]);
+    return col;
   };
 
   const updateCollection = (id: string, updates: Partial<Collection>) => {
@@ -259,33 +334,112 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCollections((prev) => prev.filter((c) => c.id !== id));
   };
 
-  // ORDER CRUD
+  // SHOPPABLE VIDEOS ACTIONS
+  const addShoppableVideo = (newVid: Omit<ShoppableVideo, "id"> & { id?: string }): ShoppableVideo => {
+    const id = newVid.id || `vid-${Date.now()}`;
+    const vid: ShoppableVideo = { ...newVid, id };
+    setShoppableVideos((prev) => [...prev, vid]);
+    return vid;
+  };
+
+  const updateShoppableVideo = (id: string, updates: Partial<ShoppableVideo>) => {
+    setShoppableVideos((prev) => prev.map((v) => (v.id === id ? { ...v, ...updates } : v)));
+  };
+
+  const deleteShoppableVideo = (id: string) => {
+    setShoppableVideos((prev) => prev.filter((v) => v.id !== id));
+  };
+
+  // REVIEWS ACTIONS
+  const addReview = (newRev: Omit<Review, "id" | "date"> & { id?: string }): Review => {
+    const id = newRev.id || `rev-${Date.now()}`;
+    const rev: Review = {
+      ...newRev,
+      id,
+      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+    };
+    setReviews((prev) => [rev, ...prev]);
+    return rev;
+  };
+
+  const updateReview = (id: string, updates: Partial<Review>) => {
+    setReviews((prev) => prev.map((r) => (r.id === id ? { ...r, ...updates } : r)));
+  };
+
+  const deleteReview = (id: string) => {
+    setReviews((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  // NAVIGATION
+  const updateNavigationItems = (items: NavigationItem[]) => {
+    setNavigationItems(items);
+  };
+
+  // LOOKBOOK ACTIONS
+  const addLookbookItem = (itemData: Omit<LookbookItem, "id"> & { id?: string }): LookbookItem => {
+    const id = itemData.id || `look-${Date.now()}`;
+    const item: LookbookItem = { ...itemData, id };
+    setLookbookItems((prev) => [...prev, item]);
+    return item;
+  };
+
+  const updateLookbookItem = (id: string, updates: Partial<LookbookItem>) => {
+    setLookbookItems((prev) => prev.map((l) => (l.id === id ? { ...l, ...updates } : l)));
+  };
+
+  const deleteLookbookItem = (id: string) => {
+    setLookbookItems((prev) => prev.filter((l) => l.id !== id));
+  };
+
+  // FAQ ACTIONS
+  const addFAQ = (faqData: Omit<FAQItem, "id"> & { id?: string }): FAQItem => {
+    const id = faqData.id || `faq-${Date.now()}`;
+    const faq: FAQItem = { ...faqData, id };
+    setFaqs((prev) => [...prev, faq]);
+    return faq;
+  };
+
+  const updateFAQ = (id: string, updates: Partial<FAQItem>) => {
+    setFaqs((prev) => prev.map((f) => (f.id === id ? { ...f, ...updates } : f)));
+  };
+
+  const deleteFAQ = (id: string) => {
+    setFaqs((prev) => prev.filter((f) => f.id !== id));
+  };
+
+  // ORDER ACTIONS
   const addOrder = (orderData: Omit<Order, "id" | "orderNumber" | "date" | "timeline">): Order => {
-    const orderNumber = `DEMO-EV-${Math.floor(1000 + Math.random() * 9000)}`;
-    const nowStr = new Date().toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
+    const randomNum = Math.floor(10000 + Math.random() * 90000);
+    const orderNumber = `EV-${randomNum}`;
+    const id = `ord-${Date.now()}`;
+    const date = new Date().toISOString().split("T")[0];
+
     const newOrder: Order = {
       ...orderData,
-      id: `ord-${Date.now()}`,
+      id,
       orderNumber,
-      date: nowStr,
+      date,
       timeline: [
         {
-          title: "Order Placed & Payment Confirmed (Demo)",
-          timestamp: `${nowStr}, ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`,
+          title: "Order Placed & Registered in Atelier Database",
+          timestamp: "Just now",
           completed: true,
+          note: `Payment: ${orderData.paymentMethod} (${orderData.paymentStatus})`,
         },
         {
-          title: "Craft Quality Inspection",
+          title: "Quality Check & Handloom Packing",
           timestamp: "Scheduled within 24 hours",
+          completed: false,
+          note: "Surat Central Atelier",
+        },
+        {
+          title: "Dispatched via Express Courier",
+          timestamp: "Pending pickup",
           completed: false,
         },
         {
-          title: "Dispatch via Insured Express Courier",
-          timestamp: "Estimated 2–3 business days",
+          title: "Delivered to Patron",
+          timestamp: "Estimated in 2–4 business days",
           completed: false,
         },
       ],
@@ -293,7 +447,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setOrders((prev) => [newOrder, ...prev]);
 
-    // Also update/register customer
+    // Update customer lifetime records
     addOrUpdateCustomer({
       name: orderData.customerName,
       email: orderData.customerEmail,
@@ -301,7 +455,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       city: orderData.city,
       totalOrders: 1,
       totalSpend: orderData.total,
-      joinedDate: nowStr,
+      lastOrderDate: date,
+      joinedDate: date,
     });
 
     return newOrder;
@@ -309,24 +464,23 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateOrderStatus = (id: string, status: OrderStatus, note?: string) => {
     setOrders((prev) =>
-      prev.map((o) => {
-        if (o.id !== id) return o;
-        const nowStr = `${new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}, ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+      prev.map((order) => {
+        if (order.id !== id) return order;
         const updatedTimeline = [
-          ...o.timeline,
+          ...order.timeline,
           {
-            title: `Status Updated to ${status}`,
-            timestamp: nowStr,
-            note: note || `Admin updated order status to ${status}`,
+            title: `Status updated to ${status}`,
+            timestamp: new Date().toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
             completed: true,
+            note: note || `Updated by Atelier Admin`,
           },
         ];
-        return {
-          ...o,
-          status,
-          paymentStatus: status === "Delivered" || status === "Shipped" ? "Paid" : o.paymentStatus,
-          timeline: updatedTimeline,
-        };
+        return { ...order, status, timeline: updatedTimeline };
       })
     );
   };
@@ -335,7 +489,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setOrders((prev) => prev.filter((o) => o.id !== id));
   };
 
-  // CUSTOMER MANAGEMENT
+  // CUSTOMER ACTIONS
   const addOrUpdateCustomer = (customerData: Omit<Customer, "id"> & { id?: string }) => {
     setCustomers((prev) => {
       const existing = prev.find((c) => c.email.toLowerCase() === customerData.email.toLowerCase());
@@ -346,83 +500,67 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 ...c,
                 totalOrders: c.totalOrders + 1,
                 totalSpend: c.totalSpend + customerData.totalSpend,
-                name: customerData.name || c.name,
-                phone: customerData.phone || c.phone,
-                city: customerData.city || c.city,
+                lastOrderDate: customerData.lastOrderDate,
               }
             : c
         );
       }
-      const newCust: Customer = {
-        ...customerData,
-        id: customerData.id || `cust-${Date.now()}`,
-      };
-      return [newCust, ...prev];
+      const id = customerData.id || `cust-${Date.now()}`;
+      return [...prev, { ...customerData, id }];
     });
   };
 
-  // COUPONS
+  // COUPON ACTIONS
   const addCoupon = (couponData: Omit<Coupon, "id"> & { id?: string }): Coupon => {
-    const newCoupon: Coupon = {
-      ...couponData,
-      id: couponData.id || `coupon-${Date.now()}`,
-      code: couponData.code.toUpperCase().trim(),
-      usageCount: 0,
-    };
+    const id = couponData.id || `coup-${Date.now()}`;
+    const newCoupon: Coupon = { ...couponData, id };
     setCoupons((prev) => [...prev, newCoupon]);
     return newCoupon;
   };
 
   const updateCoupon = (id: string, updates: Partial<Coupon>) => {
-    setCoupons((prev) =>
-      prev.map((c) =>
-        c.id === id ? { ...c, ...updates, code: (updates.code || c.code).toUpperCase().trim() } : c
-      )
-    );
+    setCoupons((prev) => prev.map((c) => (c.id === id ? { ...c, ...updates } : c)));
   };
 
   const deleteCoupon = (id: string) => {
     setCoupons((prev) => prev.filter((c) => c.id !== id));
   };
 
-  const validateCoupon = (
-    code: string,
-    subtotal: number
-  ): { isValid: boolean; discountAmount: number; message: string; coupon?: Coupon } => {
-    const cleanCode = code.trim().toUpperCase();
-    const found = coupons.find((c) => c.code === cleanCode && c.isActive);
+  const validateCoupon = (code: string, subtotal: number) => {
+    const normalized = code.trim().toUpperCase();
+    const coupon = coupons.find((c) => c.code.toUpperCase() === normalized && c.isActive);
 
-    if (!found) {
-      return { isValid: false, discountAmount: 0, message: "Invalid or inactive privilege coupon code." };
+    if (!coupon) {
+      return { isValid: false, discountAmount: 0, message: "Invalid or inactive promo code." };
     }
 
-    if (subtotal < found.minOrderValue) {
+    if (subtotal < coupon.minOrderValue) {
       return {
         isValid: false,
         discountAmount: 0,
-        message: `Minimum order value of ₹${found.minOrderValue.toLocaleString("en-IN")} required.`,
+        message: `Minimum order value for code ${coupon.code} is ₹${coupon.minOrderValue.toLocaleString("en-IN")}.`,
       };
     }
 
-    let discount = 0;
-    if (found.discountType === "percentage") {
-      discount = Math.round((subtotal * found.discountValue) / 100);
-      if (found.maxDiscount && discount > found.maxDiscount) {
-        discount = found.maxDiscount;
+    let discountAmount = 0;
+    if (coupon.discountType === "percentage") {
+      discountAmount = Math.round((subtotal * coupon.discountValue) / 100);
+      if (coupon.maxDiscount && discountAmount > coupon.maxDiscount) {
+        discountAmount = coupon.maxDiscount;
       }
     } else {
-      discount = found.discountValue;
+      discountAmount = Math.min(coupon.discountValue, subtotal);
     }
 
     return {
       isValid: true,
-      discountAmount: discount,
-      message: `Coupon ${found.code} applied successfully!`,
-      coupon: found,
+      discountAmount,
+      message: `Privilege code ${coupon.code} applied! Saved ₹${discountAmount.toLocaleString("en-IN")}`,
+      coupon,
     };
   };
 
-  // CONTENT & CMS
+  // CONTENT / CMS
   const updateNotificationBar = (config: Partial<NotificationBarConfig>) => {
     setNotificationBar((prev) => ({ ...prev, ...config }));
   };
@@ -435,52 +573,16 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCraftsmanshipCMS((prev) => ({ ...prev, ...config }));
   };
 
-  const addLookbookItem = (itemData: Omit<LookbookItem, "id"> & { id?: string }): LookbookItem => {
-    const newItem: LookbookItem = {
-      ...itemData,
-      id: itemData.id || `look-${Date.now()}`,
-      isPublished: itemData.isPublished ?? true,
-    };
-    setLookbookItems((prev) => [...prev, newItem]);
-    return newItem;
-  };
-
-  const updateLookbookItem = (id: string, updates: Partial<LookbookItem>) => {
-    setLookbookItems((prev) => prev.map((l) => (l.id === id ? { ...l, ...updates } : l)));
-  };
-
-  const deleteLookbookItem = (id: string) => {
-    setLookbookItems((prev) => prev.filter((l) => l.id !== id));
-  };
-
-  const addFAQ = (faqData: Omit<FAQItem, "id"> & { id?: string }): FAQItem => {
-    const newFaq: FAQItem = {
-      ...faqData,
-      id: faqData.id || `faq-${Date.now()}`,
-      isEnabled: faqData.isEnabled ?? true,
-      order: faqData.order || faqs.length + 1,
-    };
-    setFaqs((prev) => [...prev, newFaq]);
-    return newFaq;
-  };
-
-  const updateFAQ = (id: string, updates: Partial<FAQItem>) => {
-    setFaqs((prev) => prev.map((f) => (f.id === id ? { ...f, ...updates } : f)));
-  };
-
-  const deleteFAQ = (id: string) => {
-    setFaqs((prev) => prev.filter((f) => f.id !== id));
-  };
-
-  // MEDIA
-  const addMediaAsset = (asset: Omit<MediaAsset, "id" | "createdAt">): MediaAsset => {
-    const newAsset: MediaAsset = {
-      ...asset,
-      id: `media-${Date.now()}`,
+  // MEDIA ASSET ACTIONS
+  const addMediaAsset = (assetData: Omit<MediaAsset, "id" | "createdAt">): MediaAsset => {
+    const id = `med-${Date.now()}`;
+    const asset: MediaAsset = {
+      ...assetData,
+      id,
       createdAt: new Date().toISOString().split("T")[0],
     };
-    setMediaAssets((prev) => [newAsset, ...prev]);
-    return newAsset;
+    setMediaAssets((prev) => [asset, ...prev]);
+    return asset;
   };
 
   const deleteMediaAsset = (id: string) => {
@@ -492,19 +594,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSiteSettings((prev) => ({ ...prev, ...settings }));
   };
 
-  // ADMIN AUTH
+  // AUTH
   const loginAdmin = (email: string, pass: string): boolean => {
-    // Demo admin authentication
-    const cleanEmail = email.trim().toLowerCase();
-    if (cleanEmail === "admin@evaravastra.com" || cleanEmail === "admin" || (cleanEmail.includes("@") && pass.length >= 4)) {
-      const user: AdminUser = {
-        id: "admin-master",
-        email: cleanEmail,
-        name: "Darshil (Creative Director)",
-        role: "Administrator",
-        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
-      };
-      setAdminUser(user);
+    if (
+      (email === "admin@evaravastra.com" && pass === "evara2026") ||
+      (email === "evaravastra@gmail.com" && pass === "evara2026") ||
+      (email === "admin" && pass === "admin")
+    ) {
+      setAdminUser(initialAdminUser);
       return true;
     }
     return false;
@@ -514,20 +611,26 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAdminUser(null);
   };
 
+  // SYSTEM RESET
   const resetToDefaultData = () => {
-    setProducts(initialProducts);
-    setCategories(initialCategories);
-    setCollections(initialCollections);
-    setOrders(initialOrders);
-    setCustomers(initialCustomers);
-    setCoupons(initialCoupons);
+    localStorage.clear();
+    setSiteSettings(initialSiteSettings);
     setNotificationBar(initialNotificationBar);
     setHomepageCMS(initialHomepageCMS);
     setCraftsmanshipCMS(initialCraftsmanshipCMS);
     setLookbookItems(initialLookbookItems);
     setFaqs(initialFAQs);
+    setCategories(initialCategories);
+    setCollections(initialCollections);
+    setProducts(initialProducts);
+    setShoppableVideos(initialShoppableVideos);
+    setReviews(initialReviews);
+    setNavigationItems(initialNavigationItems);
+    setCoupons(initialCoupons);
+    setOrders(initialOrders);
+    setCustomers(initialCustomers);
     setMediaAssets(initialMediaAssets);
-    setSiteSettings(initialSiteSettings);
+    setAdminUser(initialAdminUser);
   };
 
   return (
@@ -539,27 +642,49 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateProduct,
         deleteProduct,
         duplicateProduct,
+
         categories,
         activeCategories,
         addCategory,
         updateCategory,
         deleteCategory,
+
         collections,
         activeCollections,
         addCollection,
         updateCollection,
         deleteCollection,
+
+        shoppableVideos,
+        publishedVideos,
+        addShoppableVideo,
+        updateShoppableVideo,
+        deleteShoppableVideo,
+
+        reviews,
+        approvedReviews,
+        featuredReviews,
+        addReview,
+        updateReview,
+        deleteReview,
+
+        navigationItems,
+        updateNavigationItems,
+
         orders,
         addOrder,
         updateOrderStatus,
         deleteOrder,
+
         customers,
         addOrUpdateCustomer,
+
         coupons,
         addCoupon,
         updateCoupon,
         deleteCoupon,
         validateCoupon,
+
         notificationBar,
         updateNotificationBar,
         homepageCMS,
@@ -576,15 +701,19 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         addFAQ,
         updateFAQ,
         deleteFAQ,
+
         mediaAssets,
         addMediaAsset,
         deleteMediaAsset,
+
         siteSettings,
         updateSiteSettings,
+
         adminUser,
         isAdminAuthenticated: !!adminUser,
         loginAdmin,
         logoutAdmin,
+
         resetToDefaultData,
       }}
     >

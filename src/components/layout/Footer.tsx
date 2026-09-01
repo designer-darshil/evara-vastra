@@ -1,6 +1,6 @@
 import React from "react";
 import { useData } from "../../context/DataContext";
-import { ArrowRight, ShieldCheck, Lock } from "lucide-react";
+import { ShieldCheck, Truck, RefreshCw, Mail, Phone, MapPin } from "lucide-react";
 
 export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNavigate }) => {
   const { siteSettings, activeCategories } = useData();
@@ -8,8 +8,8 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
   return (
     <footer
       style={{
-        backgroundColor: "var(--bg-dark)",
-        color: "var(--text-inverse)",
+        backgroundColor: "#171513",
+        color: "#EBE6DF",
         paddingTop: "5.5rem",
         paddingBottom: "3rem",
         borderTop: "1px solid rgba(255, 255, 255, 0.08)",
@@ -21,17 +21,17 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-            gap: "3rem 2rem",
+            gap: "3rem 2.5rem",
             paddingBottom: "4rem",
             borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
           }}
         >
-          {/* Col 1: Brand & Atelier Manifesto */}
+          {/* Col 1: Brand & Atelier Contact */}
           <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             <div>
               <span
                 style={{
-                  fontSize: "0.65rem",
+                  fontSize: "0.68rem",
                   fontWeight: 700,
                   letterSpacing: "0.26em",
                   textTransform: "uppercase",
@@ -40,18 +40,19 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
                   marginBottom: "0.4rem",
                 }}
               >
-                ATELIER HANDLOOMS
+                CONTEMPORARY INDIAN WOMENSWEAR
               </span>
               <h3
                 className="font-serif"
                 style={{
                   fontSize: "1.85rem",
-                  letterSpacing: "0.08em",
-                  color: "#F8F4EE",
+                  letterSpacing: "0.12em",
+                  color: "#FFFFFF",
                   lineHeight: 1.1,
+                  margin: 0,
                 }}
               >
-                {siteSettings.name || "EVARA VASTRA"}
+                {siteSettings.name}
               </h3>
             </div>
 
@@ -59,19 +60,30 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
               style={{
                 fontSize: "0.85rem",
                 lineHeight: 1.65,
-                color: "var(--text-inverse-muted)",
+                color: "#A9A29A",
+                margin: 0,
               }}
             >
-              Rooted in the living heritage of Indian handlooms. Pure katan silks, organic handspun cottons, and architectural linens designed for modern drapes.
+              Surat-crafted Sarees, Designer Co-Ord Sets, Chinon Kurti Palazzo Ensembles, and Festive Anarkali Gowns designed for modern living.
             </p>
 
-            <div style={{ fontSize: "0.78rem", color: "var(--text-inverse-muted)" }}>
-              <p style={{ margin: "0 0 0.3rem 0" }}>{siteSettings.atelierAddress}</p>
-              <p style={{ margin: 0 }}>Phone: {siteSettings.phone}</p>
+            <div style={{ fontSize: "0.82rem", color: "#C5BEB5", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <MapPin size={15} style={{ color: "var(--accent-gold)", flexShrink: 0 }} />
+                <span>{siteSettings.atelierAddress}</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <Phone size={15} style={{ color: "var(--accent-gold)", flexShrink: 0 }} />
+                <span>Customer Care: {siteSettings.phone}</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <Mail size={15} style={{ color: "var(--accent-gold)", flexShrink: 0 }} />
+                <span>Email: {siteSettings.email}</span>
+              </div>
             </div>
           </div>
 
-          {/* Col 2: The Saree Catalog */}
+          {/* Col 2: Categories */}
           <div>
             <h4
               style={{
@@ -83,26 +95,34 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
                 marginBottom: "1.25rem",
               }}
             >
-              Saree Weaves
+              Shop By Category
             </h4>
             <ul
               style={{
                 listStyle: "none",
+                padding: 0,
+                margin: 0,
                 display: "flex",
                 flexDirection: "column",
                 gap: "0.75rem",
               }}
             >
-              {activeCategories.slice(0, 5).map((cat) => (
+              {activeCategories.map((cat) => (
                 <li key={cat.id}>
                   <button
                     onClick={() => onNavigate(`/shop/${cat.slug}`)}
                     style={{
-                      color: "var(--text-inverse-muted)",
+                      background: "none",
+                      border: "none",
+                      color: "#A9A29A",
                       fontSize: "0.85rem",
-                      transition: "color 0.2s ease",
+                      cursor: "pointer",
+                      padding: 0,
                       textAlign: "left",
+                      transition: "color 0.2s ease",
                     }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = "#A9A29A")}
                   >
                     {cat.name}
                   </button>
@@ -110,172 +130,148 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
               ))}
               <li>
                 <button
-                  onClick={() => onNavigate("/shop")}
+                  onClick={() => onNavigate("/shop?filter=newArrival")}
                   style={{
-                    color: "#FFFFFF",
-                    fontWeight: 600,
-                    fontSize: "0.85rem",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "0.3rem",
-                  }}
-                >
-                  View All Sarees <ArrowRight size={13} />
-                </button>
-              </li>
-            </ul>
-          </div>
-
-          {/* Col 3: Atelier & Craft */}
-          <div>
-            <h4
-              style={{
-                fontSize: "0.75rem",
-                fontWeight: 700,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: "var(--accent-gold)",
-                marginBottom: "1.25rem",
-              }}
-            >
-              Atelier & Heritage
-            </h4>
-            <ul
-              style={{
-                listStyle: "none",
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.75rem",
-              }}
-            >
-              <li>
-                <button
-                  onClick={() => onNavigate("/craftsmanship")}
-                  style={{ color: "var(--text-inverse-muted)", fontSize: "0.85rem" }}
-                >
-                  Artisanal Craftsmanship
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate("/lookbook")}
-                  style={{ color: "var(--text-inverse-muted)", fontSize: "0.85rem" }}
-                >
-                  Campaign Lookbook
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate("/about")}
-                  style={{ color: "var(--text-inverse-muted)", fontSize: "0.85rem" }}
-                >
-                  Our Story & Atelier
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate("/contact")}
-                  style={{ color: "var(--text-inverse-muted)", fontSize: "0.85rem" }}
-                >
-                  Book Mumbai Studio Drape
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate("/faq")}
-                  style={{ color: "var(--text-inverse-muted)", fontSize: "0.85rem" }}
-                >
-                  Client Inquiries & Care
-                </button>
-              </li>
-            </ul>
-          </div>
-
-          {/* Col 4: Patron Services & Admin Portal */}
-          <div>
-            <h4
-              style={{
-                fontSize: "0.75rem",
-                fontWeight: 700,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: "var(--accent-gold)",
-                marginBottom: "1.25rem",
-              }}
-            >
-              Patron Concierge
-            </h4>
-            <ul
-              style={{
-                listStyle: "none",
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.75rem",
-              }}
-            >
-              <li>
-                <button
-                  onClick={() => onNavigate("/account")}
-                  style={{ color: "var(--text-inverse-muted)", fontSize: "0.85rem" }}
-                >
-                  My Client Profile
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate("/orders")}
-                  style={{ color: "var(--text-inverse-muted)", fontSize: "0.85rem" }}
-                >
-                  Track Recent Orders
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate("/wishlist")}
-                  style={{ color: "var(--text-inverse-muted)", fontSize: "0.85rem" }}
-                >
-                  Saved Pieces
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate("/admin/login")}
-                  style={{
+                    background: "none",
+                    border: "none",
                     color: "var(--accent-gold)",
                     fontSize: "0.85rem",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "0.35rem",
                     fontWeight: 600,
+                    cursor: "pointer",
+                    padding: 0,
+                    textAlign: "left",
                   }}
                 >
-                  <Lock size={12} /> Atelier Admin Portal
+                  ★ New Season Drops
                 </button>
               </li>
             </ul>
+          </div>
+
+          {/* Col 3: Customer Care & Policies */}
+          <div>
+            <h4
+              style={{
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "var(--accent-gold)",
+                marginBottom: "1.25rem",
+              }}
+            >
+              Customer Care & Policies
+            </h4>
+            <ul
+              style={{
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.75rem",
+              }}
+            >
+              {[
+                { label: "Track Your Order", href: "/orders" },
+                { label: "Shipping Policy", href: "/shipping" },
+                { label: "Replacement & Exchange", href: "/returns" },
+                { label: "Privacy Policy", href: "/privacy" },
+                { label: "Terms of Service", href: "/terms" },
+                { label: "Contact Us", href: "/contact" },
+                { label: "FAQs & Help Center", href: "/faq" },
+              ].map((item) => (
+                <li key={item.label}>
+                  <button
+                    onClick={() => onNavigate(item.href)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#A9A29A",
+                      fontSize: "0.85rem",
+                      cursor: "pointer",
+                      padding: 0,
+                      textAlign: "left",
+                      transition: "color 0.2s ease",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = "#A9A29A")}
+                  >
+                    {item.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Col 4: Assurance Badges */}
+          <div>
+            <h4
+              style={{
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "var(--accent-gold)",
+                marginBottom: "1.25rem",
+              }}
+            >
+              The Evara Promise
+            </h4>
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
+                <Truck size={18} style={{ color: "var(--accent-gold)", flexShrink: 0, marginTop: "2px" }} />
+                <div>
+                  <strong style={{ fontSize: "0.82rem", color: "#FFFFFF", display: "block" }}>Free Pan-India Delivery</strong>
+                  <span style={{ fontSize: "0.75rem", color: "#A9A29A" }}>Insured delivery to 28,000+ pin codes.</span>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
+                <ShieldCheck size={18} style={{ color: "var(--accent-gold)", flexShrink: 0, marginTop: "2px" }} />
+                <div>
+                  <strong style={{ fontSize: "0.82rem", color: "#FFFFFF", display: "block" }}>COD & 10% Prepaid Off</strong>
+                  <span style={{ fontSize: "0.75rem", color: "#A9A29A" }}>Instant savings on UPI and card orders.</span>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
+                <RefreshCw size={18} style={{ color: "var(--accent-gold)", flexShrink: 0, marginTop: "2px" }} />
+                <div>
+                  <strong style={{ fontSize: "0.82rem", color: "#FFFFFF", display: "block" }}>7-Day Easy Exchange</strong>
+                  <span style={{ fontSize: "0.75rem", color: "#A9A29A" }}>Doorstep reverse pickup assistance.</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Bottom Bar */}
+        {/* Bottom Copyright & Disclaimer */}
         <div
           style={{
             paddingTop: "2.5rem",
             display: "flex",
             flexWrap: "wrap",
-            alignItems: "center",
             justifyContent: "space-between",
-            gap: "1.5rem",
-            fontSize: "0.75rem",
-            color: "var(--text-inverse-muted)",
+            alignItems: "center",
+            gap: "1rem",
+            fontSize: "0.78rem",
+            color: "#8E877F",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <ShieldCheck size={16} style={{ color: "var(--accent-gold)" }} />
-            <span>100% Certified Pure Handloom Silk Mark • Insured Worldwide Dispatch</span>
-          </div>
-
           <div>
-            <span>{siteSettings.copyrightText || "© 2026 EVARA VASTRA SAREES. HANDWOVEN IN INDIA."}</span>
+            © 2026 EVARA VASTRA. ALL RIGHTS RESERVED. SURAT, GUJARAT, INDIA.
+          </div>
+          <div style={{ display: "flex", gap: "1.5rem" }}>
+            <button onClick={() => onNavigate("/privacy")} style={{ background: "none", border: "none", color: "#8E877F", cursor: "pointer", fontSize: "0.78rem" }}>
+              Privacy
+            </button>
+            <button onClick={() => onNavigate("/terms")} style={{ background: "none", border: "none", color: "#8E877F", cursor: "pointer", fontSize: "0.78rem" }}>
+              Terms
+            </button>
+            <button onClick={() => onNavigate("/admin")} style={{ background: "none", border: "none", color: "var(--accent-gold)", cursor: "pointer", fontSize: "0.78rem", fontWeight: 600 }}>
+              Admin Portal
+            </button>
           </div>
         </div>
       </div>

@@ -23,7 +23,7 @@ export const AdminCategoriesPage: React.FC<{ onNavigate: (href: string) => void 
       setForm({
         name: cat.name,
         slug: cat.slug,
-        shortDescription: cat.shortDescription,
+        shortDescription: cat.shortDescription || cat.description || "",
         image: cat.image,
         isEnabled: cat.isEnabled,
       });

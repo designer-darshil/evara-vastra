@@ -4,6 +4,8 @@ import { Product } from "../types";
 export interface CartItem {
   product: Product;
   quantity: number;
+  selectedSize?: string;
+  selectedColor?: string;
   blouseOptIn?: boolean;
 }
 
@@ -24,7 +26,12 @@ interface ShopContextType {
   cursorLabel: string | null;
 
   // Cart operations
-  addToCart: (product: Product, quantity?: number, blouseOptIn?: boolean) => void;
+  addToCart: (
+    product: Product,
+    quantity?: number,
+    selectedSizeOrBlouse?: string | boolean,
+    selectedColor?: string
+  ) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -117,25 +124,34 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Cart operations
-  const addToCart = (product: Product, quantity: number = 1, blouseOptIn: boolean = false) => {
+  const addToCart = (
+    product: Product,
+    quantity: number = 1,
+    selectedSizeOrBlouse?: string | boolean,
+    selectedColor?: string
+  ) => {
+    const size = typeof selectedSizeOrBlouse === "string" ? selectedSizeOrBlouse : undefined;
+    const blouseOptIn = typeof selectedSizeOrBlouse === "boolean" ? selectedSizeOrBlouse : false;
+
     setCart((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
+      const existing = prev.find((item) => item.product.id === product.id && item.selectedSize === size);
       if (existing) {
         return prev.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + quantity, blouseOptIn }
+          item.product.id === product.id && item.selectedSize === size
+            ? { ...item, quantity: item.quantity + quantity, blouseOptIn, selectedColor: selectedColor || item.selectedColor }
             : item
         );
       }
-      return [...prev, { product, quantity, blouseOptIn }];
+      return [...prev, { product, quantity, blouseOptIn, selectedSize: size, selectedColor }];
     });
-    showToast(`Added "${product.title}" to your shopping bag.`, "cart");
+
+    showToast(`Added "${product.title}" to shopping bag.`, "cart");
     setIsCartDrawerOpen(true);
   };
 
   const removeFromCart = (productId: string) => {
     setCart((prev) => prev.filter((item) => item.product.id !== productId));
-    showToast("Item removed from your bag.", "info");
+    showToast("Item removed from bag.", "info");
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
@@ -154,45 +170,53 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCart([]);
   };
 
+  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+
+  const cartSubtotal = cart.reduce(
+    (total, item) => total + item.product.price * item.quantity,
+    0
+  );
+
   // Wishlist operations
   const toggleWishlist = (productId: string) => {
-    const isCurrentlySaved = wishlist.includes(productId);
-    if (isCurrentlySaved) {
-      setWishlist((prev) => prev.filter((id) => id !== productId));
-      showToast("Removed from your saved pieces.", "wishlist");
-    } else {
-      setWishlist((prev) => [...prev, productId]);
-      showToast("Added to your saved pieces.", "wishlist");
-    }
+    setWishlist((prev) => {
+      const exists = prev.includes(productId);
+      if (exists) {
+        showToast("Removed from wishlist.", "wishlist");
+        return prev.filter((id) => id !== productId);
+      } else {
+        showToast("Saved to your personal wishlist.", "wishlist");
+        return [...prev, productId];
+      }
+    });
   };
 
   const isInWishlist = (productId: string) => wishlist.includes(productId);
 
-  // Recently viewed
-  const addRecentlyViewed = (productId: string) => {
-    setRecentlyViewed((prev) => {
-      const filtered = prev.filter((id) => id !== productId);
-      const updated = [productId, ...filtered].slice(0, 6);
-      try {
-        localStorage.setItem("evara_recently_viewed", JSON.stringify(updated));
-      } catch {}
-      return updated;
-    });
-  };
+  const wishlistCount = wishlist.length;
 
+  // Search & Drawer Modals
   const openSearch = () => setIsSearchOpen(true);
   const closeSearch = () => setIsSearchOpen(false);
+
   const openCartDrawer = () => setIsCartDrawerOpen(true);
   const closeCartDrawer = () => setIsCartDrawerOpen(false);
+
   const openQuickView = (product: Product) => setQuickViewProduct(product);
   const closeQuickView = () => setQuickViewProduct(null);
 
-  const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
-  const cartSubtotal = cart.reduce(
-    (acc, item) => acc + item.product.price * item.quantity,
-    0
-  );
-  const wishlistCount = wishlist.length;
+  const addRecentlyViewed = (productId: string) => {
+    setRecentlyViewed((prev) => {
+      const filtered = prev.filter((id) => id !== productId);
+      const updated = [productId, ...filtered].slice(0, 8);
+      try {
+        localStorage.setItem("evara_recently_viewed", JSON.stringify(updated));
+      } catch (e) {
+        console.error(e);
+      }
+      return updated;
+    });
+  };
 
   return (
     <ShopContext.Provider
@@ -205,21 +229,25 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
         quickViewProduct,
         toasts,
         cursorLabel,
+
         addToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
         cartCount,
         cartSubtotal,
+
         toggleWishlist,
         isInWishlist,
         wishlistCount,
+
         openSearch,
         closeSearch,
         openCartDrawer,
         closeCartDrawer,
         openQuickView,
         closeQuickView,
+
         showToast,
         setCursorLabel,
         addRecentlyViewed,

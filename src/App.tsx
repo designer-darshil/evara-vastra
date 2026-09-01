@@ -27,14 +27,15 @@ import { WishlistPage } from "./pages/WishlistPage";
 import { AccountPage } from "./pages/AccountPage";
 import { OrdersPage } from "./pages/OrdersPage";
 import { AboutPage } from "./pages/AboutPage";
-import { CraftsmanshipPage } from "./pages/CraftsmanshipPage";
-import { LookbookPage } from "./pages/LookbookPage";
 import { ContactPage } from "./pages/ContactPage";
 import { FaqPage } from "./pages/FaqPage";
+import { ShippingPolicyPage } from "./pages/ShippingPolicyPage";
+import { ReturnsPolicyPage } from "./pages/ReturnsPolicyPage";
+import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
+import { TermsPage } from "./pages/TermsPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 
-// Admin Panel Components & Pages
-import { AdminLayout } from "./admin/AdminLayout";
+// Admin Panel Pages
 import { AdminLoginPage } from "./admin/AdminLoginPage";
 import { AdminDashboardPage } from "./admin/AdminDashboardPage";
 import { AdminProductsPage } from "./admin/AdminProductsPage";
@@ -47,9 +48,9 @@ import { AdminCustomersPage } from "./admin/AdminCustomersPage";
 import { AdminContentHubPage } from "./admin/AdminContentHubPage";
 import { AdminHomepageCMSPage } from "./admin/AdminHomepageCMSPage";
 import { AdminNotificationBarPage } from "./admin/AdminNotificationBarPage";
-import { AdminLookbookPage } from "./admin/AdminLookbookPage";
-import { AdminCraftsmanshipCMSPage } from "./admin/AdminCraftsmanshipCMSPage";
-import { AdminFaqCMSPage } from "./admin/AdminFaqCMSPage";
+import { AdminShoppableVideosPage } from "./admin/AdminShoppableVideosPage";
+import { AdminReviewsPage } from "./admin/AdminReviewsPage";
+import { AdminNavigationPage } from "./admin/AdminNavigationPage";
 import { AdminCouponsPage } from "./admin/AdminCouponsPage";
 import { AdminMediaPage } from "./admin/AdminMediaPage";
 import { AdminSettingsPage } from "./admin/AdminSettingsPage";
@@ -70,10 +71,9 @@ const AppContent: React.FC = () => {
 
     window.addEventListener("popstate", handleLocationChange);
 
-    // Initial brief luxury loader
     const timer = setTimeout(() => {
       setIsAppLoading(false);
-    }, 600);
+    }, 450);
 
     return () => {
       window.removeEventListener("popstate", handleLocationChange);
@@ -91,13 +91,13 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     const path = currentPath;
     if (path.startsWith("/admin")) {
-      document.title = "Atelier Admin | EVARA VASTRA Management Suite";
+      document.title = "Atelier Admin Suite | EVARA VASTRA";
     } else if (path === "/") {
-      document.title = siteSettings.seoDefaultTitle || "EVARA VASTRA — Contemporary Indian Sarees | Modern Luxury Handlooms";
+      document.title = siteSettings.seoDefaultTitle || "EVARA VASTRA — Contemporary Indian Womenswear | Sarees, Co-Ords & Kurta Sets";
     } else if (path.startsWith("/shop")) {
-      document.title = "Shop Handloom Sarees | EVARA VASTRA";
+      document.title = "Shop Catalog | EVARA VASTRA";
     } else if (path.startsWith("/product/")) {
-      document.title = "Saree Drape | EVARA VASTRA";
+      document.title = "Product Details | EVARA VASTRA";
     } else if (path.startsWith("/collections")) {
       document.title = "Curated Collections | EVARA VASTRA";
     } else if (path === "/cart") {
@@ -105,13 +105,17 @@ const AppContent: React.FC = () => {
     } else if (path === "/checkout") {
       document.title = "Express Checkout | EVARA VASTRA";
     } else if (path === "/orders") {
-      document.title = "My Orders & Tracking | EVARA VASTRA";
-    } else if (path === "/lookbook") {
-      document.title = "Season Lookbook | EVARA VASTRA";
-    } else if (path === "/craftsmanship") {
-      document.title = "Artisanal Craftsmanship | EVARA VASTRA";
+      document.title = "Track Orders | EVARA VASTRA";
+    } else if (path === "/shipping") {
+      document.title = "Shipping Policy | EVARA VASTRA";
+    } else if (path === "/returns") {
+      document.title = "Replacement & Exchange Policy | EVARA VASTRA";
+    } else if (path === "/privacy") {
+      document.title = "Privacy Policy | EVARA VASTRA";
+    } else if (path === "/terms") {
+      document.title = "Terms of Service | EVARA VASTRA";
     } else {
-      document.title = "EVARA VASTRA — Contemporary Indian Sarees";
+      document.title = "EVARA VASTRA — Contemporary Indian Womenswear";
     }
   }, [currentPath, siteSettings.seoDefaultTitle]);
 
@@ -124,55 +128,67 @@ const AppContent: React.FC = () => {
       return <AdminLoginPage onNavigate={navigate} />;
     }
 
-    let adminPageContent: React.ReactNode = <AdminDashboardPage onNavigate={navigate} />;
-
     if (currentPath === "/admin" || currentPath === "/admin/") {
-      adminPageContent = <AdminDashboardPage onNavigate={navigate} />;
-    } else if (currentPath === "/admin/products") {
-      adminPageContent = <AdminProductsPage onNavigate={navigate} />;
-    } else if (currentPath === "/admin/products/new") {
-      adminPageContent = <AdminProductEditPage onNavigate={navigate} />;
-    } else if (currentPath.startsWith("/admin/products/edit/")) {
+      return <AdminDashboardPage onNavigate={navigate} />;
+    }
+    if (currentPath === "/admin/products") {
+      return <AdminProductsPage onNavigate={navigate} />;
+    }
+    if (currentPath === "/admin/products/new") {
+      return <AdminProductEditPage onNavigate={navigate} />;
+    }
+    if (currentPath.startsWith("/admin/products/edit/")) {
       const prodId = currentPath.replace("/admin/products/edit/", "");
-      adminPageContent = <AdminProductEditPage productId={prodId} onNavigate={navigate} />;
-    } else if (currentPath === "/admin/categories") {
-      adminPageContent = <AdminCategoriesPage onNavigate={navigate} />;
-    } else if (currentPath === "/admin/collections") {
-      adminPageContent = <AdminCollectionsPage onNavigate={navigate} />;
-    } else if (currentPath === "/admin/orders") {
-      adminPageContent = <AdminOrdersPage onNavigate={navigate} />;
-    } else if (currentPath.startsWith("/admin/orders/")) {
+      return <AdminProductEditPage productId={prodId} onNavigate={navigate} />;
+    }
+    if (currentPath === "/admin/categories") {
+      return <AdminCategoriesPage onNavigate={navigate} />;
+    }
+    if (currentPath === "/admin/collections") {
+      return <AdminCollectionsPage onNavigate={navigate} />;
+    }
+    if (currentPath === "/admin/shoppable-videos") {
+      return <AdminShoppableVideosPage onNavigate={navigate} />;
+    }
+    if (currentPath === "/admin/reviews") {
+      return <AdminReviewsPage onNavigate={navigate} />;
+    }
+    if (currentPath === "/admin/navigation") {
+      return <AdminNavigationPage onNavigate={navigate} />;
+    }
+    if (currentPath === "/admin/orders") {
+      return <AdminOrdersPage onNavigate={navigate} />;
+    }
+    if (currentPath.startsWith("/admin/orders/")) {
       const ordId = currentPath.replace("/admin/orders/", "");
-      adminPageContent = <AdminOrderDetailPage orderId={ordId} onNavigate={navigate} />;
-    } else if (currentPath === "/admin/customers") {
-      adminPageContent = <AdminCustomersPage onNavigate={navigate} />;
-    } else if (currentPath === "/admin/content") {
-      adminPageContent = <AdminContentHubPage onNavigate={navigate} />;
-    } else if (currentPath === "/admin/content/homepage") {
-      adminPageContent = <AdminHomepageCMSPage onNavigate={navigate} />;
-    } else if (currentPath === "/admin/content/notification-bar") {
-      adminPageContent = <AdminNotificationBarPage onNavigate={navigate} />;
-    } else if (currentPath === "/admin/lookbook") {
-      adminPageContent = <AdminLookbookPage onNavigate={navigate} />;
-    } else if (currentPath === "/admin/content/craftsmanship") {
-      adminPageContent = <AdminCraftsmanshipCMSPage onNavigate={navigate} />;
-    } else if (currentPath === "/admin/content/faq") {
-      adminPageContent = <AdminFaqCMSPage onNavigate={navigate} />;
-    } else if (currentPath === "/admin/coupons") {
-      adminPageContent = <AdminCouponsPage onNavigate={navigate} />;
-    } else if (currentPath === "/admin/media") {
-      adminPageContent = <AdminMediaPage onNavigate={navigate} />;
-    } else if (currentPath === "/admin/settings") {
-      adminPageContent = <AdminSettingsPage onNavigate={navigate} />;
-    } else if (currentPath === "/admin/analytics") {
-      adminPageContent = <AdminAnalyticsPage onNavigate={navigate} />;
+      return <AdminOrderDetailPage orderId={ordId} onNavigate={navigate} />;
+    }
+    if (currentPath === "/admin/customers") {
+      return <AdminCustomersPage onNavigate={navigate} />;
+    }
+    if (currentPath === "/admin/content") {
+      return <AdminContentHubPage onNavigate={navigate} />;
+    }
+    if (currentPath === "/admin/content/homepage") {
+      return <AdminHomepageCMSPage onNavigate={navigate} />;
+    }
+    if (currentPath === "/admin/content/notification-bar" || currentPath === "/admin/notification-bar") {
+      return <AdminNotificationBarPage onNavigate={navigate} />;
+    }
+    if (currentPath === "/admin/coupons") {
+      return <AdminCouponsPage onNavigate={navigate} />;
+    }
+    if (currentPath === "/admin/media") {
+      return <AdminMediaPage onNavigate={navigate} />;
+    }
+    if (currentPath === "/admin/settings") {
+      return <AdminSettingsPage onNavigate={navigate} />;
+    }
+    if (currentPath === "/admin/analytics") {
+      return <AdminAnalyticsPage onNavigate={navigate} />;
     }
 
-    return (
-      <AdminLayout currentPath={currentPath} onNavigate={navigate}>
-        {adminPageContent}
-      </AdminLayout>
-    );
+    return <AdminDashboardPage onNavigate={navigate} />;
   };
 
   // Storefront Router
@@ -253,20 +269,28 @@ const AppContent: React.FC = () => {
       return <AboutPage onNavigate={navigate} />;
     }
 
-    if (currentPath === "/craftsmanship") {
-      return <CraftsmanshipPage onNavigate={navigate} />;
-    }
-
-    if (currentPath === "/lookbook") {
-      return <LookbookPage onNavigate={navigate} />;
-    }
-
     if (currentPath === "/contact") {
       return <ContactPage onNavigate={navigate} />;
     }
 
     if (currentPath === "/faq") {
       return <FaqPage onNavigate={navigate} />;
+    }
+
+    if (currentPath === "/shipping") {
+      return <ShippingPolicyPage onNavigate={navigate} />;
+    }
+
+    if (currentPath === "/returns") {
+      return <ReturnsPolicyPage onNavigate={navigate} />;
+    }
+
+    if (currentPath === "/privacy") {
+      return <PrivacyPolicyPage onNavigate={navigate} />;
+    }
+
+    if (currentPath === "/terms") {
+      return <TermsPage onNavigate={navigate} />;
     }
 
     return <NotFoundPage onNavigate={navigate} />;

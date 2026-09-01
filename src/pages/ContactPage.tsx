@@ -1,19 +1,20 @@
 import React, { useState } from "react";
-import { siteConfig } from "../data/site";
+import { useData } from "../context/DataContext";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { useShop } from "../context/ShopContext";
-import { MapPin, Phone, Mail, Clock, CheckCircle2, ArrowRight } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, CheckCircle2, MessageCircle, Send } from "lucide-react";
 
 export const ContactPage: React.FC<{ onNavigate: (href: string) => void }> = ({
   onNavigate,
 }) => {
+  const { siteSettings } = useData();
   const { showToast } = useShop();
 
   const [form, setForm] = useState({
     name: "",
     email: "",
     phone: "",
-    subject: "Bridal Commission / Custom Weave Inquiry",
+    subject: "Order Inquiry / Size Assistance",
     message: "",
   });
 
@@ -27,19 +28,19 @@ export const ContactPage: React.FC<{ onNavigate: (href: string) => void }> = ({
     }
 
     setIsSubmitted(true);
-    showToast("Message received. Our concierge will be in touch shortly.", "info");
+    showToast("Message received! Our team will get back to you shortly.", "info");
   };
 
   return (
     <div className="animate-fade-in" style={{ paddingBottom: "7rem", paddingTop: "2.5rem" }}>
       <div className="container">
-        <Breadcrumbs items={[{ label: "Contact & Atelier Concierge" }]} onNavigate={onNavigate} />
+        <Breadcrumbs items={[{ label: "Contact Us & Support" }]} onNavigate={onNavigate} />
 
-        <div style={{ maxWidth: "720px", margin: "1rem 0 4rem 0" }}>
+        <div style={{ maxWidth: "720px", margin: "1rem 0 3.5rem 0" }}>
           <span
             style={{
               fontSize: "0.72rem",
-              fontWeight: 600,
+              fontWeight: 700,
               letterSpacing: "0.2em",
               textTransform: "uppercase",
               color: "var(--accent-wine)",
@@ -47,13 +48,13 @@ export const ContactPage: React.FC<{ onNavigate: (href: string) => void }> = ({
               marginBottom: "0.4rem",
             }}
           >
-            ATELIER APPOINTMENTS & CLIENT CARE
+            CUSTOMER CARE & INQUIRIES
           </span>
           <h1 className="font-serif" style={{ fontSize: "clamp(2.4rem, 4.5vw, 3.8rem)", color: "var(--text-primary)", lineHeight: 1.1 }}>
-            Let's Talk About Your Next Drape.
+            We're Here to Help.
           </h1>
           <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", marginTop: "0.5rem" }}>
-            Whether you seek bridal consultation, bespoke weave commissions, or styling guidance, our creative concierge is here to assist you.
+            Reach out to our customer care team for sizing recommendations, order tracking, bulk inquiries, or exchange support.
           </p>
         </div>
 
@@ -61,61 +62,87 @@ export const ContactPage: React.FC<{ onNavigate: (href: string) => void }> = ({
           style={{
             display: "grid",
             gridTemplateColumns: "0.85fr 1.15fr",
-            gap: "clamp(2rem, 5vw, 5rem)",
+            gap: "clamp(2rem, 5vw, 4rem)",
             alignItems: "start",
           }}
           className="contact-layout-grid"
         >
           {/* Left Studio Information */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
             <div
               style={{
                 backgroundColor: "#FFFFFF",
                 padding: "2rem",
                 border: "1px solid var(--border-subtle)",
+                borderRadius: "4px",
                 display: "flex",
                 flexDirection: "column",
                 gap: "1.5rem",
+                boxShadow: "var(--shadow-subtle)",
               }}
             >
-              <h3 className="font-serif" style={{ fontSize: "1.45rem" }}>
-                Mumbai Atelier & Studio
+              <h3 className="font-serif" style={{ fontSize: "1.45rem", margin: 0 }}>
+                Surat Atelier & Headquarters
               </h3>
 
-              <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.88rem", color: "var(--text-secondary)" }}>
                 <MapPin size={18} style={{ color: "var(--accent-wine)", flexShrink: 0, marginTop: "2px" }} />
-                <span>{siteConfig.contact.atelierAddress}</span>
+                <span>{siteSettings.atelierAddress}</span>
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", fontSize: "0.88rem", color: "var(--text-secondary)" }}>
                 <Phone size={18} style={{ color: "var(--accent-wine)", flexShrink: 0 }} />
-                <span>{siteConfig.contact.phone}</span>
+                <span>Customer Care: {siteSettings.phone}</span>
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", fontSize: "0.88rem", color: "var(--text-secondary)" }}>
                 <Mail size={18} style={{ color: "var(--accent-wine)", flexShrink: 0 }} />
-                <span>{siteConfig.contact.email}</span>
+                <span>Email: {siteSettings.email}</span>
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", fontSize: "0.88rem", color: "var(--text-secondary)" }}>
                 <Clock size={18} style={{ color: "var(--accent-gold)", flexShrink: 0 }} />
-                <span>{siteConfig.contact.hours}</span>
+                <span>Support Hours: Mon–Sat, 10:00 AM – 7:30 PM IST</span>
               </div>
             </div>
 
+            {/* Quick WhatsApp Card */}
             <div
               style={{
-                backgroundColor: "var(--bg-surface-subtle)",
-                padding: "1.5rem 2rem",
-                border: "1px solid var(--border-subtle)",
+                backgroundColor: "#E8F5E9",
+                padding: "1.75rem",
+                border: "1px solid #C8E6C9",
+                borderRadius: "4px",
               }}
             >
-              <h4 className="font-serif" style={{ fontSize: "1.2rem", marginBottom: "0.4rem" }}>
-                Private Bridal Draping Sessions
-              </h4>
-              <p style={{ fontSize: "0.825rem", color: "var(--text-secondary)", lineHeight: 1.6 }}>
-                Experience one-on-one appointments at our Mumbai studio with our master drape stylist. Appointments should be requested 48 hours in advance.
+              <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: "#1B5E20", marginBottom: "0.5rem" }}>
+                <MessageCircle size={22} />
+                <h4 style={{ fontSize: "1.1rem", fontWeight: 700, margin: 0 }}>
+                  Instant WhatsApp Assistance
+                </h4>
+              </div>
+              <p style={{ fontSize: "0.85rem", color: "#2E7D32", lineHeight: 1.5, margin: "0 0 1rem 0" }}>
+                Chat live with our product specialists for instant real photos, size guides, and order updates.
               </p>
+              <a
+                href={`https://wa.me/919274344037?text=${encodeURIComponent("Hi Evara Vastra, I need assistance with an order/product.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  backgroundColor: "#2E7D32",
+                  color: "#FFFFFF",
+                  padding: "0.6rem 1.25rem",
+                  borderRadius: "3px",
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                  textDecoration: "none",
+                }}
+              >
+                Chat on WhatsApp (+91-92743 44037)
+              </a>
             </div>
           </div>
 
@@ -126,6 +153,7 @@ export const ContactPage: React.FC<{ onNavigate: (href: string) => void }> = ({
               padding: "clamp(2rem, 4vw, 3rem)",
               border: "1px solid var(--border-subtle)",
               boxShadow: "var(--shadow-subtle)",
+              borderRadius: "4px",
             }}
           >
             {isSubmitted ? (
@@ -135,127 +163,133 @@ export const ContactPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                     width: "60px",
                     height: "60px",
                     borderRadius: "50%",
-                    backgroundColor: "rgba(35,78,62,0.1)",
-                    color: "#234E3E",
+                    backgroundColor: "#E8F5E9",
+                    color: "#2E7D32",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    margin: "0 auto 1.25rem auto",
+                    margin: "0 auto 1.5rem auto",
                   }}
                 >
                   <CheckCircle2 size={32} />
                 </div>
-                <h3 className="font-serif" style={{ fontSize: "1.85rem", color: "var(--text-primary)" }}>
-                  Message Received.
+                <h3 className="font-serif" style={{ fontSize: "1.85rem", marginBottom: "0.5rem" }}>
+                  Message Transmitted
                 </h3>
-                <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", maxWidth: "380px", margin: "0.5rem auto 1.5rem auto" }}>
-                  Thank you for reaching out to EVARA VASTRA. Our atelier concierge will review your inquiry and connect with you shortly.
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", lineHeight: 1.6, maxWidth: "400px", margin: "0 auto 2rem auto" }}>
+                  Thank you for writing to us. Our customer support concierge will respond to <strong>{form.email}</strong> within 12 hours.
                 </p>
                 <button
                   onClick={() => {
                     setIsSubmitted(false);
-                    setForm({ name: "", email: "", phone: "", subject: "Bridal Commission / Custom Weave Inquiry", message: "" });
+                    setForm({ name: "", email: "", phone: "", subject: "Order Inquiry", message: "" });
                   }}
-                  className="btn-secondary"
+                  className="btn btn-secondary"
                 >
                   Send Another Inquiry
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-                <h3 className="font-serif" style={{ fontSize: "1.6rem", marginBottom: "0.5rem" }}>
-                  Send an Inquiry
+              <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                <h3 className="font-serif" style={{ fontSize: "1.6rem", margin: 0 }}>
+                  Send an Online Inquiry
                 </h3>
 
                 <div>
-                  <label style={{ display: "block", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 600, color: "var(--text-muted)", marginBottom: "0.3rem" }}>
-                    Your Name *
+                  <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.4rem" }}>
+                    Full Name *
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Radhika Mehta"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    style={{ width: "100%", padding: "0.75rem", border: "1px solid var(--border-medium)", outline: "none" }}
+                    placeholder="e.g. Pooja Sharma"
+                    className="input-field"
+                    style={{ width: "100%" }}
                   />
                 </div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                   <div>
-                    <label style={{ display: "block", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 600, color: "var(--text-muted)", marginBottom: "0.3rem" }}>
+                    <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.4rem" }}>
                       Email Address *
                     </label>
                     <input
                       type="email"
                       required
-                      placeholder="radhika@example.com"
                       value={form.email}
                       onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      style={{ width: "100%", padding: "0.75rem", border: "1px solid var(--border-medium)", outline: "none" }}
+                      placeholder="pooja@gmail.com"
+                      className="input-field"
+                      style={{ width: "100%" }}
                     />
                   </div>
                   <div>
-                    <label style={{ display: "block", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 600, color: "var(--text-muted)", marginBottom: "0.3rem" }}>
-                      Phone / WhatsApp
+                    <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.4rem" }}>
+                      Phone / WhatsApp Number
                     </label>
                     <input
                       type="tel"
-                      placeholder="+91 98200 XXXXX"
                       value={form.phone}
                       onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      style={{ width: "100%", padding: "0.75rem", border: "1px solid var(--border-medium)", outline: "none" }}
+                      placeholder="+91 98450 12345"
+                      className="input-field"
+                      style={{ width: "100%" }}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label style={{ display: "block", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 600, color: "var(--text-muted)", marginBottom: "0.3rem" }}>
-                    Inquiry Subject
+                  <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.4rem" }}>
+                    Subject of Inquiry
                   </label>
                   <select
                     value={form.subject}
                     onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                    style={{ width: "100%", padding: "0.75rem", border: "1px solid var(--border-medium)", outline: "none", backgroundColor: "#FFFFFF" }}
+                    className="input-field"
+                    style={{ width: "100%" }}
                   >
-                    <option value="Bridal Commission / Custom Weave Inquiry">Bridal Commission / Custom Weave Inquiry</option>
-                    <option value="Studio Appointment Booking (Mumbai)">Studio Appointment Booking (Mumbai)</option>
-                    <option value="Order Tracking & Delivery Inquiry">Order Tracking & Delivery Inquiry</option>
-                    <option value="International Shipping Assistance">International Shipping Assistance</option>
-                    <option value="General Styling & Fabric Advice">General Styling & Fabric Advice</option>
+                    <option value="Order Inquiry / Size Assistance">Order Inquiry / Size Assistance</option>
+                    <option value="Exchange / Replacement Request">Exchange / Replacement Request</option>
+                    <option value="Bulk / Festive Event Orders">Bulk / Festive Event Orders</option>
+                    <option value="General Feedback">General Feedback</option>
                   </select>
                 </div>
 
                 <div>
-                  <label style={{ display: "block", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 600, color: "var(--text-muted)", marginBottom: "0.3rem" }}>
+                  <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.4rem" }}>
                     Your Message *
                   </label>
                   <textarea
-                    rows={4}
                     required
-                    placeholder="Tell us about your upcoming occasion, preferred drape color, or specific weaving question..."
+                    rows={5}
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    style={{ width: "100%", padding: "0.75rem", border: "1px solid var(--border-medium)", outline: "none" }}
+                    placeholder="Please include your order ID if you have an active order..."
+                    className="input-field"
+                    style={{ width: "100%", resize: "vertical" }}
                   />
                 </div>
 
-                <button type="submit" className="btn-wine" style={{ alignSelf: "flex-start", marginTop: "0.5rem" }}>
-                  Send Message <ArrowRight size={15} />
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  style={{
+                    padding: "0.9rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <Send size={16} /> Submit Message
                 </button>
               </form>
             )}
           </div>
         </div>
       </div>
-
-      <style>{`
-        @media (max-width: 860px) {
-          .contact-layout-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };

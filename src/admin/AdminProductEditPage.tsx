@@ -32,7 +32,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
     category: "silk",
     collection: "silk-edit",
     price: 12500,
-    compareAtPrice: null,
+    compareAtPrice: undefined,
     fabric: "Pure Mulberry Silk",
     color: "Wine",
     colorHex: "#7C2430",
@@ -406,7 +406,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
               <input
                 type="number"
                 value={formData.compareAtPrice || ""}
-                onChange={(e) => setFormData({ ...formData, compareAtPrice: e.target.value ? Number(e.target.value) : null })}
+                onChange={(e) => setFormData({ ...formData, compareAtPrice: e.target.value ? Number(e.target.value) : undefined })}
                 placeholder="Leave blank if not on promotion"
                 style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.95rem" }}
               />

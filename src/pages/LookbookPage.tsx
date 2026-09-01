@@ -127,7 +127,7 @@ export const LookbookPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                         <strong style={{ display: "block", fontSize: "0.95rem", color: "var(--text-primary)" }}>{look.productTitle}</strong>
                       </div>
                       <span style={{ fontSize: "1.1rem", fontWeight: 600, color: "var(--text-primary)" }}>
-                        {new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(look.productPrice)}
+                        {new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(look.productPrice || 0)}
                       </span>
                     </div>
 

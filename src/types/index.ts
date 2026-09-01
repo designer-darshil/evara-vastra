@@ -1,75 +1,296 @@
-export interface ProductDetails {
-  length: string;
-  width: string;
-  blousePiece: boolean;
-  blouseLength: string;
-  blouseDescription: string;
-  weaveType: string;
-  zariType?: string;
-  weight: string;
-  origin: string;
-  craftTime: string;
-  care: string;
-  palluDetails: string;
-  borderDetails: string;
-  boxIncludes: string;
-}
+// ==========================================
+// EVARA VASTRA — Complete Data Models
+// ==========================================
 
 export type ProductStatus = "published" | "draft" | "archived";
 
+export interface ProductVariant {
+  id: string;
+  title: string;
+  size?: string;
+  color?: string;
+  price: number;
+  compareAtPrice?: number;
+  inStock: boolean;
+  sku?: string;
+  featuredImage?: string;
+}
+
+export interface ProductDetails {
+  origin?: string;
+  fabric?: string;
+  craft?: string;
+  length?: string;
+  width?: string;
+  blousePiece?: boolean;
+  blouseLength?: string;
+  blouseDescription?: string;
+  care?: string;
+  packageDetails?: string;
+  topFabric?: string;
+  bottomFabric?: string;
+  dupattaFabric?: string;
+  work?: string;
+  weaveType?: string;
+  zariType?: string;
+  craftTime?: string;
+  weight?: string;
+  palluDetails?: string;
+  borderDetails?: string;
+  boxIncludes?: string;
+}
+
 export interface Product {
   id: string;
-  slug: string;
   title: string;
-  code: string;
-  category: string;
-  collection: string;
-  price: number;
-  compareAtPrice: number | null;
-  fabric: string;
-  color: string;
-  colorHex: string;
-  occasions: string[];
-  craft: string;
+  slug: string;
+  sku: string;
+  code?: string;
   description: string;
   shortDescription: string;
-  featured: boolean;
-  bestseller: boolean;
-  newArrival: boolean;
-  inStock: boolean;
-  inventoryCount: number;
-  status: ProductStatus;
+  price: number;
+  compareAtPrice?: number;
+  discountPercentage?: number;
   images: string[];
+  category: string;
+  collection?: string;
+  collections: string[];
+  variants: ProductVariant[];
+  sizes: string[];
+  colors: string[];
+  colorHex?: string;
+  fabric: string;
+  craft: string;
+  color: string;
+  occasions: string[];
+  inventory: number;
+  inventoryCount: number;
+  inStock: boolean;
+  status: ProductStatus;
+  featured: boolean;
+  newArrival: boolean;
+  bestseller: boolean;
+  tags: string[];
   details: ProductDetails;
-  stylingNotes: string;
-  drapeTip: string;
+  stylingNotes?: string;
+  drapeTip?: string;
   seoTitle?: string;
   seoDescription?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+  };
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Category {
   id: string;
-  slug: string;
   name: string;
-  shortDescription: string;
+  slug: string;
+  description?: string;
+  shortDescription?: string;
   image: string;
-  itemCount?: number;
+  order?: number;
   isEnabled: boolean;
+  productsCount?: number;
 }
 
 export interface Collection {
   id: string;
-  slug: string;
   title: string;
-  subtitle: string;
-  editorialStatement: string;
+  slug: string;
+  subtitle?: string;
+  season?: string;
+  editorialStatement?: string;
+  story?: string;
   heroImage: string;
-  story: string;
-  season: string;
+  productIds?: string[];
   isPublished: boolean;
-  featured?: boolean;
+  isFeaturedOnHome?: boolean;
+  order?: number;
+}
+
+export interface ShoppableVideo {
+  id: string;
+  title: string;
+  videoUrl: string;
+  thumbnailUrl: string;
+  productId: string;
+  productTitle: string;
+  productPrice: number;
+  productSlug: string;
+  ctaText: string;
+  isPublished: boolean;
+  order: number;
+}
+
+export interface Review {
+  id: string;
+  customerName: string;
+  rating: number;
+  title: string;
+  comment: string;
+  date: string;
+  isVerified: boolean;
+  productId?: string;
+  productTitle?: string;
+  status: "approved" | "pending" | "rejected";
+  isFeaturedOnHome: boolean;
+}
+
+export interface NavigationItem {
+  id: string;
+  label: string;
+  href: string;
+  isMegaMenu?: boolean;
+  order: number;
+  isEnabled: boolean;
+}
+
+export interface NotificationBarConfig {
+  isEnabled: boolean;
+  message: string;
+  link: string;
+  linkText: string;
+  backgroundStyle: "wine" | "dark" | "gold";
+  isDismissible: boolean;
+  showOnMobile: boolean;
+  showOnDesktop: boolean;
+}
+
+export interface TrustSignal {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  isEnabled: boolean;
+}
+
+export interface CraftsmanshipStep {
+  id: string;
+  step?: string;
+  stepNumber?: string;
+  title: string;
+  subtitle?: string;
+  description: string;
+  image: string;
+  details?: string[];
+}
+
+export interface CraftsmanshipCMS {
+  heroTitle?: string;
+  heroHeading?: string;
+  heroSubhead?: string;
+  heroSubtitle?: string;
+  introNarrative?: string;
+  heroImage: string;
+  steps: CraftsmanshipStep[];
+  manifesto?: string;
+}
+
+export interface LookbookItem {
+  id: string;
+  season?: string;
+  lookNumber?: string;
+  title: string;
+  subtitle?: string;
+  narrative?: string;
+  image: string;
+  location?: string;
+  sareeName?: string;
+  sareeSlug?: string;
+  productTitle?: string;
+  productPrice?: number;
+  productSlug?: string;
+  productFabric?: string;
+  stylingDetails?: string[];
+  palette?: string[];
+  isPublished: boolean;
+}
+
+export interface FAQItem {
+  id: string;
+  category: string;
+  question: string;
+  answer: string;
+  order: number;
+  isPublished?: boolean;
+  isEnabled?: boolean;
+}
+
+export interface HomepageCMS {
+  heroHeading: string;
+  heroAccentWord: string;
+  heroSubheading: string;
+  heroBadge: string;
+  heroCtaText: string;
+  heroCtaLink: string;
+  heroSecondaryCtaText: string;
+  heroSecondaryCtaLink: string;
+  primaryCtaText?: string;
+  primaryCtaLink?: string;
+  secondaryCtaText?: string;
+  secondaryCtaLink?: string;
+  heroImage: string;
+  featuredCategoryIds: string[];
+  featuredProductIds: string[];
+  newArrivalProductIds: string[];
+  premiumSareeCollectionSlug: string;
+  featuredCollectionSlug?: string;
+  whyChooseUsTitle: string;
+  whyChooseUsSubtitle: string;
+  trustSignals: TrustSignal[];
+  newsletterTitle: string;
+  newsletterSubtitle: string;
+  manifestoImage?: string;
+  manifestoLoomImage?: string;
+  manifestoQuote?: string;
+  manifestoNarrative1?: string;
+  manifestoNarrative2?: string;
+  sectionVisibility: {
+    notificationBar: boolean;
+    hero: boolean;
+    marquee: boolean;
+    categories: boolean;
+    newArrivals?: boolean;
+    featuredProducts?: boolean;
+    premiumSarees?: boolean;
+    otherCollections?: boolean;
+    whyChooseUs?: boolean;
+    shoppableVideos?: boolean;
+    reviews?: boolean;
+    trustSignals?: boolean;
+    newsletter: boolean;
+    featuredCollection?: boolean;
+    brandStory?: boolean;
+    fabricDiscovery?: boolean;
+    occasionGrid?: boolean;
+    lookbookTeaser?: boolean;
+    customerNotes?: boolean;
+  };
+}
+
+export interface SiteSettings {
+  name: string;
+  tagline: string;
+  slogan: string;
+  domain: string;
+  email: string;
+  phone: string;
+  whatsapp: string;
+  atelierAddress: string;
+  freeShippingThreshold: number;
+  prepaidDiscountPercentage: number;
+  standardShippingFee: number;
+  codAvailable: boolean;
+  returnWindowDays: number;
+  instagramUrl: string;
+  facebookUrl?: string;
+  youtubeUrl?: string;
+  copyrightText: string;
+  seoDefaultTitle: string;
+  seoDefaultDescription: string;
 }
 
 export type OrderStatus =
@@ -88,15 +309,18 @@ export interface OrderItem {
   price: number;
   quantity: number;
   image: string;
-  fabric: string;
+  variantTitle?: string;
+  fabric?: string;
+  size?: string;
+  color?: string;
   blouseOptIn?: boolean;
 }
 
 export interface OrderTimelineEvent {
   title: string;
   timestamp: string;
-  note?: string;
   completed: boolean;
+  note?: string;
 }
 
 export interface Order {
@@ -104,12 +328,6 @@ export interface Order {
   orderNumber: string;
   date: string;
   status: OrderStatus;
-  total: number;
-  subtotal: number;
-  shippingFee: number;
-  discount: number;
-  paymentMethod: string;
-  paymentStatus: "Paid" | "Pending" | "Cash on Delivery";
   customerName: string;
   customerEmail: string;
   customerPhone: string;
@@ -118,9 +336,16 @@ export interface Order {
   state: string;
   pincode: string;
   country: string;
-  trackingNumber: string;
+  paymentMethod: string;
+  paymentStatus: "Paid" | "Pending" | "Cash on Delivery" | "Refunded";
+  trackingNumber?: string;
   carrier?: string;
   items: OrderItem[];
+  subtotal: number;
+  discount: number;
+  shippingFee: number;
+  prepaidDiscount?: number;
+  total: number;
   timeline: OrderTimelineEvent[];
 }
 
@@ -132,6 +357,7 @@ export interface Customer {
   city: string;
   totalOrders: number;
   totalSpend: number;
+  lastOrderDate: string;
   joinedDate: string;
 }
 
@@ -147,115 +373,18 @@ export interface Coupon {
   usageCount: number;
 }
 
-export interface NotificationBarConfig {
-  isEnabled: boolean;
-  message: string;
-  link: string;
-  linkText: string;
-  backgroundStyle: "dark" | "wine" | "gold";
-  isDismissible: boolean;
-}
-
-export interface HomepageCMS {
-  heroHeading: string;
-  heroAccentWord: string;
-  heroSubheading: string;
-  heroBadge: string;
-  heroImage: string;
-  primaryCtaText: string;
-  primaryCtaLink: string;
-  secondaryCtaText: string;
-  secondaryCtaLink: string;
-  featuredCollectionSlug: string;
-  manifestoQuote: string;
-  manifestoNarrative1: string;
-  manifestoNarrative2: string;
-  manifestoImage: string;
-  manifestoLoomImage: string;
-  sectionVisibility: {
-    hero: boolean;
-    marquee: boolean;
-    categories: boolean;
-    featuredCollection: boolean;
-    brandStory: boolean;
-    fabricDiscovery: boolean;
-    occasionGrid: boolean;
-    lookbookTeaser: boolean;
-    customerNotes: boolean;
-    newsletter: boolean;
-  };
-}
-
-export interface CraftStep {
-  step: string;
-  title: string;
-  description: string;
-  image: string;
-}
-
-export interface CraftsmanshipCMS {
-  heroHeading: string;
-  heroSubhead: string;
-  introNarrative: string;
-  steps: CraftStep[];
-}
-
-export interface LookbookItem {
-  id: string;
-  lookNumber: string;
-  title: string;
-  season: string;
-  location: string;
-  narrative: string;
-  image: string;
-  productSlug: string;
-  productTitle: string;
-  productPrice: number;
-  productFabric: string;
-  stylingDetails: string[];
-  isPublished: boolean;
-}
-
-export interface FAQItem {
-  id: string;
-  question: string;
-  answer: string;
-  category: "shipping" | "craft" | "care" | "returns" | "blouse";
-  isEnabled: boolean;
-  order: number;
-}
-
 export interface MediaAsset {
   id: string;
   title: string;
   url: string;
-  category: "products" | "collections" | "hero" | "craft" | "editorial";
-  dimensions?: string;
+  category: "products" | "hero" | "videos" | "banners";
   createdAt: string;
-}
-
-export interface SiteSettings {
-  name: string;
-  tagline: string;
-  slogan: string;
-  email: string;
-  phone: string;
-  whatsapp: string;
-  atelierAddress: string;
-  hours: string;
-  currencySymbol: string;
-  currencyCode: string;
-  freeShippingThreshold: number;
-  standardShippingFee: number;
-  copyrightText: string;
-  seoDefaultTitle: string;
-  seoDefaultDescription: string;
 }
 
 export interface AdminUser {
   id: string;
   email: string;
   name: string;
-  role: "Administrator" | "Store Manager";
+  role: "superadmin" | "manager" | "editor";
   avatar?: string;
 }

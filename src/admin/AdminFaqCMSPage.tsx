@@ -24,7 +24,7 @@ export const AdminFaqCMSPage: React.FC<{ onNavigate: (href: string) => void }> =
         question: faq.question,
         answer: faq.answer,
         category: faq.category,
-        isEnabled: faq.isEnabled,
+        isEnabled: faq.isEnabled !== undefined ? faq.isEnabled : (faq.isPublished !== undefined ? faq.isPublished : true),
         order: faq.order,
       });
     } else {
@@ -32,7 +32,7 @@ export const AdminFaqCMSPage: React.FC<{ onNavigate: (href: string) => void }> =
       setForm({
         question: "",
         answer: "",
-        category: "shipping",
+        category: "Shipping & Delivery",
         isEnabled: true,
         order: faqs.length + 1,
       });
@@ -44,16 +44,22 @@ export const AdminFaqCMSPage: React.FC<{ onNavigate: (href: string) => void }> =
     e.preventDefault();
     if (!form.question || !form.answer) return;
 
+    const payload = {
+      ...form,
+      isPublished: form.isEnabled,
+    };
+
     if (editingFaq) {
-      updateFAQ(editingFaq.id, form);
+      updateFAQ(editingFaq.id, payload);
     } else {
-      addFAQ(form);
+      addFAQ(payload);
     }
     setIsModalOpen(false);
   };
 
   const handleToggleEnable = (faq: FAQItem) => {
-    updateFAQ(faq.id, { isEnabled: !faq.isEnabled });
+    const nextVal = !(faq.isEnabled !== undefined ? faq.isEnabled : faq.isPublished);
+    updateFAQ(faq.id, { isEnabled: nextVal, isPublished: nextVal });
   };
 
   return (
@@ -116,20 +122,25 @@ export const AdminFaqCMSPage: React.FC<{ onNavigate: (href: string) => void }> =
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <button
-                onClick={() => handleToggleEnable(faq)}
-                style={{
-                  fontSize: "0.7rem",
-                  fontWeight: 700,
-                  padding: "0.3rem 0.6rem",
-                  backgroundColor: faq.isEnabled ? "rgba(35,78,62,0.12)" : "#EFECE6",
-                  color: faq.isEnabled ? "#234E3E" : "#6F6257",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                {faq.isEnabled ? "ACTIVE" : "HIDDEN"}
-              </button>
+              {(() => {
+                const active = faq.isEnabled !== undefined ? faq.isEnabled : faq.isPublished;
+                return (
+                  <button
+                    onClick={() => handleToggleEnable(faq)}
+                    style={{
+                      fontSize: "0.7rem",
+                      fontWeight: 700,
+                      padding: "0.3rem 0.6rem",
+                      backgroundColor: active ? "rgba(35,78,62,0.12)" : "#EFECE6",
+                      color: active ? "#234E3E" : "#6F6257",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {active ? "ACTIVE" : "HIDDEN"}
+                  </button>
+                );
+              })()}
               <button
                 onClick={() => handleOpenModal(faq)}
                 style={{ padding: "0.4rem 0.6rem", fontSize: "0.75rem", border: "1px solid #D9D2C7", backgroundColor: "#FAF8F5", cursor: "pointer" }}

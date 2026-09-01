@@ -136,7 +136,7 @@ export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }>
                 </p>
                 <div style={{ backgroundColor: "#FAF8F5", padding: "0.6rem 0.75rem", border: "1px solid #EBE5DB", fontSize: "0.75rem" }}>
                   <span style={{ color: "#8E8276", display: "block" }}>Linked Saree:</span>
-                  <strong>{look.productTitle}</strong> (₹{look.productPrice.toLocaleString("en-IN")})
+                  <strong>{look.productTitle}</strong> {look.productPrice ? `(₹${look.productPrice.toLocaleString("en-IN")})` : ""}
                 </div>
               </div>
 

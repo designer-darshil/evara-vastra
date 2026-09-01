@@ -26,10 +26,10 @@ export const AdminCollectionsPage: React.FC<{ onNavigate: (href: string) => void
       setForm({
         title: col.title,
         slug: col.slug,
-        subtitle: col.subtitle,
-        editorialStatement: col.editorialStatement,
-        story: col.story,
-        season: col.season,
+        subtitle: col.subtitle || "",
+        editorialStatement: col.editorialStatement || "",
+        story: col.story || "",
+        season: col.season || "Autumn / Winter 2026",
         heroImage: col.heroImage,
         isPublished: col.isPublished,
       });

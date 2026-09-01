@@ -29,7 +29,7 @@ export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }>
         const q = searchQuery.toLowerCase();
         const matches =
           p.title.toLowerCase().includes(q) ||
-          p.code.toLowerCase().includes(q) ||
+          (p.code || p.sku || "").toLowerCase().includes(q) ||
           p.fabric.toLowerCase().includes(q);
         if (!matches) return false;
       }
@@ -247,7 +247,7 @@ export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }>
 
                   {/* SKU */}
                   <td style={{ padding: "0.85rem 1rem", color: "#6F6257", fontFamily: "monospace" }}>
-                    {p.code}
+                    {p.code || p.sku}
                   </td>
 
                   {/* Category */}

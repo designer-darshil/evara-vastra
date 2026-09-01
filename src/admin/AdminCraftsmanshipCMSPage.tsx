@@ -119,7 +119,7 @@ export const AdminCraftsmanshipCMSPage: React.FC<{ onNavigate: (href: string) =>
         {form.steps.map((step, idx) => (
           <div key={idx} style={{ backgroundColor: "#FFFFFF", padding: "1.5rem", border: "1px solid #E5DFD5", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-              <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#7C2430" }}>STEP {step.step}</span>
+              <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#7C2430" }}>STEP {step.step || step.stepNumber || idx + 1}</span>
               <div>
                 <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
                   Step Title
