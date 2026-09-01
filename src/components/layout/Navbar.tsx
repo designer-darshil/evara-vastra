@@ -70,7 +70,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
           className="header-inner"
         >
           {/* Left: Mobile Menu & Primary Links */}
-          <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", flex: 1 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "clamp(0.5rem, 2vw, 1.25rem)", flex: 1 }}>
             <button
               onClick={onOpenMobileMenu}
               aria-label="Open mobile navigation menu"
@@ -532,7 +532,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
                     top: "-2px",
                     right: "-2px",
                     backgroundColor: "var(--accent-wine)",
-                    color: "#FFFFFF",
+                    color: "var(--text-inverse)",
                     fontSize: "0.6rem",
                     fontWeight: 700,
                     width: "17px",
@@ -582,7 +582,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
                     top: "-2px",
                     right: "-2px",
                     backgroundColor: "var(--accent-wine)",
-                    color: "#FFFFFF",
+                    color: "var(--text-inverse)",
                     fontSize: "0.6rem",
                     fontWeight: 700,
                     width: "17px",
@@ -605,7 +605,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
               aria-label="Atelier Admin Suite"
               style={{
                 backgroundColor: isAdminAuthenticated ? "var(--accent-wine)" : "var(--bg-surface-subtle)",
-                color: isAdminAuthenticated ? "#FFFFFF" : "var(--text-secondary)",
+                color: isAdminAuthenticated ? "var(--text-inverse)" : "var(--text-secondary)",
                 border: "1px solid var(--border-subtle)",
                 borderRadius: "3px",
                 padding: "0.35rem 0.6rem",

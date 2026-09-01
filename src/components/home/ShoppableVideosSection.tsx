@@ -70,7 +70,7 @@ export const ShoppableVideosSection: React.FC<{ onNavigate: (href: string) => vo
                 borderRadius: "4px",
                 overflow: "hidden",
                 boxShadow: "var(--shadow-subtle)",
-                backgroundColor: "#1A1A1A",
+                backgroundColor: "var(--bg-dark-surface)",
                 cursor: "pointer",
                 transition: "transform 0.3s ease, box-shadow 0.3s ease",
               }}

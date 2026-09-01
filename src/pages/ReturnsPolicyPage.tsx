@@ -36,7 +36,7 @@ export const ReturnsPolicyPage: React.FC<{ onNavigate: (href: string) => void }>
         {/* Highlight Card */}
         <div
           style={{
-            backgroundColor: "#FFFFFF",
+            backgroundColor: "var(--bg-surface)",
             border: "1px solid var(--border-subtle)",
             padding: "2rem",
             boxShadow: "var(--shadow-subtle)",

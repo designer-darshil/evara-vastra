@@ -8,6 +8,8 @@
   --bg-primary: #F8F4EE;
   --bg-surface: #FFFFFF;
   --bg-surface-subtle: #F2ECE1;
+  --bg-surface-elevated: #FFFFFF;
+  --bg-muted: #FAF7F5;
   --bg-header: rgba(248, 244, 238, 0.96);
   --bg-header-scrolled: rgba(255, 255, 255, 0.98);
   --bg-dark: #171513;
@@ -32,6 +34,42 @@
   --border-subtle: rgba(23, 21, 19, 0.08);
   --border-medium: rgba(23, 21, 19, 0.16);
   --border-dark: rgba(248, 244, 238, 0.12);
+
+  /* Success / Status */
+  --success-bg: #E8F5E9;
+  --success-text: #2E7D32;
+  --whatsapp-bg: #2E7D32;
+
+  /* Overlay */
+  --overlay-bg: rgba(23, 21, 19, 0.6);
+  --overlay-heavy: rgba(23, 21, 19, 0.75);
+
+  /* Wishlist button on product images */
+  --wishlist-btn-bg: rgba(255, 255, 255, 0.9);
+  --wishlist-btn-border: rgba(0, 0, 0, 0.06);
+  --wishlist-btn-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+  /* Hero floating badge */
+  --hero-badge-bg: rgba(248, 244, 238, 0.95);
+  --hero-badge-border: rgba(177, 138, 82, 0.3);
+
+  /* Footer (intentionally dark in light mode) */
+  --footer-bg: #171513;
+  --footer-text: #EBE6DF;
+  --footer-text-muted: #A9A29A;
+  --footer-text-secondary: #C5BEB5;
+  --footer-heading: #FFFFFF;
+  --footer-border: rgba(255, 255, 255, 0.08);
+  --footer-copyright: #8E877F;
+
+  /* Admin panel */
+  --admin-bg: #F7F5F0;
+  --admin-surface: #FFFFFF;
+  --admin-surface-subtle: #FAF8F5;
+  --admin-border: #E5DFD5;
+  --admin-text: #171513;
+  --admin-text-secondary: #6F6257;
+  --admin-text-muted: #8E877F;
 
   /* Typography */
   --font-serif: 'Cormorant Garamond', Georgia, serif;
@@ -59,6 +97,8 @@
   --bg-primary: #12100E;
   --bg-surface: #1C1917;
   --bg-surface-subtle: #24201D;
+  --bg-surface-elevated: #24201D;
+  --bg-muted: #1C1917;
   --bg-header: rgba(18, 16, 14, 0.96);
   --bg-header-scrolled: rgba(28, 25, 23, 0.98);
   --bg-dark: #0A0908;
@@ -83,6 +123,42 @@
   --border-subtle: rgba(248, 244, 238, 0.1);
   --border-medium: rgba(248, 244, 238, 0.18);
   --border-dark: rgba(248, 244, 238, 0.18);
+
+  /* Success / Status */
+  --success-bg: rgba(46, 125, 50, 0.2);
+  --success-text: #81C784;
+  --whatsapp-bg: #2E7D32;
+
+  /* Overlay */
+  --overlay-bg: rgba(0, 0, 0, 0.65);
+  --overlay-heavy: rgba(0, 0, 0, 0.8);
+
+  /* Wishlist button on product images */
+  --wishlist-btn-bg: rgba(28, 25, 23, 0.85);
+  --wishlist-btn-border: rgba(255, 255, 255, 0.1);
+  --wishlist-btn-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+
+  /* Hero floating badge */
+  --hero-badge-bg: rgba(28, 25, 23, 0.92);
+  --hero-badge-border: rgba(205, 176, 123, 0.3);
+
+  /* Footer (stays dark, slightly different shade) */
+  --footer-bg: #0E0D0B;
+  --footer-text: #D8D2CB;
+  --footer-text-muted: #8E877F;
+  --footer-text-secondary: #A9A29A;
+  --footer-heading: #F5EFEB;
+  --footer-border: rgba(255, 255, 255, 0.08);
+  --footer-copyright: #6B655E;
+
+  /* Admin panel */
+  --admin-bg: #12100E;
+  --admin-surface: #1C1917;
+  --admin-surface-subtle: #24201D;
+  --admin-border: rgba(248, 244, 238, 0.1);
+  --admin-text: #F5EFEB;
+  --admin-text-secondary: #C8BFB5;
+  --admin-text-muted: #8E8276;
 
   --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.35);
   --shadow-medium: 0 12px 32px rgba(0, 0, 0, 0.5);
@@ -112,7 +188,6 @@ body {
   line-height: 1.6;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  overflow-x: hidden;
   min-height: 100vh;
   transition: background-color var(--transition-smooth), color var(--transition-smooth);
 }
@@ -398,8 +473,96 @@ img {
   animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Responsive & Mobile Specific Polish */
-@media (max-width: 768px) {
+/* ==========================================================================
+   RESPONSIVE LAYOUT UTILITIES
+   ========================================================================== */
+
+/* Hero Grid */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+}
+
+/* PDP Layout Grid */
+.pdp-layout-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: start;
+}
+
+/* Gallery Layout Grid */
+.gallery-layout-grid {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 0.75rem;
+}
+
+/* Gallery Thumbs */
+.gallery-thumbs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 560px;
+  overflow-y: auto;
+}
+
+/* Shop Main Grid (sidebar + product grid) */
+.shop-main-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* Cart Grid */
+.cart-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 3rem;
+  align-items: start;
+}
+
+.cart-item-row {
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+/* Checkout Grid */
+.checkout-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+/* Product Grid — fluid columns */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: clamp(0.85rem, 2vw, 1.5rem);
+}
+
+/* Mobile Filter Button — hidden on desktop, shown on mobile */
+.mobile-filter-btn {
+  display: none;
+}
+
+/* Desktop Filter Sidebar */
+.desktop-filter-sidebar {
+  display: block;
+}
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+
+/* Mobile: up to 640px */
+@media (max-width: 640px) {
   .desktop-only {
     display: none !important;
   }
@@ -408,16 +571,10 @@ img {
     display: flex !important;
   }
 
-  /* Compact section spacing */
+  /* Responsive section spacing */
   section {
-    padding-top: 3rem !important;
-    padding-bottom: 3rem !important;
-  }
-
-  /* 2-column mobile product grid with clean gap */
-  .mobile-product-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 0.85rem !important;
+    padding-top: clamp(2rem, 6vw, 3rem);
+    padding-bottom: clamp(2rem, 6vw, 3rem);
   }
 
   .btn {
@@ -425,34 +582,141 @@ img {
     font-size: 0.8rem;
   }
 
+  /* Hero */
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  /* PDP */
   .pdp-layout-grid {
-    grid-template-columns: 1fr !important;
-    gap: 1.75rem !important;
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
   }
 
   .gallery-layout-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr;
   }
 
   .gallery-thumbs {
-    flex-direction: row !important;
-    max-height: none !important;
-    overflow-x: auto !important;
+    flex-direction: row;
+    max-height: none;
+    overflow-x: auto;
   }
 
   .gallery-thumbs button {
-    width: 64px !important;
-    min-width: 64px !important;
+    width: 64px;
+    min-width: 64px;
+  }
+
+  /* Shop */
+  .shop-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .desktop-filter-sidebar {
+    display: none;
+  }
+
+  .mobile-filter-btn {
+    display: inline-flex;
+  }
+
+  /* Product grid: 2 columns on mobile */
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
+  }
+
+  /* Cart */
+  .cart-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .cart-item-row {
+    grid-template-columns: 80px 1fr;
+  }
+
+  /* Checkout */
+  .checkout-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  /* Header */
+  .header-inner {
+    height: var(--header-height-mobile);
+  }
+
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
   }
 }
 
-@media (min-width: 769px) {
+/* Tablet: 641px to 1024px */
+@media (min-width: 641px) and (max-width: 1024px) {
   .mobile-only {
     display: none !important;
   }
 
   .desktop-only {
     display: flex !important;
+  }
+
+  section {
+    padding-top: clamp(3rem, 5vw, 4rem);
+    padding-bottom: clamp(3rem, 5vw, 4rem);
+  }
+
+  .hero-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+  }
+
+  .pdp-layout-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .shop-main-grid {
+    grid-template-columns: 220px 1fr;
+    gap: 2rem;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+
+  .cart-grid {
+    grid-template-columns: 1fr 320px;
+    gap: 2rem;
+  }
+
+  .checkout-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+}
+
+/* Desktop: 1025px+ */
+@media (min-width: 1025px) {
+  .mobile-only {
+    display: none !important;
+  }
+
+  .desktop-only {
+    display: flex !important;
+  }
+}
+
+/* Large Desktop: 1440px+ — cap widths */
+@media (min-width: 1440px) {
+  .product-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 

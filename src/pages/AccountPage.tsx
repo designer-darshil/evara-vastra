@@ -67,7 +67,7 @@ export const AccountPage: React.FC<{ onNavigate: (href: string) => void }> = ({
           {/* Left Account Navigation */}
           <aside
             style={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--bg-surface)",
               border: "1px solid var(--border-subtle)",
               padding: "1.5rem",
               display: "flex",
@@ -132,7 +132,7 @@ export const AccountPage: React.FC<{ onNavigate: (href: string) => void }> = ({
           {/* Right Tab Content */}
           <main
             style={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--bg-surface)",
               border: "1px solid var(--border-subtle)",
               padding: "2.5rem",
               boxShadow: "var(--shadow-subtle)",

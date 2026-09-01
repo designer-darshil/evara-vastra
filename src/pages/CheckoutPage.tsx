@@ -105,7 +105,7 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
         <div className="container" style={{ maxWidth: "680px" }}>
           <div
             style={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--bg-surface)",
               padding: "clamp(2rem, 5vw, 3.5rem)",
               border: "1px solid var(--border-subtle)",
               boxShadow: "var(--shadow-medium)",
@@ -215,7 +215,7 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
             style={{
               padding: "4rem 2rem",
               textAlign: "center",
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--bg-surface)",
               border: "1px solid var(--border-subtle)",
             }}
           >
@@ -230,18 +230,12 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
         ) : (
           <form onSubmit={handleSubmitOrder}>
             <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1.35fr 0.65fr",
-                gap: "3.5rem",
-                alignItems: "start",
-              }}
-              className="checkout-layout-grid"
+              className="checkout-grid"
             >
               {/* Left Form Inputs */}
               <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
                 {/* 1. Contact Info */}
-                <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid var(--border-subtle)" }}>
+                <div style={{ backgroundColor: "var(--bg-surface)", padding: "2rem", border: "1px solid var(--border-subtle)" }}>
                   <h3 className="font-serif" style={{ fontSize: "1.35rem", marginBottom: "1.25rem", color: "var(--text-primary)" }}>
                     1. Contact Information
                   </h3>
@@ -302,7 +296,7 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                 </div>
 
                 {/* 2. Delivery Address */}
-                <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid var(--border-subtle)" }}>
+                <div style={{ backgroundColor: "var(--bg-surface)", padding: "2rem", border: "1px solid var(--border-subtle)" }}>
                   <h3 className="font-serif" style={{ fontSize: "1.35rem", marginBottom: "1.25rem", color: "var(--text-primary)" }}>
                     2. Shipping Address
                   </h3>
@@ -363,7 +357,7 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                 </div>
 
                 {/* 3. Payment Method */}
-                <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid var(--border-subtle)" }}>
+                <div style={{ backgroundColor: "var(--bg-surface)", padding: "2rem", border: "1px solid var(--border-subtle)" }}>
                   <h3 className="font-serif" style={{ fontSize: "1.35rem", marginBottom: "1.25rem", color: "var(--text-primary)" }}>
                     3. Payment Preference
                   </h3>
@@ -411,7 +405,7 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
               {/* Right Order Summary & Confirm */}
               <div
                 style={{
-                  backgroundColor: "#FFFFFF",
+                  backgroundColor: "var(--bg-surface)",
                   padding: "2rem",
                   border: "1px solid var(--border-subtle)",
                   boxShadow: "var(--shadow-subtle)",
@@ -486,13 +480,7 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
         )}
       </div>
 
-      <style>{`
-        @media (max-width: 900px) {
-          .checkout-layout-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
+
     </div>
   );
 };

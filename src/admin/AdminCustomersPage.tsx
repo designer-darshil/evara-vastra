@@ -31,7 +31,7 @@ export const AdminCustomersPage: React.FC<{ onNavigate: (href: string) => void }
         <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7C2430", display: "block" }}>
           PATRON DIRECTORY
         </span>
-        <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "#171513", margin: "0.2rem 0 0 0" }}>
+        <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: "0.2rem 0 0 0" }}>
           Client Accounts ({customers.length})
         </h1>
         <p style={{ fontSize: "0.8rem", color: "#8E8276", margin: "0.25rem 0 0 0" }}>
@@ -42,9 +42,9 @@ export const AdminCustomersPage: React.FC<{ onNavigate: (href: string) => void }
       {/* Search Bar */}
       <div
         style={{
-          backgroundColor: "#FFFFFF",
+          backgroundColor: "var(--admin-surface)",
           padding: "1rem 1.25rem",
-          border: "1px solid #E5DFD5",
+          border: "1px solid var(--admin-border)",
           display: "flex",
           alignItems: "center",
           gap: "0.75rem",
@@ -61,10 +61,10 @@ export const AdminCustomersPage: React.FC<{ onNavigate: (href: string) => void }
       </div>
 
       {/* Customers Table */}
-      <div style={{ backgroundColor: "#FFFFFF", border: "1px solid #E5DFD5", overflowX: "auto" }}>
+      <div style={{ backgroundColor: "var(--admin-surface)", border: "1px solid var(--admin-border)", overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.825rem", textAlign: "left" }}>
           <thead>
-            <tr style={{ backgroundColor: "#FAF8F5", color: "#6F6257", borderBottom: "1px solid #E5DFD5" }}>
+            <tr style={{ backgroundColor: "var(--admin-surface-subtle)", color: "var(--admin-text-secondary)", borderBottom: "1px solid var(--admin-border)" }}>
               <th style={{ padding: "0.85rem 1rem" }}>PATRON NAME</th>
               <th style={{ padding: "0.85rem 1rem" }}>EMAIL</th>
               <th style={{ padding: "0.85rem 1rem" }}>PHONE / WHATSAPP</th>
@@ -84,7 +84,7 @@ export const AdminCustomersPage: React.FC<{ onNavigate: (href: string) => void }
             ) : (
               filteredCustomers.map((cust) => (
                 <tr key={cust.id} style={{ borderBottom: "1px solid #F2EEE6" }}>
-                  <td style={{ padding: "0.85rem 1rem", fontWeight: 700, color: "#171513" }}>
+                  <td style={{ padding: "0.85rem 1rem", fontWeight: 700, color: "var(--admin-text)" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
                       <div
                         style={{
@@ -105,10 +105,10 @@ export const AdminCustomersPage: React.FC<{ onNavigate: (href: string) => void }
                       <span>{cust.name}</span>
                     </div>
                   </td>
-                  <td style={{ padding: "0.85rem 1rem", color: "#6F6257" }}>{cust.email}</td>
-                  <td style={{ padding: "0.85rem 1rem", color: "#6F6257" }}>{cust.phone}</td>
-                  <td style={{ padding: "0.85rem 1rem", color: "#6F6257" }}>{cust.city}</td>
-                  <td style={{ padding: "0.85rem 1rem", fontWeight: 600, color: "#171513" }}>
+                  <td style={{ padding: "0.85rem 1rem", color: "var(--admin-text-secondary)" }}>{cust.email}</td>
+                  <td style={{ padding: "0.85rem 1rem", color: "var(--admin-text-secondary)" }}>{cust.phone}</td>
+                  <td style={{ padding: "0.85rem 1rem", color: "var(--admin-text-secondary)" }}>{cust.city}</td>
+                  <td style={{ padding: "0.85rem 1rem", fontWeight: 600, color: "var(--admin-text)" }}>
                     {cust.totalOrders} order(s)
                   </td>
                   <td style={{ padding: "0.85rem 1rem", fontWeight: 700, color: "#7C2430" }}>

@@ -14,7 +14,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
     <section
       style={{
         position: "relative",
-        minHeight: "calc(90vh - 72px)",
+        minHeight: "clamp(auto, 70vh, calc(90vh - 72px))",
         display: "flex",
         alignItems: "center",
         overflow: "hidden",
@@ -25,12 +25,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
     >
       <div className="container">
         <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1.15fr 0.85fr",
-            gap: "clamp(2rem, 5vw, 5rem)",
-            alignItems: "center",
-          }}
           className="hero-grid"
         >
           {/* Left Narrative Column */}
@@ -186,7 +180,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                 aspectRatio: "3/4",
                 boxShadow: "var(--shadow-elevated)",
                 overflow: "hidden",
-                backgroundColor: "#EDE7DD",
+                backgroundColor: "var(--bg-surface-subtle)",
               }}
             >
               <img
@@ -208,10 +202,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                   bottom: "1.5rem",
                   left: "1.5rem",
                   right: "1.5rem",
-                  backgroundColor: "rgba(248, 244, 238, 0.95)",
+                  backgroundColor: "var(--hero-badge-bg)",
                   backdropFilter: "blur(8px)",
                   padding: "1rem 1.25rem",
-                  border: "1px solid rgba(177, 138, 82, 0.3)",
+                  border: "1px solid var(--hero-badge-border)",
                   boxShadow: "var(--shadow-subtle)",
                 }}
               >
@@ -255,14 +249,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
         </div>
       </div>
 
-      <style>{`
-        @media (max-width: 860px) {
-          .hero-grid {
-            grid-template-columns: 1fr !important;
-            gap: 2.5rem !important;
-          }
-        }
-      `}</style>
     </section>
   );
 };

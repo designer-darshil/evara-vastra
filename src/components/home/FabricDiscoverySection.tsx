@@ -91,7 +91,7 @@ export const FabricDiscoverySection: React.FC<{
         {/* Active Fabric Showcase Card */}
         <div
           style={{
-            backgroundColor: "#FFFFFF",
+            backgroundColor: "var(--bg-surface)",
             border: "1px solid var(--border-subtle)",
             boxShadow: "var(--shadow-medium)",
             display: "grid",
@@ -104,7 +104,7 @@ export const FabricDiscoverySection: React.FC<{
           <div
             style={{
               aspectRatio: "4/3",
-              backgroundColor: "#EDE7DD",
+              backgroundColor: "var(--bg-surface-subtle)",
               overflow: "hidden",
             }}
           >

@@ -82,7 +82,7 @@ export const CustomerNotesSection: React.FC = () => {
             <div
               key={note.id}
               style={{
-                backgroundColor: "#FFFFFF",
+                backgroundColor: "var(--bg-surface)",
                 padding: "2.5rem 2rem",
                 border: "1px solid var(--border-subtle)",
                 display: "flex",

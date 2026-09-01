@@ -30,7 +30,7 @@ export const BrandStorySection: React.FC<{ onNavigate: (href: string) => void }>
             <div
               style={{
                 aspectRatio: "4/5",
-                backgroundColor: "#EDE7DD",
+                backgroundColor: "var(--bg-surface-subtle)",
                 overflow: "hidden",
                 boxShadow: "var(--shadow-medium)",
               }}
@@ -56,7 +56,7 @@ export const BrandStorySection: React.FC<{ onNavigate: (href: string) => void }>
                 right: "-2rem",
                 width: "55%",
                 aspectRatio: "1/1",
-                backgroundColor: "#EDE7DD",
+                backgroundColor: "var(--bg-surface-subtle)",
                 border: "6px solid var(--bg-primary)",
                 boxShadow: "var(--shadow-elevated)",
                 overflow: "hidden",

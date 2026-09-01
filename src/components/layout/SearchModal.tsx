@@ -259,7 +259,7 @@ export const SearchModal: React.FC<{ onNavigate: (href: string) => void }> = ({
                         width: "48px",
                         height: "64px",
                         objectFit: "cover",
-                        backgroundColor: "#EDE7DD",
+                        backgroundColor: "var(--bg-surface-subtle)",
                       }}
                     />
                     <div style={{ flex: 1 }}>

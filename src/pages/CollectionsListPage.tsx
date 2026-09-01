@@ -46,7 +46,7 @@ export const CollectionsListPage: React.FC<{ onNavigate: (href: string) => void 
               <div
                 key={col.id}
                 style={{
-                  backgroundColor: "#FFFFFF",
+                  backgroundColor: "var(--bg-surface)",
                   border: "1px solid var(--border-subtle)",
                   display: "grid",
                   gridTemplateColumns: isEven ? "1.2fr 0.8fr" : "0.8fr 1.2fr",
@@ -61,7 +61,7 @@ export const CollectionsListPage: React.FC<{ onNavigate: (href: string) => void 
                     order: isEven ? 1 : 2,
                     aspectRatio: "16/10",
                     overflow: "hidden",
-                    backgroundColor: "#EDE7DD",
+                    backgroundColor: "var(--bg-surface-subtle)",
                   }}
                 >
                   <img

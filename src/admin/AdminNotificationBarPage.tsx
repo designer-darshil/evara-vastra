@@ -21,17 +21,17 @@ export const AdminNotificationBarPage: React.FC<{ onNavigate: (href: string) => 
   return (
     <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
       {/* Top Header */}
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem", borderBottom: "1px solid #E5DFD5", paddingBottom: "1rem" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem", borderBottom: "1px solid var(--admin-border)", paddingBottom: "1rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           <button
             type="button"
             onClick={() => onNavigate("/admin/content")}
-            style={{ padding: "0.5rem 0.75rem", backgroundColor: "#FFFFFF", border: "1px solid #D9D2C7", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.8rem" }}
+            style={{ padding: "0.5rem 0.75rem", backgroundColor: "var(--admin-surface)", border: "1px solid #D9D2C7", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.8rem" }}
           >
             <ArrowLeft size={14} /> Content Hub
           </button>
           <div>
-            <h1 className="font-serif" style={{ fontSize: "1.8rem", color: "#171513", margin: 0 }}>
+            <h1 className="font-serif" style={{ fontSize: "1.8rem", color: "var(--admin-text)", margin: 0 }}>
               Website Notification Ribbon
             </h1>
             <span style={{ fontSize: "0.75rem", color: "#8E8276" }}>
@@ -62,8 +62,8 @@ export const AdminNotificationBarPage: React.FC<{ onNavigate: (href: string) => 
       )}
 
       {/* Live Preview Box */}
-      <div style={{ backgroundColor: "#FFFFFF", padding: "1.5rem", border: "1px solid #E5DFD5" }}>
-        <h3 className="font-serif" style={{ fontSize: "1.1rem", margin: "0 0 0.75rem 0", color: "#6F6257" }}>
+      <div style={{ backgroundColor: "var(--admin-surface)", padding: "1.5rem", border: "1px solid var(--admin-border)" }}>
+        <h3 className="font-serif" style={{ fontSize: "1.1rem", margin: "0 0 0.75rem 0", color: "var(--admin-text-secondary)" }}>
           Live Preview on Storefront:
         </h3>
 
@@ -90,7 +90,7 @@ export const AdminNotificationBarPage: React.FC<{ onNavigate: (href: string) => 
       </div>
 
       {/* Form Fields */}
-      <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid #E5DFD5", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+      <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "1rem", paddingBottom: "1.25rem", borderBottom: "1px solid #F0EAE1" }}>
           <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.9rem", fontWeight: 600, cursor: "pointer" }}>
             <input
@@ -104,7 +104,7 @@ export const AdminNotificationBarPage: React.FC<{ onNavigate: (href: string) => 
         </div>
 
         <div>
-          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
             Announcement Message Text *
           </label>
           <input
@@ -119,7 +119,7 @@ export const AdminNotificationBarPage: React.FC<{ onNavigate: (href: string) => 
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Action Link Destination
             </label>
             <input
@@ -132,7 +132,7 @@ export const AdminNotificationBarPage: React.FC<{ onNavigate: (href: string) => 
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Action Link Label
             </label>
             <input
@@ -147,13 +147,13 @@ export const AdminNotificationBarPage: React.FC<{ onNavigate: (href: string) => 
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Visual Background Theme
             </label>
             <select
               value={form.backgroundStyle}
               onChange={(e) => setForm({ ...form, backgroundStyle: e.target.value as any })}
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", backgroundColor: "#FFFFFF" }}
+              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface)" }}
             >
               <option value="wine">Deep Wine Accent (#7C2430)</option>
               <option value="dark">Charcoal Black (#171513)</option>

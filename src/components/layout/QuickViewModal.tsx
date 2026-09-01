@@ -83,7 +83,7 @@ export const QuickViewModal: React.FC<{ onNavigate: (href: string) => void }> = 
           boxShadow: "var(--shadow-elevated)",
           position: "relative",
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
           borderRadius: "4px",
           border: "1px solid var(--border-subtle)",
         }}

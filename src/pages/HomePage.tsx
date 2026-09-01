@@ -297,7 +297,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 className="input-field"
                 style={{
                   flex: 1,
-                  backgroundColor: "#FFFFFF",
+                  backgroundColor: "var(--bg-surface)",
                 }}
               />
               <button

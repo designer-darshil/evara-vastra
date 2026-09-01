@@ -71,7 +71,7 @@ export const ContactPage: React.FC<{ onNavigate: (href: string) => void }> = ({
           <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
             <div
               style={{
-                backgroundColor: "#FFFFFF",
+                backgroundColor: "var(--bg-surface)",
                 padding: "2rem",
                 border: "1px solid var(--border-subtle)",
                 borderRadius: "4px",
@@ -109,7 +109,7 @@ export const ContactPage: React.FC<{ onNavigate: (href: string) => void }> = ({
             {/* Quick WhatsApp Card */}
             <div
               style={{
-                backgroundColor: "#E8F5E9",
+                backgroundColor: "var(--success-bg)",
                 padding: "1.75rem",
                 border: "1px solid #C8E6C9",
                 borderRadius: "4px",
@@ -121,7 +121,7 @@ export const ContactPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                   Instant WhatsApp Assistance
                 </h4>
               </div>
-              <p style={{ fontSize: "0.85rem", color: "#2E7D32", lineHeight: 1.5, margin: "0 0 1rem 0" }}>
+              <p style={{ fontSize: "0.85rem", color: "var(--success-text)", lineHeight: 1.5, margin: "0 0 1rem 0" }}>
                 Chat live with our product specialists for instant real photos, size guides, and order updates.
               </p>
               <a
@@ -132,7 +132,7 @@ export const ContactPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "0.5rem",
-                  backgroundColor: "#2E7D32",
+                  backgroundColor: "var(--whatsapp-bg)",
                   color: "#FFFFFF",
                   padding: "0.6rem 1.25rem",
                   borderRadius: "3px",
@@ -149,7 +149,7 @@ export const ContactPage: React.FC<{ onNavigate: (href: string) => void }> = ({
           {/* Right Interactive Form */}
           <div
             style={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--bg-surface)",
               padding: "clamp(2rem, 4vw, 3rem)",
               border: "1px solid var(--border-subtle)",
               boxShadow: "var(--shadow-subtle)",
@@ -163,8 +163,8 @@ export const ContactPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                     width: "60px",
                     height: "60px",
                     borderRadius: "50%",
-                    backgroundColor: "#E8F5E9",
-                    color: "#2E7D32",
+                    backgroundColor: "var(--success-bg)",
+                    color: "var(--success-text)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",

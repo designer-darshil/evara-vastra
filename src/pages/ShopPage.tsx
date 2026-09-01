@@ -283,7 +283,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                 alignItems: "center",
                 gap: "0.5rem",
                 padding: "0.6rem 1.2rem",
-                backgroundColor: "#FFFFFF",
+                backgroundColor: "var(--bg-surface)",
                 border: "1px solid var(--border-medium)",
                 fontSize: "0.8rem",
                 fontWeight: 600,
@@ -319,7 +319,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                 onChange={(e) => setSortBy(e.target.value)}
                 style={{
                   padding: "0.45rem 1.5rem 0.45rem 0.75rem",
-                  backgroundColor: "#FFFFFF",
+                  backgroundColor: "var(--bg-surface)",
                   border: "1px solid var(--border-medium)",
                   color: "var(--text-primary)",
                   fontWeight: 500,
@@ -423,16 +423,10 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
         {/* Main Content Layout */}
         <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "240px 1fr",
-            gap: "3.5rem",
-            alignItems: "start",
-          }}
-          className="shop-layout-grid"
+          className="shop-main-grid"
         >
           {/* Desktop Filter Sidebar */}
-          <aside className="desktop-filters" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+          <aside className="desktop-filter-sidebar" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
             {/* Category Filter */}
             <div>
               <h4
@@ -677,9 +671,9 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                     gridCols === 4
                       ? "repeat(auto-fill, minmax(230px, 1fr))"
                       : "repeat(auto-fill, minmax(280px, 1fr))",
-                  gap: "2.5rem 1.75rem",
+                  gap: "clamp(0.85rem, 2vw, 2.5rem) clamp(0.85rem, 2vw, 1.75rem)",
                 }}
-                className="mobile-product-grid"
+                className="product-grid"
               >
                 {sortedProducts.map((product: Product, idx: number) => (
                   <ProductCard
@@ -736,7 +730,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                 <button
                   onClick={() => setSelectedCategory("all")}
-                  style={{ textAlign: "left", fontSize: "0.85rem", color: selectedCategory === "all" ? "#7C2430" : "#6F6257", fontWeight: selectedCategory === "all" ? 700 : 400 }}
+                  style={{ textAlign: "left", fontSize: "0.85rem", color: selectedCategory === "all" ? "var(--accent-wine)" : "var(--text-secondary)", fontWeight: selectedCategory === "all" ? 700 : 400 }}
                 >
                   All Categories
                 </button>
@@ -744,7 +738,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                   <button
                     key={c.id}
                     onClick={() => setSelectedCategory(c.slug)}
-                    style={{ textAlign: "left", fontSize: "0.85rem", color: selectedCategory === c.slug ? "#7C2430" : "#6F6257", fontWeight: selectedCategory === c.slug ? 700 : 400 }}
+                    style={{ textAlign: "left", fontSize: "0.85rem", color: selectedCategory === c.slug ? "var(--accent-wine)" : "var(--text-secondary)", fontWeight: selectedCategory === c.slug ? 700 : 400 }}
                   >
                     {c.name}
                   </button>
@@ -759,19 +753,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         </div>
       )}
 
-      <style>{`
-        @media (max-width: 960px) {
-          .shop-layout-grid {
-            grid-template-columns: 1fr !important;
-          }
-          .desktop-filters {
-            display: none !important;
-          }
-          .mobile-filter-btn {
-            display: inline-flex !important;
-          }
-        }
-      `}</style>
+
     </div>
   );
 };

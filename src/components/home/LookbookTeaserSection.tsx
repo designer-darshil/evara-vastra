@@ -80,7 +80,7 @@ export const LookbookTeaserSection: React.FC<{
               onClick={() => onNavigate(`/product/${look.productSlug}`)}
               data-cursor="VIEW LOOK"
               style={{
-                backgroundColor: "#FFFFFF",
+                backgroundColor: "var(--bg-surface)",
                 border: "1px solid var(--border-subtle)",
                 overflow: "hidden",
                 boxShadow: "var(--shadow-subtle)",
@@ -93,7 +93,7 @@ export const LookbookTeaserSection: React.FC<{
                 style={{
                   aspectRatio: "3/4",
                   overflow: "hidden",
-                  backgroundColor: "#EDE7DD",
+                  backgroundColor: "var(--bg-surface-subtle)",
                   position: "relative",
                 }}
               >

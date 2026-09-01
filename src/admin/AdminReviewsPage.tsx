@@ -50,7 +50,7 @@ export const AdminReviewsPage: React.FC<{ onNavigate: (href: string) => void }> 
       {/* Reviews Table */}
       <div
         style={{
-          backgroundColor: "#FFFFFF",
+          backgroundColor: "var(--admin-surface)",
           border: "1px solid var(--border-subtle)",
           borderRadius: "6px",
           overflow: "hidden",

@@ -28,12 +28,12 @@ export const AdminSettingsPage: React.FC<{ onNavigate: (href: string) => void }>
   return (
     <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
       {/* Header */}
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem", borderBottom: "1px solid #E5DFD5", paddingBottom: "1rem" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem", borderBottom: "1px solid var(--admin-border)", paddingBottom: "1rem" }}>
         <div>
           <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7C2430", display: "block" }}>
             STOREFRONT CONFIGURATION
           </span>
-          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "#171513", margin: "0.2rem 0 0 0" }}>
+          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: "0.2rem 0 0 0" }}>
             Atelier Settings
           </h1>
         </div>
@@ -50,14 +50,14 @@ export const AdminSettingsPage: React.FC<{ onNavigate: (href: string) => void }>
       )}
 
       {/* Brand & Identity */}
-      <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid #E5DFD5", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "#171513", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
+      <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "var(--admin-text)", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
           1. Brand Identity & Positioning
         </h3>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Official Brand Name *
             </label>
             <input
@@ -70,7 +70,7 @@ export const AdminSettingsPage: React.FC<{ onNavigate: (href: string) => void }>
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Brand Tagline
             </label>
             <input
@@ -83,7 +83,7 @@ export const AdminSettingsPage: React.FC<{ onNavigate: (href: string) => void }>
         </div>
 
         <div>
-          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
             Brand Slogan
           </label>
           <input
@@ -96,14 +96,14 @@ export const AdminSettingsPage: React.FC<{ onNavigate: (href: string) => void }>
       </div>
 
       {/* Atelier Contact Details */}
-      <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid #E5DFD5", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "#171513", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
+      <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "var(--admin-text)", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
           2. Atelier Concierge & Physical Address
         </h3>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Concierge Email *
             </label>
             <input
@@ -116,7 +116,7 @@ export const AdminSettingsPage: React.FC<{ onNavigate: (href: string) => void }>
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Phone Number *
             </label>
             <input
@@ -129,7 +129,7 @@ export const AdminSettingsPage: React.FC<{ onNavigate: (href: string) => void }>
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               WhatsApp Concierge
             </label>
             <input
@@ -142,7 +142,7 @@ export const AdminSettingsPage: React.FC<{ onNavigate: (href: string) => void }>
         </div>
 
         <div>
-          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
             Studio Physical Address *
           </label>
           <input
@@ -156,14 +156,14 @@ export const AdminSettingsPage: React.FC<{ onNavigate: (href: string) => void }>
       </div>
 
       {/* Shipping & Commerce Thresholds */}
-      <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid #E5DFD5", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "#171513", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
+      <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "var(--admin-text)", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
           3. Shipping & Commerce Thresholds
         </h3>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Free Shipping Order Threshold (INR ₹)
             </label>
             <input
@@ -175,7 +175,7 @@ export const AdminSettingsPage: React.FC<{ onNavigate: (href: string) => void }>
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Standard Shipping Fee (INR ₹)
             </label>
             <input
@@ -189,7 +189,7 @@ export const AdminSettingsPage: React.FC<{ onNavigate: (href: string) => void }>
       </div>
 
       {/* System Reset Section */}
-      <div style={{ backgroundColor: "#FAF8F5", padding: "1.5rem 2rem", border: "1px solid #E5DFD5", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div style={{ backgroundColor: "var(--admin-surface-subtle)", padding: "1.5rem 2rem", border: "1px solid var(--admin-border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
           <strong style={{ fontSize: "0.85rem", color: "#7C2430", display: "block" }}>
             Database Reset to Factory Demo Data
@@ -216,7 +216,7 @@ export const AdminSettingsPage: React.FC<{ onNavigate: (href: string) => void }>
               padding: "0.5rem 1rem",
               fontSize: "0.75rem",
               border: "1px solid #E8C8C8",
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--admin-surface)",
               color: "#7C2430",
               cursor: "pointer",
             }}

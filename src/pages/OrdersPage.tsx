@@ -46,7 +46,7 @@ export const OrdersPage: React.FC<{ onNavigate: (href: string) => void }> = ({
 
         {/* Order Cards List */}
         {orders.length === 0 ? (
-          <div style={{ padding: "4rem 2rem", textAlign: "center", backgroundColor: "#FFFFFF", border: "1px solid var(--border-subtle)" }}>
+          <div style={{ padding: "4rem 2rem", textAlign: "center", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border-subtle)" }}>
             <h3 className="font-serif" style={{ fontSize: "1.6rem" }}>No Past Orders Found</h3>
             <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginTop: "0.5rem" }}>
               When you place an order, its real-time fulfillment timeline and courier tracking will appear here.
@@ -61,7 +61,7 @@ export const OrdersPage: React.FC<{ onNavigate: (href: string) => void }> = ({
               <div
                 key={order.id}
                 style={{
-                  backgroundColor: "#FFFFFF",
+                  backgroundColor: "var(--bg-surface)",
                   border: "1px solid var(--border-subtle)",
                   boxShadow: "var(--shadow-subtle)",
                   padding: "2rem",
@@ -185,7 +185,7 @@ export const OrdersPage: React.FC<{ onNavigate: (href: string) => void }> = ({
         >
           <div
             style={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--bg-surface)",
               maxWidth: "540px",
               width: "100%",
               padding: "2.5rem",

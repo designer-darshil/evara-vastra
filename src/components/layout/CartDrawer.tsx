@@ -107,8 +107,8 @@ export const CartDrawer: React.FC<{ onNavigate: (href: string) => void }> = ({
             onClick={closeCartDrawer}
             aria-label="Close shopping bag"
             style={{
-              width: "36px",
-              height: "36px",
+              width: "44px",
+              height: "44px",
               borderRadius: "50%",
               backgroundColor: "var(--bg-primary)",
               display: "flex",

@@ -65,7 +65,7 @@ export const FaqPage: React.FC<{ onNavigate: (href: string) => void }> = ({
               display: "flex",
               alignItems: "center",
               gap: "0.75rem",
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--bg-surface)",
               border: "1px solid var(--border-medium)",
               padding: "0.75rem 1.25rem",
               marginTop: "2rem",
@@ -127,7 +127,7 @@ export const FaqPage: React.FC<{ onNavigate: (href: string) => void }> = ({
         {/* Accordion List */}
         <div style={{ maxWidth: "860px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "1rem" }}>
           {filteredFaqs.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "3rem", backgroundColor: "#FFFFFF" }}>
+            <div style={{ textAlign: "center", padding: "3rem", backgroundColor: "var(--bg-surface)" }}>
               <p style={{ color: "var(--text-secondary)" }}>No matching questions found.</p>
             </div>
           ) : (
@@ -137,7 +137,7 @@ export const FaqPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                 <div
                   key={faq.id}
                   style={{
-                    backgroundColor: "#FFFFFF",
+                    backgroundColor: "var(--bg-surface)",
                     border: "1px solid var(--border-subtle)",
                     overflow: "hidden",
                     transition: "box-shadow 0.2s ease",

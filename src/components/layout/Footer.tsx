@@ -8,11 +8,11 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
   return (
     <footer
       style={{
-        backgroundColor: "#171513",
-        color: "#EBE6DF",
+        backgroundColor: "var(--footer-bg)",
+        color: "var(--footer-text)",
         paddingTop: "5.5rem",
         paddingBottom: "3rem",
-        borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+        borderTop: "1px solid var(--footer-border)",
       }}
     >
       <div className="container">
@@ -23,7 +23,7 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
             gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
             gap: "3rem 2.5rem",
             paddingBottom: "4rem",
-            borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+            borderBottom: "1px solid var(--footer-border)",
           }}
         >
           {/* Col 1: Brand & Atelier Contact */}
@@ -47,7 +47,7 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
                 style={{
                   fontSize: "1.85rem",
                   letterSpacing: "0.12em",
-                  color: "#FFFFFF",
+                  color: "var(--footer-heading)",
                   lineHeight: 1.1,
                   margin: 0,
                 }}
@@ -60,14 +60,14 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
               style={{
                 fontSize: "0.85rem",
                 lineHeight: 1.65,
-                color: "#A9A29A",
+                color: "var(--footer-text-muted)",
                 margin: 0,
               }}
             >
               Surat-crafted Sarees, Designer Co-Ord Sets, Chinon Kurti Palazzo Ensembles, and Festive Anarkali Gowns designed for modern living.
             </p>
 
-            <div style={{ fontSize: "0.82rem", color: "#C5BEB5", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+            <div style={{ fontSize: "0.82rem", color: "var(--footer-text-secondary)", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                 <MapPin size={15} style={{ color: "var(--accent-gold)", flexShrink: 0 }} />
                 <span>{siteSettings.atelierAddress}</span>
@@ -114,15 +114,15 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
                     style={{
                       background: "none",
                       border: "none",
-                      color: "#A9A29A",
+                      color: "var(--footer-text-muted)",
                       fontSize: "0.85rem",
                       cursor: "pointer",
                       padding: 0,
                       textAlign: "left",
                       transition: "color 0.2s ease",
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "#A9A29A")}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "var(--footer-heading)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = "var(--footer-text-muted)")}
                   >
                     {cat.name}
                   </button>
@@ -187,15 +187,15 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
                     style={{
                       background: "none",
                       border: "none",
-                      color: "#A9A29A",
+                      color: "var(--footer-text-muted)",
                       fontSize: "0.85rem",
                       cursor: "pointer",
                       padding: 0,
                       textAlign: "left",
                       transition: "color 0.2s ease",
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "#A9A29A")}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "var(--footer-heading)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = "var(--footer-text-muted)")}
                   >
                     {item.label}
                   </button>
@@ -222,24 +222,24 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
               <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
                 <Truck size={18} style={{ color: "var(--accent-gold)", flexShrink: 0, marginTop: "2px" }} />
                 <div>
-                  <strong style={{ fontSize: "0.82rem", color: "#FFFFFF", display: "block" }}>Free Pan-India Delivery</strong>
-                  <span style={{ fontSize: "0.75rem", color: "#A9A29A" }}>Insured delivery to 28,000+ pin codes.</span>
+                  <strong style={{ fontSize: "0.82rem", color: "var(--footer-heading)", display: "block" }}>Free Pan-India Delivery</strong>
+                  <span style={{ fontSize: "0.75rem", color: "var(--footer-text-muted)" }}>Insured delivery to 28,000+ pin codes.</span>
                 </div>
               </div>
 
               <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
                 <ShieldCheck size={18} style={{ color: "var(--accent-gold)", flexShrink: 0, marginTop: "2px" }} />
                 <div>
-                  <strong style={{ fontSize: "0.82rem", color: "#FFFFFF", display: "block" }}>COD & 10% Prepaid Off</strong>
-                  <span style={{ fontSize: "0.75rem", color: "#A9A29A" }}>Instant savings on UPI and card orders.</span>
+                  <strong style={{ fontSize: "0.82rem", color: "var(--footer-heading)", display: "block" }}>COD & 10% Prepaid Off</strong>
+                  <span style={{ fontSize: "0.75rem", color: "var(--footer-text-muted)" }}>Instant savings on UPI and card orders.</span>
                 </div>
               </div>
 
               <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
                 <RefreshCw size={18} style={{ color: "var(--accent-gold)", flexShrink: 0, marginTop: "2px" }} />
                 <div>
-                  <strong style={{ fontSize: "0.82rem", color: "#FFFFFF", display: "block" }}>7-Day Easy Exchange</strong>
-                  <span style={{ fontSize: "0.75rem", color: "#A9A29A" }}>Doorstep reverse pickup assistance.</span>
+                  <strong style={{ fontSize: "0.82rem", color: "var(--footer-heading)", display: "block" }}>7-Day Easy Exchange</strong>
+                  <span style={{ fontSize: "0.75rem", color: "var(--footer-text-muted)" }}>Doorstep reverse pickup assistance.</span>
                 </div>
               </div>
             </div>
@@ -256,17 +256,17 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
             alignItems: "center",
             gap: "1rem",
             fontSize: "0.78rem",
-            color: "#8E877F",
+            color: "var(--footer-copyright)",
           }}
         >
           <div>
             © 2026 EVARA VASTRA. ALL RIGHTS RESERVED. SURAT, GUJARAT, INDIA.
           </div>
           <div style={{ display: "flex", gap: "1.5rem" }}>
-            <button onClick={() => onNavigate("/privacy")} style={{ background: "none", border: "none", color: "#8E877F", cursor: "pointer", fontSize: "0.78rem" }}>
+            <button onClick={() => onNavigate("/privacy")} style={{ background: "none", border: "none", color: "var(--footer-copyright)", cursor: "pointer", fontSize: "0.78rem" }}>
               Privacy
             </button>
-            <button onClick={() => onNavigate("/terms")} style={{ background: "none", border: "none", color: "#8E877F", cursor: "pointer", fontSize: "0.78rem" }}>
+            <button onClick={() => onNavigate("/terms")} style={{ background: "none", border: "none", color: "var(--footer-copyright)", cursor: "pointer", fontSize: "0.78rem" }}>
               Terms
             </button>
             <button onClick={() => onNavigate("/admin")} style={{ background: "none", border: "none", color: "var(--accent-gold)", cursor: "pointer", fontSize: "0.78rem", fontWeight: 600 }}>

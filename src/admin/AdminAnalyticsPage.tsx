@@ -31,7 +31,7 @@ export const AdminAnalyticsPage: React.FC<{ onNavigate: (href: string) => void }
         <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7C2430", display: "block" }}>
           TRANSPARENT COMMERCE METRICS
         </span>
-        <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "#171513", margin: "0.2rem 0 0 0" }}>
+        <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: "0.2rem 0 0 0" }}>
           Store Performance & Intelligence
         </h1>
       </div>
@@ -39,14 +39,14 @@ export const AdminAnalyticsPage: React.FC<{ onNavigate: (href: string) => void }
       {/* Honest Integration Notice */}
       <div
         style={{
-          backgroundColor: "#FAF8F5",
+          backgroundColor: "var(--admin-surface-subtle)",
           padding: "1rem 1.25rem",
-          border: "1px solid #E5DFD5",
+          border: "1px solid var(--admin-border)",
           display: "flex",
           alignItems: "center",
           gap: "0.75rem",
           fontSize: "0.8rem",
-          color: "#6F6257",
+          color: "var(--admin-text-secondary)",
         }}
       >
         <AlertCircle size={18} style={{ color: "#B18A52", flexShrink: 0 }} />
@@ -57,51 +57,51 @@ export const AdminAnalyticsPage: React.FC<{ onNavigate: (href: string) => void }
 
       {/* KPI Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.25rem" }}>
-        <div style={{ backgroundColor: "#FFFFFF", padding: "1.5rem", border: "1px solid #E5DFD5" }}>
-          <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257" }}>
+        <div style={{ backgroundColor: "var(--admin-surface)", padding: "1.5rem", border: "1px solid var(--admin-border)" }}>
+          <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)" }}>
             Total Store Revenue
           </span>
-          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "#171513", marginTop: "0.25rem" }}>
+          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "var(--admin-text)", marginTop: "0.25rem" }}>
             {formatINR(totalRevenue)}
           </div>
           <span style={{ fontSize: "0.72rem", color: "#234E3E" }}>From {totalOrders} total completed orders</span>
         </div>
 
-        <div style={{ backgroundColor: "#FFFFFF", padding: "1.5rem", border: "1px solid #E5DFD5" }}>
-          <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257" }}>
+        <div style={{ backgroundColor: "var(--admin-surface)", padding: "1.5rem", border: "1px solid var(--admin-border)" }}>
+          <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)" }}>
             Average Order Value (AOV)
           </span>
-          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "#171513", marginTop: "0.25rem" }}>
+          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "var(--admin-text)", marginTop: "0.25rem" }}>
             {formatINR(avgOrderValue)}
           </div>
-          <span style={{ fontSize: "0.72rem", color: "#6F6257" }}>Per transaction basket</span>
+          <span style={{ fontSize: "0.72rem", color: "var(--admin-text-secondary)" }}>Per transaction basket</span>
         </div>
 
-        <div style={{ backgroundColor: "#FFFFFF", padding: "1.5rem", border: "1px solid #E5DFD5" }}>
-          <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257" }}>
+        <div style={{ backgroundColor: "var(--admin-surface)", padding: "1.5rem", border: "1px solid var(--admin-border)" }}>
+          <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)" }}>
             Total Sarees Sold
           </span>
-          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "#171513", marginTop: "0.25rem" }}>
+          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "var(--admin-text)", marginTop: "0.25rem" }}>
             {totalItemsSold} units
           </div>
-          <span style={{ fontSize: "0.72rem", color: "#6F6257" }}>Across all handloom fabrics</span>
+          <span style={{ fontSize: "0.72rem", color: "var(--admin-text-secondary)" }}>Across all handloom fabrics</span>
         </div>
 
-        <div style={{ backgroundColor: "#FFFFFF", padding: "1.5rem", border: "1px solid #E5DFD5" }}>
-          <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257" }}>
+        <div style={{ backgroundColor: "var(--admin-surface)", padding: "1.5rem", border: "1px solid var(--admin-border)" }}>
+          <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)" }}>
             Active Registered Patrons
           </span>
-          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "#171513", marginTop: "0.25rem" }}>
+          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "var(--admin-text)", marginTop: "0.25rem" }}>
             {customers.length}
           </div>
-          <span style={{ fontSize: "0.72rem", color: "#6F6257" }}>Client directory profiles</span>
+          <span style={{ fontSize: "0.72rem", color: "var(--admin-text-secondary)" }}>Client directory profiles</span>
         </div>
       </div>
 
       {/* Breakdown Section */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }} className="admin-analytics-grid">
         {/* Payment Channels */}
-        <div style={{ backgroundColor: "#FFFFFF", padding: "1.75rem", border: "1px solid #E5DFD5" }}>
+        <div style={{ backgroundColor: "var(--admin-surface)", padding: "1.75rem", border: "1px solid var(--admin-border)" }}>
           <h3 className="font-serif" style={{ fontSize: "1.3rem", margin: "0 0 1rem 0" }}>
             Revenue by Payment Method
           </h3>
@@ -110,7 +110,7 @@ export const AdminAnalyticsPage: React.FC<{ onNavigate: (href: string) => void }
             {Object.entries(paymentBreakdown).map(([method, amt]) => {
               const pct = totalRevenue > 0 ? Math.round((amt / totalRevenue) * 100) : 0;
               return (
-                <div key={method} style={{ padding: "0.75rem", backgroundColor: "#FAF8F5", border: "1px solid #EBE5DB" }}>
+                <div key={method} style={{ padding: "0.75rem", backgroundColor: "var(--admin-surface-subtle)", border: "1px solid #EBE5DB" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.25rem", fontSize: "0.85rem" }}>
                     <strong>{method}</strong>
                     <span>{formatINR(amt)} ({pct}%)</span>
@@ -125,7 +125,7 @@ export const AdminAnalyticsPage: React.FC<{ onNavigate: (href: string) => void }
         </div>
 
         {/* Category Coverage */}
-        <div style={{ backgroundColor: "#FFFFFF", padding: "1.75rem", border: "1px solid #E5DFD5" }}>
+        <div style={{ backgroundColor: "var(--admin-surface)", padding: "1.75rem", border: "1px solid var(--admin-border)" }}>
           <h3 className="font-serif" style={{ fontSize: "1.3rem", margin: "0 0 1rem 0" }}>
             Catalog Distribution by Fabric
           </h3>
@@ -134,7 +134,7 @@ export const AdminAnalyticsPage: React.FC<{ onNavigate: (href: string) => void }
             {categories.map((cat) => {
               const count = products.filter((p) => p.category === cat.slug).length;
               return (
-                <div key={cat.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.6rem 0.75rem", backgroundColor: "#FAF8F5", border: "1px solid #EBE5DB", fontSize: "0.85rem" }}>
+                <div key={cat.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.6rem 0.75rem", backgroundColor: "var(--admin-surface-subtle)", border: "1px solid #EBE5DB", fontSize: "0.85rem" }}>
                   <span>{cat.name}</span>
                   <strong style={{ color: "#7C2430" }}>{count} saree(s)</strong>
                 </div>

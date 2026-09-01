@@ -54,7 +54,7 @@ export const CraftsmanshipPage: React.FC<{ onNavigate: (href: string) => void }>
                   gridTemplateColumns: isEven ? "1.1fr 0.9fr" : "0.9fr 1.1fr",
                   gap: "clamp(2rem, 5vw, 5rem)",
                   alignItems: "center",
-                  backgroundColor: "#FFFFFF",
+                  backgroundColor: "var(--bg-surface)",
                   padding: "clamp(1.5rem, 3.5vw, 3rem)",
                   border: "1px solid var(--border-subtle)",
                 }}
@@ -85,7 +85,7 @@ export const CraftsmanshipPage: React.FC<{ onNavigate: (href: string) => void }>
                     order: isEven ? 2 : 1,
                     aspectRatio: "16/11",
                     overflow: "hidden",
-                    backgroundColor: "#EDE7DD",
+                    backgroundColor: "var(--bg-surface-subtle)",
                   }}
                 >
                   <img

@@ -123,7 +123,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           }}
         >
           {isOutOfStock ? (
-            <span className="badge-tag" style={{ backgroundColor: "#171513", color: "#FFFFFF", fontSize: "0.65rem", padding: "0.2rem 0.45rem" }}>
+            <span className="badge-tag" style={{ backgroundColor: "var(--bg-dark)", color: "var(--text-inverse)", fontSize: "0.65rem", padding: "0.2rem 0.45rem" }}>
               SOLD OUT
             </span>
           ) : isLowStock ? (
@@ -156,16 +156,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             minWidth: "38px",
             minHeight: "38px",
             borderRadius: "50%",
-            backgroundColor: "rgba(255, 255, 255, 0.9)",
+            backgroundColor: "var(--wishlist-btn-bg)",
             backdropFilter: "blur(4px)",
-            border: "1px solid rgba(0,0,0,0.06)",
+            border: `1px solid var(--wishlist-btn-border)`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             color: isSaved ? "var(--accent-wine)" : "var(--text-primary)",
             transition: "transform 0.2s ease, background-color 0.2s ease",
             cursor: "pointer",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
+            boxShadow: "var(--wishlist-btn-shadow)",
           }}
         >
           <Heart size={16} fill={isSaved ? "var(--accent-wine)" : "none"} strokeWidth={1.75} />
@@ -277,8 +277,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               style={{
                 fontSize: "0.68rem",
                 fontWeight: 700,
-                color: "#2E7D32",
-                backgroundColor: "#E8F5E9",
+                color: "var(--success-text)",
+                backgroundColor: "var(--success-bg)",
                 padding: "0.1rem 0.35rem",
                 borderRadius: "2px",
                 lineHeight: 1.2,

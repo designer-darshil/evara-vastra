@@ -31,17 +31,17 @@ export const AdminHomepageCMSPage: React.FC<{ onNavigate: (href: string) => void
   return (
     <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
       {/* Top Header */}
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem", borderBottom: "1px solid #E5DFD5", paddingBottom: "1rem" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem", borderBottom: "1px solid var(--admin-border)", paddingBottom: "1rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           <button
             type="button"
             onClick={() => onNavigate("/admin/content")}
-            style={{ padding: "0.5rem 0.75rem", backgroundColor: "#FFFFFF", border: "1px solid #D9D2C7", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.8rem" }}
+            style={{ padding: "0.5rem 0.75rem", backgroundColor: "var(--admin-surface)", border: "1px solid #D9D2C7", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.8rem" }}
           >
             <ArrowLeft size={14} /> Content Hub
           </button>
           <div>
-            <h1 className="font-serif" style={{ fontSize: "1.8rem", color: "#171513", margin: 0 }}>
+            <h1 className="font-serif" style={{ fontSize: "1.8rem", color: "var(--admin-text)", margin: 0 }}>
               Homepage CMS & Visual Layout
             </h1>
             <span style={{ fontSize: "0.75rem", color: "#8E8276" }}>
@@ -72,14 +72,14 @@ export const AdminHomepageCMSPage: React.FC<{ onNavigate: (href: string) => void
       )}
 
       {/* 1. Hero Section Content */}
-      <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid #E5DFD5", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "#171513", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
+      <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "var(--admin-text)", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
           1. Hero Banner & Typography
         </h3>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Hero Heading Lead *
             </label>
             <input
@@ -92,7 +92,7 @@ export const AdminHomepageCMSPage: React.FC<{ onNavigate: (href: string) => void
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Hero Accent Highlight Word *
             </label>
             <input
@@ -107,7 +107,7 @@ export const AdminHomepageCMSPage: React.FC<{ onNavigate: (href: string) => void
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Hero Season Badge Tag
             </label>
             <input
@@ -119,7 +119,7 @@ export const AdminHomepageCMSPage: React.FC<{ onNavigate: (href: string) => void
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Hero Image URL *
             </label>
             <input
@@ -133,7 +133,7 @@ export const AdminHomepageCMSPage: React.FC<{ onNavigate: (href: string) => void
         </div>
 
         <div>
-          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
             Hero Subheading Narrative
           </label>
           <textarea
@@ -146,7 +146,7 @@ export const AdminHomepageCMSPage: React.FC<{ onNavigate: (href: string) => void
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "1rem" }}>
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Primary CTA Text
             </label>
             <input
@@ -157,7 +157,7 @@ export const AdminHomepageCMSPage: React.FC<{ onNavigate: (href: string) => void
             />
           </div>
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Primary CTA Link
             </label>
             <input
@@ -168,7 +168,7 @@ export const AdminHomepageCMSPage: React.FC<{ onNavigate: (href: string) => void
             />
           </div>
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Secondary CTA Text
             </label>
             <input
@@ -179,7 +179,7 @@ export const AdminHomepageCMSPage: React.FC<{ onNavigate: (href: string) => void
             />
           </div>
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Secondary CTA Link
             </label>
             <input
@@ -193,19 +193,19 @@ export const AdminHomepageCMSPage: React.FC<{ onNavigate: (href: string) => void
       </div>
 
       {/* 2. Featured Collection Section */}
-      <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid #E5DFD5", display: "flex", flexDirection: "column", gap: "1rem" }}>
-        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "#171513", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
+      <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "var(--admin-text)", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
           2. Featured Collection Spotlight
         </h3>
 
         <div>
-          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
             Select Spotlight Collection
           </label>
           <select
             value={form.featuredCollectionSlug}
             onChange={(e) => setForm({ ...form, featuredCollectionSlug: e.target.value })}
-            style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", backgroundColor: "#FFFFFF" }}
+            style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface)" }}
           >
             {collections.map((col) => (
               <option key={col.id} value={col.slug}>
@@ -217,13 +217,13 @@ export const AdminHomepageCMSPage: React.FC<{ onNavigate: (href: string) => void
       </div>
 
       {/* 3. Brand Story Manifesto */}
-      <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid #E5DFD5", display: "flex", flexDirection: "column", gap: "1rem" }}>
-        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "#171513", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
+      <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "var(--admin-text)", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
           3. Brand Story Manifesto Section
         </h3>
 
         <div>
-          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
             Manifesto Quote Headline
           </label>
           <input
@@ -236,7 +236,7 @@ export const AdminHomepageCMSPage: React.FC<{ onNavigate: (href: string) => void
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Paragraph 1
             </label>
             <textarea
@@ -247,7 +247,7 @@ export const AdminHomepageCMSPage: React.FC<{ onNavigate: (href: string) => void
             />
           </div>
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
               Paragraph 2
             </label>
             <textarea
@@ -261,8 +261,8 @@ export const AdminHomepageCMSPage: React.FC<{ onNavigate: (href: string) => void
       </div>
 
       {/* 4. Section Visibility Toggles */}
-      <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid #E5DFD5", display: "flex", flexDirection: "column", gap: "1rem" }}>
-        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "#171513", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
+      <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "var(--admin-text)", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
           4. Homepage Section Visibility Controls
         </h3>
 

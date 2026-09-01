@@ -59,7 +59,7 @@ export const AdminOrdersPage: React.FC<{ onNavigate: (href: string) => void }> =
         <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7C2430", display: "block" }}>
           FULFILLMENT & TRANSACTIONS
         </span>
-        <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "#171513", margin: "0.2rem 0 0 0" }}>
+        <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: "0.2rem 0 0 0" }}>
           Order Management ({orders.length})
         </h1>
       </div>
@@ -67,9 +67,9 @@ export const AdminOrdersPage: React.FC<{ onNavigate: (href: string) => void }> =
       {/* Filter Bar */}
       <div
         style={{
-          backgroundColor: "#FFFFFF",
+          backgroundColor: "var(--admin-surface)",
           padding: "1rem 1.25rem",
-          border: "1px solid #E5DFD5",
+          border: "1px solid var(--admin-border)",
           display: "flex",
           flexWrap: "wrap",
           alignItems: "center",
@@ -89,13 +89,13 @@ export const AdminOrdersPage: React.FC<{ onNavigate: (href: string) => void }> =
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#6F6257", textTransform: "uppercase" }}>
+          <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--admin-text-secondary)", textTransform: "uppercase" }}>
             Status:
           </span>
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            style={{ padding: "0.45rem 0.75rem", border: "1px solid #D9D2C7", backgroundColor: "#FAF8F5", fontSize: "0.8rem", outline: "none" }}
+            style={{ padding: "0.45rem 0.75rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface-subtle)", fontSize: "0.8rem", outline: "none" }}
           >
             <option value="all">All Statuses ({orders.length})</option>
             <option value="Pending">Pending</option>
@@ -110,10 +110,10 @@ export const AdminOrdersPage: React.FC<{ onNavigate: (href: string) => void }> =
       </div>
 
       {/* Orders Table */}
-      <div style={{ backgroundColor: "#FFFFFF", border: "1px solid #E5DFD5", overflowX: "auto" }}>
+      <div style={{ backgroundColor: "var(--admin-surface)", border: "1px solid var(--admin-border)", overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.825rem", textAlign: "left" }}>
           <thead>
-            <tr style={{ backgroundColor: "#FAF8F5", color: "#6F6257", borderBottom: "1px solid #E5DFD5" }}>
+            <tr style={{ backgroundColor: "var(--admin-surface-subtle)", color: "var(--admin-text-secondary)", borderBottom: "1px solid var(--admin-border)" }}>
               <th style={{ padding: "0.85rem 1rem" }}>ORDER #</th>
               <th style={{ padding: "0.85rem 1rem" }}>DATE</th>
               <th style={{ padding: "0.85rem 1rem" }}>CUSTOMER</th>
@@ -134,20 +134,20 @@ export const AdminOrdersPage: React.FC<{ onNavigate: (href: string) => void }> =
             ) : (
               filteredOrders.map((order) => (
                 <tr key={order.id} style={{ borderBottom: "1px solid #F2EEE6" }}>
-                  <td style={{ padding: "0.85rem 1rem", fontWeight: 700, color: "#171513" }}>
+                  <td style={{ padding: "0.85rem 1rem", fontWeight: 700, color: "var(--admin-text)" }}>
                     {order.orderNumber}
                   </td>
-                  <td style={{ padding: "0.85rem 1rem", color: "#6F6257" }}>
+                  <td style={{ padding: "0.85rem 1rem", color: "var(--admin-text-secondary)" }}>
                     {order.date}
                   </td>
                   <td style={{ padding: "0.85rem 1rem" }}>
-                    <strong style={{ display: "block", color: "#171513" }}>{order.customerName}</strong>
+                    <strong style={{ display: "block", color: "var(--admin-text)" }}>{order.customerName}</strong>
                     <span style={{ fontSize: "0.72rem", color: "#8E8276" }}>{order.city}</span>
                   </td>
-                  <td style={{ padding: "0.85rem 1rem", color: "#6F6257" }}>
+                  <td style={{ padding: "0.85rem 1rem", color: "var(--admin-text-secondary)" }}>
                     {order.items.reduce((s, i) => s + i.quantity, 0)} saree(s)
                   </td>
-                  <td style={{ padding: "0.85rem 1rem", fontWeight: 700, color: "#171513" }}>
+                  <td style={{ padding: "0.85rem 1rem", fontWeight: 700, color: "var(--admin-text)" }}>
                     {formatINR(order.total)}
                   </td>
                   <td style={{ padding: "0.85rem 1rem" }}>
@@ -199,7 +199,7 @@ export const AdminOrdersPage: React.FC<{ onNavigate: (href: string) => void }> =
                           padding: "0.4rem 0.65rem",
                           fontSize: "0.75rem",
                           border: "1px solid #D9D2C7",
-                          backgroundColor: "#FAF8F5",
+                          backgroundColor: "var(--admin-surface-subtle)",
                           cursor: "pointer",
                         }}
                       >
@@ -212,7 +212,7 @@ export const AdminOrdersPage: React.FC<{ onNavigate: (href: string) => void }> =
                           padding: "0.4rem",
                           color: "#7C2430",
                           border: "1px solid #E8C8C8",
-                          backgroundColor: "#FAF8F5",
+                          backgroundColor: "var(--admin-surface-subtle)",
                           cursor: "pointer",
                         }}
                       >
@@ -244,7 +244,7 @@ export const AdminOrdersPage: React.FC<{ onNavigate: (href: string) => void }> =
         >
           <div
             style={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--admin-surface)",
               padding: "2rem",
               maxWidth: "460px",
               width: "100%",
@@ -255,19 +255,19 @@ export const AdminOrdersPage: React.FC<{ onNavigate: (href: string) => void }> =
             <h3 className="font-serif" style={{ fontSize: "1.4rem", margin: "0 0 0.5rem 0" }}>
               Update Status: {statusModalOrder.orderNumber}
             </h3>
-            <p style={{ fontSize: "0.8rem", color: "#6F6257", marginBottom: "1.25rem" }}>
+            <p style={{ fontSize: "0.8rem", color: "var(--admin-text-secondary)", marginBottom: "1.25rem" }}>
               Customer: <strong>{statusModalOrder.customerName}</strong> ({statusModalOrder.customerEmail})
             </p>
 
             <form onSubmit={handleUpdateStatus} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   New Order Status *
                 </label>
                 <select
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value as any)}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", backgroundColor: "#FFFFFF" }}
+                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface)" }}
                 >
                   <option value="Pending">Pending</option>
                   <option value="Confirmed">Confirmed</option>
@@ -280,7 +280,7 @@ export const AdminOrdersPage: React.FC<{ onNavigate: (href: string) => void }> =
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   Status Timeline Note (Optional)
                 </label>
                 <input

@@ -38,7 +38,7 @@ export const CustomerReviewsSection: React.FC<{ onNavigate?: (href: string) => v
   };
 
   return (
-    <section style={{ padding: "5.5rem 0", backgroundColor: "#FFFFFF" }}>
+    <section style={{ padding: "5.5rem 0", backgroundColor: "var(--bg-surface)" }}>
       <div className="container">
         {/* Rating Header */}
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3.5rem", gap: "1.5rem" }}>
@@ -113,7 +113,7 @@ export const CustomerReviewsSection: React.FC<{ onNavigate?: (href: string) => v
                     {review.customerName}
                   </span>
                   {review.isVerified && (
-                    <span style={{ fontSize: "0.7rem", color: "#2E7D32", display: "flex", alignItems: "center", gap: "0.2rem", fontWeight: 600 }}>
+                    <span style={{ fontSize: "0.7rem", color: "var(--success-text)", display: "flex", alignItems: "center", gap: "0.2rem", fontWeight: 600 }}>
                       <CheckCircle size={12} /> Verified Buyer
                     </span>
                   )}
@@ -146,7 +146,7 @@ export const CustomerReviewsSection: React.FC<{ onNavigate?: (href: string) => v
         >
           <div
             style={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--bg-surface)",
               width: "100%",
               maxWidth: "500px",
               padding: "2rem",
@@ -173,7 +173,7 @@ export const CustomerReviewsSection: React.FC<{ onNavigate?: (href: string) => v
 
             {submitted ? (
               <div style={{ textAlign: "center", padding: "2rem 0" }}>
-                <CheckCircle size={48} style={{ color: "#2E7D32", margin: "0 auto 1rem auto" }} />
+                <CheckCircle size={48} style={{ color: "var(--success-text)", margin: "0 auto 1rem auto" }} />
                 <h3 className="font-serif" style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>Thank You!</h3>
                 <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>Your verified review has been published.</p>
               </div>

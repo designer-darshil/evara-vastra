@@ -70,7 +70,7 @@ export const AdminFaqCMSPage: React.FC<{ onNavigate: (href: string) => void }> =
           <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7C2430", display: "block" }}>
             CLIENT INQUIRIES & SUPPORT
           </span>
-          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "#171513", margin: "0.2rem 0 0 0" }}>
+          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: "0.2rem 0 0 0" }}>
             FAQ Knowledge Base ({faqs.length})
           </h1>
         </div>
@@ -86,8 +86,8 @@ export const AdminFaqCMSPage: React.FC<{ onNavigate: (href: string) => void }> =
           <div
             key={faq.id}
             style={{
-              backgroundColor: "#FFFFFF",
-              border: "1px solid #E5DFD5",
+              backgroundColor: "var(--admin-surface)",
+              border: "1px solid var(--admin-border)",
               padding: "1.5rem",
               boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
               display: "flex",
@@ -113,10 +113,10 @@ export const AdminFaqCMSPage: React.FC<{ onNavigate: (href: string) => void }> =
                 <span style={{ fontSize: "0.7rem", color: "#8E8276" }}>Order: #{faq.order}</span>
               </div>
 
-              <h3 className="font-serif" style={{ fontSize: "1.25rem", color: "#171513", margin: "0 0 0.5rem 0" }}>
+              <h3 className="font-serif" style={{ fontSize: "1.25rem", color: "var(--admin-text)", margin: "0 0 0.5rem 0" }}>
                 {faq.question}
               </h3>
-              <p style={{ fontSize: "0.85rem", color: "#6F6257", lineHeight: 1.6, margin: 0 }}>
+              <p style={{ fontSize: "0.85rem", color: "var(--admin-text-secondary)", lineHeight: 1.6, margin: 0 }}>
                 {faq.answer}
               </p>
             </div>
@@ -143,13 +143,13 @@ export const AdminFaqCMSPage: React.FC<{ onNavigate: (href: string) => void }> =
               })()}
               <button
                 onClick={() => handleOpenModal(faq)}
-                style={{ padding: "0.4rem 0.6rem", fontSize: "0.75rem", border: "1px solid #D9D2C7", backgroundColor: "#FAF8F5", cursor: "pointer" }}
+                style={{ padding: "0.4rem 0.6rem", fontSize: "0.75rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface-subtle)", cursor: "pointer" }}
               >
                 <Edit2 size={13} />
               </button>
               <button
                 onClick={() => deleteFAQ(faq.id)}
-                style={{ padding: "0.4rem", color: "#7C2430", border: "1px solid #E8C8C8", backgroundColor: "#FAF8F5", cursor: "pointer" }}
+                style={{ padding: "0.4rem", color: "#7C2430", border: "1px solid #E8C8C8", backgroundColor: "var(--admin-surface-subtle)", cursor: "pointer" }}
               >
                 <Trash2 size={13} />
               </button>
@@ -175,7 +175,7 @@ export const AdminFaqCMSPage: React.FC<{ onNavigate: (href: string) => void }> =
         >
           <div
             style={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--admin-surface)",
               padding: "2rem",
               maxWidth: "520px",
               width: "100%",
@@ -189,13 +189,13 @@ export const AdminFaqCMSPage: React.FC<{ onNavigate: (href: string) => void }> =
 
             <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   Category
                 </label>
                 <select
                   value={form.category}
                   onChange={(e) => setForm({ ...form, category: e.target.value as any })}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", backgroundColor: "#FFFFFF" }}
+                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface)" }}
                 >
                   <option value="shipping">Shipping & Express Delivery</option>
                   <option value="blouse">Blouse Piece & Measurements</option>
@@ -206,7 +206,7 @@ export const AdminFaqCMSPage: React.FC<{ onNavigate: (href: string) => void }> =
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   Question *
                 </label>
                 <input
@@ -219,7 +219,7 @@ export const AdminFaqCMSPage: React.FC<{ onNavigate: (href: string) => void }> =
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   Answer *
                 </label>
                 <textarea

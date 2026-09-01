@@ -73,7 +73,7 @@ export const AdminShoppableVideosPage: React.FC<{ onNavigate: (href: string) => 
           <div
             key={video.id}
             style={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--admin-surface)",
               border: "1px solid var(--border-subtle)",
               borderRadius: "6px",
               overflow: "hidden",
@@ -224,7 +224,7 @@ export const AdminShoppableVideosPage: React.FC<{ onNavigate: (href: string) => 
         >
           <div
             style={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--admin-surface)",
               width: "100%",
               maxWidth: "520px",
               padding: "2rem",

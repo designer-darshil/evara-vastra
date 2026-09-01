@@ -73,7 +73,7 @@ export const AdminCategoriesPage: React.FC<{ onNavigate: (href: string) => void 
           <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7C2430", display: "block" }}>
             ORGANIZATION & TAXONOMY
           </span>
-          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "#171513", margin: "0.2rem 0 0 0" }}>
+          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: "0.2rem 0 0 0" }}>
             Categories ({categories.length})
           </h1>
         </div>
@@ -89,8 +89,8 @@ export const AdminCategoriesPage: React.FC<{ onNavigate: (href: string) => void 
           <div
             key={cat.id}
             style={{
-              backgroundColor: "#FFFFFF",
-              border: "1px solid #E5DFD5",
+              backgroundColor: "var(--admin-surface)",
+              border: "1px solid var(--admin-border)",
               overflow: "hidden",
               boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
               display: "flex",
@@ -123,10 +123,10 @@ export const AdminCategoriesPage: React.FC<{ onNavigate: (href: string) => void 
                 <span style={{ fontSize: "0.7rem", color: "#8E8276", textTransform: "uppercase" }}>
                   SLUG: /{cat.slug}
                 </span>
-                <h3 className="font-serif" style={{ fontSize: "1.3rem", color: "#171513", margin: "0.2rem 0 0.4rem 0" }}>
+                <h3 className="font-serif" style={{ fontSize: "1.3rem", color: "var(--admin-text)", margin: "0.2rem 0 0.4rem 0" }}>
                   {cat.name}
                 </h3>
-                <p style={{ fontSize: "0.8rem", color: "#6F6257", lineHeight: 1.4 }}>
+                <p style={{ fontSize: "0.8rem", color: "var(--admin-text-secondary)", lineHeight: 1.4 }}>
                   {cat.shortDescription}
                 </p>
               </div>
@@ -138,7 +138,7 @@ export const AdminCategoriesPage: React.FC<{ onNavigate: (href: string) => void 
                     padding: "0.4rem 0.75rem",
                     fontSize: "0.75rem",
                     border: "1px solid #D9D2C7",
-                    backgroundColor: "#FAF8F5",
+                    backgroundColor: "var(--admin-surface-subtle)",
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
@@ -153,7 +153,7 @@ export const AdminCategoriesPage: React.FC<{ onNavigate: (href: string) => void 
                     padding: "0.4rem",
                     color: "#7C2430",
                     border: "1px solid #E8C8C8",
-                    backgroundColor: "#FAF8F5",
+                    backgroundColor: "var(--admin-surface-subtle)",
                     cursor: "pointer",
                   }}
                 >
@@ -182,7 +182,7 @@ export const AdminCategoriesPage: React.FC<{ onNavigate: (href: string) => void 
         >
           <div
             style={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--admin-surface)",
               padding: "2rem",
               maxWidth: "480px",
               width: "100%",
@@ -196,7 +196,7 @@ export const AdminCategoriesPage: React.FC<{ onNavigate: (href: string) => void 
 
             <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   Category Name *
                 </label>
                 <input
@@ -209,7 +209,7 @@ export const AdminCategoriesPage: React.FC<{ onNavigate: (href: string) => void 
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   URL Slug *
                 </label>
                 <input
@@ -222,7 +222,7 @@ export const AdminCategoriesPage: React.FC<{ onNavigate: (href: string) => void 
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   Short Description
                 </label>
                 <input
@@ -234,7 +234,7 @@ export const AdminCategoriesPage: React.FC<{ onNavigate: (href: string) => void 
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   Image URL
                 </label>
                 <input

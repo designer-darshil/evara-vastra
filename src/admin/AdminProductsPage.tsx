@@ -93,7 +93,7 @@ export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }>
           >
             INVENTORY & CATALOG
           </span>
-          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "#171513", margin: 0 }}>
+          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: 0 }}>
             Saree Catalog ({products.length})
           </h1>
         </div>
@@ -110,9 +110,9 @@ export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }>
       {/* Filter & Search Bar */}
       <div
         style={{
-          backgroundColor: "#FFFFFF",
+          backgroundColor: "var(--admin-surface)",
           padding: "1rem 1.25rem",
-          border: "1px solid #E5DFD5",
+          border: "1px solid var(--admin-border)",
           display: "flex",
           flexWrap: "wrap",
           alignItems: "center",
@@ -146,7 +146,7 @@ export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }>
             style={{
               padding: "0.45rem 0.75rem",
               border: "1px solid #D9D2C7",
-              backgroundColor: "#FAF8F5",
+              backgroundColor: "var(--admin-surface-subtle)",
               fontSize: "0.8rem",
               outline: "none",
             }}
@@ -165,7 +165,7 @@ export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }>
             style={{
               padding: "0.45rem 0.75rem",
               border: "1px solid #D9D2C7",
-              backgroundColor: "#FAF8F5",
+              backgroundColor: "var(--admin-surface-subtle)",
               fontSize: "0.8rem",
               outline: "none",
             }}
@@ -181,14 +181,14 @@ export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }>
       {/* Products Table */}
       <div
         style={{
-          backgroundColor: "#FFFFFF",
-          border: "1px solid #E5DFD5",
+          backgroundColor: "var(--admin-surface)",
+          border: "1px solid var(--admin-border)",
           overflowX: "auto",
         }}
       >
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.825rem", textAlign: "left" }}>
           <thead>
-            <tr style={{ backgroundColor: "#FAF8F5", color: "#6F6257", borderBottom: "1px solid #E5DFD5" }}>
+            <tr style={{ backgroundColor: "var(--admin-surface-subtle)", color: "var(--admin-text-secondary)", borderBottom: "1px solid var(--admin-border)" }}>
               <th style={{ padding: "0.85rem 1rem" }}>PRODUCT</th>
               <th style={{ padding: "0.85rem 1rem" }}>SKU</th>
               <th style={{ padding: "0.85rem 1rem" }}>CATEGORY</th>
@@ -225,14 +225,14 @@ export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }>
                           height: "58px",
                           objectFit: "cover",
                           backgroundColor: "#EDE7DD",
-                          border: "1px solid #E5DFD5",
+                          border: "1px solid var(--admin-border)",
                         }}
                       />
                       <div>
                         <strong
                           onClick={() => onNavigate(`/admin/products/edit/${p.id}`)}
                           style={{
-                            color: "#171513",
+                            color: "var(--admin-text)",
                             display: "block",
                             cursor: "pointer",
                             fontSize: "0.85rem",
@@ -246,12 +246,12 @@ export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }>
                   </td>
 
                   {/* SKU */}
-                  <td style={{ padding: "0.85rem 1rem", color: "#6F6257", fontFamily: "monospace" }}>
+                  <td style={{ padding: "0.85rem 1rem", color: "var(--admin-text-secondary)", fontFamily: "monospace" }}>
                     {p.code || p.sku}
                   </td>
 
                   {/* Category */}
-                  <td style={{ padding: "0.85rem 1rem", textTransform: "capitalize", color: "#6F6257" }}>
+                  <td style={{ padding: "0.85rem 1rem", textTransform: "capitalize", color: "var(--admin-text-secondary)" }}>
                     {p.category}
                   </td>
 
@@ -319,7 +319,7 @@ export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }>
                         title="Preview on Storefront"
                         style={{
                           padding: "0.4rem",
-                          color: "#6F6257",
+                          color: "var(--admin-text-secondary)",
                           background: "none",
                           border: "1px solid #D9D2C7",
                           cursor: "pointer",
@@ -332,7 +332,7 @@ export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }>
                         title="Edit Product"
                         style={{
                           padding: "0.4rem",
-                          color: "#171513",
+                          color: "var(--admin-text)",
                           background: "none",
                           border: "1px solid #D9D2C7",
                           cursor: "pointer",
@@ -345,7 +345,7 @@ export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }>
                         title="Duplicate Saree"
                         style={{
                           padding: "0.4rem",
-                          color: "#6F6257",
+                          color: "var(--admin-text-secondary)",
                           background: "none",
                           border: "1px solid #D9D2C7",
                           cursor: "pointer",
@@ -392,7 +392,7 @@ export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }>
         >
           <div
             style={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--admin-surface)",
               padding: "2rem",
               maxWidth: "420px",
               width: "100%",
@@ -403,7 +403,7 @@ export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }>
             <h3 className="font-serif" style={{ fontSize: "1.4rem", margin: "0 0 0.5rem 0", color: "#7C2430" }}>
               Delete Saree from Catalog?
             </h3>
-            <p style={{ fontSize: "0.85rem", color: "#6F6257", lineHeight: 1.5, marginBottom: "1.5rem" }}>
+            <p style={{ fontSize: "0.85rem", color: "var(--admin-text-secondary)", lineHeight: 1.5, marginBottom: "1.5rem" }}>
               This will permanently remove this piece from the database and the customer storefront.
             </p>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem" }}>

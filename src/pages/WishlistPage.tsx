@@ -67,7 +67,7 @@ export const WishlistPage: React.FC<{ onNavigate: (href: string) => void }> = ({
             style={{
               padding: "5rem 2rem",
               textAlign: "center",
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--bg-surface)",
               border: "1px solid var(--border-subtle)",
             }}
           >

@@ -57,7 +57,7 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
           >
             ATELIER OVERVIEW
           </span>
-          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "#171513", margin: 0 }}>
+          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: 0 }}>
             Executive Dashboard
           </h1>
         </div>
@@ -91,19 +91,19 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
         {/* Total Revenue */}
         <div
           style={{
-            backgroundColor: "#FFFFFF",
+            backgroundColor: "var(--admin-surface)",
             padding: "1.5rem",
-            border: "1px solid #E5DFD5",
+            border: "1px solid var(--admin-border)",
             boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
-            <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257" }}>
+            <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)" }}>
               Total Demo Revenue
             </span>
             <TrendingUp size={16} style={{ color: "#234E3E" }} />
           </div>
-          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "#171513" }}>
+          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "var(--admin-text)" }}>
             {formatINR(totalRevenue)}
           </div>
           <span style={{ fontSize: "0.72rem", color: "#234E3E", fontWeight: 600, display: "block", marginTop: "0.25rem" }}>
@@ -114,19 +114,19 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
         {/* Orders */}
         <div
           style={{
-            backgroundColor: "#FFFFFF",
+            backgroundColor: "var(--admin-surface)",
             padding: "1.5rem",
-            border: "1px solid #E5DFD5",
+            border: "1px solid var(--admin-border)",
             boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
-            <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257" }}>
+            <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)" }}>
               Total Orders
             </span>
             <ShoppingBag size={16} style={{ color: "#7C2430" }} />
           </div>
-          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "#171513" }}>
+          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "var(--admin-text)" }}>
             {totalOrders}
           </div>
           <span style={{ fontSize: "0.72rem", color: pendingOrders > 0 ? "#7C2430" : "#6F6257", fontWeight: 600, display: "block", marginTop: "0.25rem" }}>
@@ -137,22 +137,22 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
         {/* Published Products */}
         <div
           style={{
-            backgroundColor: "#FFFFFF",
+            backgroundColor: "var(--admin-surface)",
             padding: "1.5rem",
-            border: "1px solid #E5DFD5",
+            border: "1px solid var(--admin-border)",
             boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
-            <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257" }}>
+            <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)" }}>
               Catalog Sarees
             </span>
             <Package size={16} style={{ color: "#B18A52" }} />
           </div>
-          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "#171513" }}>
+          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "var(--admin-text)" }}>
             {publishedProducts}
           </div>
-          <span style={{ fontSize: "0.72rem", color: "#6F6257", display: "block", marginTop: "0.25rem" }}>
+          <span style={{ fontSize: "0.72rem", color: "var(--admin-text-secondary)", display: "block", marginTop: "0.25rem" }}>
             {draftProducts} draft / {totalProducts} total
           </span>
         </div>
@@ -160,14 +160,14 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
         {/* Low Stock Alerts */}
         <div
           style={{
-            backgroundColor: "#FFFFFF",
+            backgroundColor: "var(--admin-surface)",
             padding: "1.5rem",
             border: lowStockProducts.length > 0 ? "1px solid #E8C8C8" : "1px solid #E5DFD5",
             boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
-            <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257" }}>
+            <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)" }}>
               Low Stock Alert
             </span>
             <AlertTriangle size={16} style={{ color: lowStockProducts.length > 0 ? "#7C2430" : "#234E3E" }} />
@@ -175,7 +175,7 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
           <div style={{ fontSize: "1.65rem", fontWeight: 700, color: lowStockProducts.length > 0 ? "#7C2430" : "#171513" }}>
             {lowStockProducts.length}
           </div>
-          <span style={{ fontSize: "0.72rem", color: "#6F6257", display: "block", marginTop: "0.25rem" }}>
+          <span style={{ fontSize: "0.72rem", color: "var(--admin-text-secondary)", display: "block", marginTop: "0.25rem" }}>
             Sarees with ≤ 3 units remaining
           </span>
         </div>
@@ -184,9 +184,9 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
       {/* Live Storefront Status Banner */}
       <div
         style={{
-          backgroundColor: "#FFFFFF",
+          backgroundColor: "var(--admin-surface)",
           padding: "1.25rem 1.5rem",
-          border: "1px solid #E5DFD5",
+          border: "1px solid var(--admin-border)",
           display: "flex",
           flexWrap: "wrap",
           alignItems: "center",
@@ -210,10 +210,10 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
             <Bell size={18} />
           </div>
           <div>
-            <strong style={{ fontSize: "0.85rem", color: "#171513", display: "block" }}>
+            <strong style={{ fontSize: "0.85rem", color: "var(--admin-text)", display: "block" }}>
               Website Announcement Bar: {notificationBar.isEnabled ? "ACTIVE ON STOREFRONT" : "DISABLED"}
             </strong>
-            <p style={{ fontSize: "0.75rem", color: "#6F6257", margin: 0 }}>
+            <p style={{ fontSize: "0.75rem", color: "var(--admin-text-secondary)", margin: 0 }}>
               "{notificationBar.message}"
             </p>
           </div>
@@ -240,8 +240,8 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
         {/* Left: Recent Orders Table */}
         <div
           style={{
-            backgroundColor: "#FFFFFF",
-            border: "1px solid #E5DFD5",
+            backgroundColor: "var(--admin-surface)",
+            border: "1px solid var(--admin-border)",
             padding: "1.5rem",
           }}
         >
@@ -269,7 +269,7 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem", textAlign: "left" }}>
               <thead>
-                <tr style={{ color: "#8E8276", borderBottom: "1px solid #E5DFD5" }}>
+                <tr style={{ color: "#8E8276", borderBottom: "1px solid var(--admin-border)" }}>
                   <th style={{ padding: "0.6rem 0.5rem" }}>ORDER</th>
                   <th style={{ padding: "0.6rem 0.5rem" }}>CUSTOMER</th>
                   <th style={{ padding: "0.6rem 0.5rem" }}>TOTAL</th>
@@ -284,7 +284,7 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
                       {order.orderNumber}
                     </td>
                     <td style={{ padding: "0.75rem 0.5rem" }}>
-                      <span style={{ display: "block", color: "#171513" }}>{order.customerName}</span>
+                      <span style={{ display: "block", color: "var(--admin-text)" }}>{order.customerName}</span>
                       <span style={{ fontSize: "0.7rem", color: "#8E8276" }}>{order.city}</span>
                     </td>
                     <td style={{ padding: "0.75rem 0.5rem", fontWeight: 600 }}>
@@ -320,7 +320,7 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
                           padding: "0.3rem 0.6rem",
                           fontSize: "0.72rem",
                           border: "1px solid #D9D2C7",
-                          backgroundColor: "#FAF8F5",
+                          backgroundColor: "var(--admin-surface-subtle)",
                           cursor: "pointer",
                         }}
                       >
@@ -337,7 +337,7 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
         {/* Right: Low Stock & Featured Collection Info */}
         <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           {/* Low Stock Watch */}
-          <div style={{ backgroundColor: "#FFFFFF", border: "1px solid #E5DFD5", padding: "1.5rem" }}>
+          <div style={{ backgroundColor: "var(--admin-surface)", border: "1px solid var(--admin-border)", padding: "1.5rem" }}>
             <h3 className="font-serif" style={{ fontSize: "1.2rem", margin: "0 0 1rem 0" }}>
               Low Inventory Watch
             </h3>
@@ -356,12 +356,12 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
                       alignItems: "center",
                       justifyContent: "space-between",
                       padding: "0.6rem 0.75rem",
-                      backgroundColor: "#FAF8F5",
+                      backgroundColor: "var(--admin-surface-subtle)",
                       border: "1px solid #EBE5DB",
                     }}
                   >
                     <div>
-                      <strong style={{ fontSize: "0.8rem", color: "#171513", display: "block" }}>
+                      <strong style={{ fontSize: "0.8rem", color: "var(--admin-text)", display: "block" }}>
                         {p.title}
                       </strong>
                       <span style={{ fontSize: "0.7rem", color: "#8E8276" }}>{p.code}</span>
@@ -376,7 +376,7 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
           </div>
 
           {/* Quick Shortcuts */}
-          <div style={{ backgroundColor: "#FFFFFF", border: "1px solid #E5DFD5", padding: "1.5rem" }}>
+          <div style={{ backgroundColor: "var(--admin-surface)", border: "1px solid var(--admin-border)", padding: "1.5rem" }}>
             <h3 className="font-serif" style={{ fontSize: "1.2rem", margin: "0 0 1rem 0" }}>
               Quick Management
             </h3>
@@ -389,7 +389,7 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
                   alignItems: "center",
                   justifyContent: "space-between",
                   padding: "0.7rem 0.85rem",
-                  backgroundColor: "#FAF8F5",
+                  backgroundColor: "var(--admin-surface-subtle)",
                   border: "1px solid #EBE5DB",
                   fontSize: "0.8rem",
                   textAlign: "left",
@@ -407,7 +407,7 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
                   alignItems: "center",
                   justifyContent: "space-between",
                   padding: "0.7rem 0.85rem",
-                  backgroundColor: "#FAF8F5",
+                  backgroundColor: "var(--admin-surface-subtle)",
                   border: "1px solid #EBE5DB",
                   fontSize: "0.8rem",
                   textAlign: "left",
@@ -425,7 +425,7 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
                   alignItems: "center",
                   justifyContent: "space-between",
                   padding: "0.7rem 0.85rem",
-                  backgroundColor: "#FAF8F5",
+                  backgroundColor: "var(--admin-surface-subtle)",
                   border: "1px solid #EBE5DB",
                   fontSize: "0.8rem",
                   textAlign: "left",

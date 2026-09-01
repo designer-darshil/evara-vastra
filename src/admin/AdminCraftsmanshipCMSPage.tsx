@@ -26,17 +26,17 @@ export const AdminCraftsmanshipCMSPage: React.FC<{ onNavigate: (href: string) =>
   return (
     <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
       {/* Top Header */}
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem", borderBottom: "1px solid #E5DFD5", paddingBottom: "1rem" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem", borderBottom: "1px solid var(--admin-border)", paddingBottom: "1rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           <button
             type="button"
             onClick={() => onNavigate("/admin/content")}
-            style={{ padding: "0.5rem 0.75rem", backgroundColor: "#FFFFFF", border: "1px solid #D9D2C7", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.8rem" }}
+            style={{ padding: "0.5rem 0.75rem", backgroundColor: "var(--admin-surface)", border: "1px solid #D9D2C7", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.8rem" }}
           >
             <ArrowLeft size={14} /> Content Hub
           </button>
           <div>
-            <h1 className="font-serif" style={{ fontSize: "1.8rem", color: "#171513", margin: 0 }}>
+            <h1 className="font-serif" style={{ fontSize: "1.8rem", color: "var(--admin-text)", margin: 0 }}>
               Craftsmanship & Atelier Page Editor
             </h1>
             <span style={{ fontSize: "0.75rem", color: "#8E8276" }}>
@@ -67,13 +67,13 @@ export const AdminCraftsmanshipCMSPage: React.FC<{ onNavigate: (href: string) =>
       )}
 
       {/* Hero Intro */}
-      <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid #E5DFD5", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "#171513", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
+      <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "var(--admin-text)", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
           Page Header & Manifesto
         </h3>
 
         <div>
-          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
             Main Headline
           </label>
           <input
@@ -86,7 +86,7 @@ export const AdminCraftsmanshipCMSPage: React.FC<{ onNavigate: (href: string) =>
         </div>
 
         <div>
-          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
             Subhead Tagline
           </label>
           <input
@@ -98,7 +98,7 @@ export const AdminCraftsmanshipCMSPage: React.FC<{ onNavigate: (href: string) =>
         </div>
 
         <div>
-          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
             Intro Narrative
           </label>
           <textarea
@@ -112,16 +112,16 @@ export const AdminCraftsmanshipCMSPage: React.FC<{ onNavigate: (href: string) =>
 
       {/* 4 Craft Steps */}
       <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-        <h3 className="font-serif" style={{ fontSize: "1.4rem", color: "#171513", margin: 0 }}>
+        <h3 className="font-serif" style={{ fontSize: "1.4rem", color: "var(--admin-text)", margin: 0 }}>
           Generational Weaving Steps ({form.steps.length})
         </h3>
 
         {form.steps.map((step, idx) => (
-          <div key={idx} style={{ backgroundColor: "#FFFFFF", padding: "1.5rem", border: "1px solid #E5DFD5", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+          <div key={idx} style={{ backgroundColor: "var(--admin-surface)", padding: "1.5rem", border: "1px solid var(--admin-border)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
               <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#7C2430" }}>STEP {step.step || step.stepNumber || idx + 1}</span>
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   Step Title
                 </label>
                 <input
@@ -132,7 +132,7 @@ export const AdminCraftsmanshipCMSPage: React.FC<{ onNavigate: (href: string) =>
                 />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   Description Narrative
                 </label>
                 <textarea
@@ -145,7 +145,7 @@ export const AdminCraftsmanshipCMSPage: React.FC<{ onNavigate: (href: string) =>
             </div>
 
             <div>
-              <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+              <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                 Step Photography URL
               </label>
               <input
@@ -154,7 +154,7 @@ export const AdminCraftsmanshipCMSPage: React.FC<{ onNavigate: (href: string) =>
                 onChange={(e) => handleStepChange(idx, "image", e.target.value)}
                 style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", marginBottom: "0.5rem" }}
               />
-              <div style={{ aspectRatio: "16/10", overflow: "hidden", backgroundColor: "#EDE7DD", border: "1px solid #E5DFD5" }}>
+              <div style={{ aspectRatio: "16/10", overflow: "hidden", backgroundColor: "#EDE7DD", border: "1px solid var(--admin-border)" }}>
                 <img src={step.image} alt={step.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               </div>
             </div>

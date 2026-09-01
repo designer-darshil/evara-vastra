@@ -81,7 +81,7 @@ export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }>
           <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7C2430", display: "block" }}>
             CAMPAIGN LOOKS
           </span>
-          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "#171513", margin: "0.2rem 0 0 0" }}>
+          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: "0.2rem 0 0 0" }}>
             Lookbook Anthology ({lookbookItems.length})
           </h1>
         </div>
@@ -97,8 +97,8 @@ export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }>
           <div
             key={look.id}
             style={{
-              backgroundColor: "#FFFFFF",
-              border: "1px solid #E5DFD5",
+              backgroundColor: "var(--admin-surface)",
+              border: "1px solid var(--admin-border)",
               overflow: "hidden",
               boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
               display: "flex",
@@ -128,13 +128,13 @@ export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }>
                 <span style={{ fontSize: "0.68rem", color: "#B18A52", fontWeight: 700, textTransform: "uppercase" }}>
                   {look.location} • {look.season}
                 </span>
-                <h3 className="font-serif" style={{ fontSize: "1.35rem", color: "#171513", margin: "0.2rem 0 0.4rem 0" }}>
+                <h3 className="font-serif" style={{ fontSize: "1.35rem", color: "var(--admin-text)", margin: "0.2rem 0 0.4rem 0" }}>
                   {look.title}
                 </h3>
-                <p style={{ fontSize: "0.825rem", color: "#6F6257", lineHeight: 1.4, marginBottom: "0.75rem" }}>
+                <p style={{ fontSize: "0.825rem", color: "var(--admin-text-secondary)", lineHeight: 1.4, marginBottom: "0.75rem" }}>
                   {look.narrative}
                 </p>
-                <div style={{ backgroundColor: "#FAF8F5", padding: "0.6rem 0.75rem", border: "1px solid #EBE5DB", fontSize: "0.75rem" }}>
+                <div style={{ backgroundColor: "var(--admin-surface-subtle)", padding: "0.6rem 0.75rem", border: "1px solid #EBE5DB", fontSize: "0.75rem" }}>
                   <span style={{ color: "#8E8276", display: "block" }}>Linked Saree:</span>
                   <strong>{look.productTitle}</strong> {look.productPrice ? `(₹${look.productPrice.toLocaleString("en-IN")})` : ""}
                 </div>
@@ -147,7 +147,7 @@ export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }>
                     padding: "0.4rem 0.75rem",
                     fontSize: "0.75rem",
                     border: "1px solid #D9D2C7",
-                    backgroundColor: "#FAF8F5",
+                    backgroundColor: "var(--admin-surface-subtle)",
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
@@ -162,7 +162,7 @@ export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }>
                     padding: "0.4rem",
                     color: "#7C2430",
                     border: "1px solid #E8C8C8",
-                    backgroundColor: "#FAF8F5",
+                    backgroundColor: "var(--admin-surface-subtle)",
                     cursor: "pointer",
                   }}
                 >
@@ -191,7 +191,7 @@ export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }>
         >
           <div
             style={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--admin-surface)",
               padding: "2rem",
               maxWidth: "520px",
               width: "100%",
@@ -208,7 +208,7 @@ export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }>
             <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "1rem" }}>
                 <div>
-                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                     Look #
                   </label>
                   <input
@@ -219,7 +219,7 @@ export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }>
                   />
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                     Look Title *
                   </label>
                   <input
@@ -234,7 +234,7 @@ export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                 <div>
-                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                     Location
                   </label>
                   <input
@@ -245,7 +245,7 @@ export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }>
                   />
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                     Season
                   </label>
                   <input
@@ -258,7 +258,7 @@ export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }>
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   Image URL *
                 </label>
                 <input
@@ -271,13 +271,13 @@ export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }>
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   Assign Saree for "Shop This Drape"
                 </label>
                 <select
                   value={form.productSlug}
                   onChange={(e) => handleSelectProduct(e.target.value)}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", backgroundColor: "#FFFFFF" }}
+                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface)" }}
                 >
                   {products.map((p) => (
                     <option key={p.id} value={p.slug}>
@@ -288,7 +288,7 @@ export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }>
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   Editorial Narrative
                 </label>
                 <textarea

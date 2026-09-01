@@ -65,7 +65,7 @@ export const CartPage: React.FC<{ onNavigate: (href: string) => void }> = ({
             style={{
               padding: "5rem 2rem",
               textAlign: "center",
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--bg-surface)",
               border: "1px solid var(--border-subtle)",
             }}
           >
@@ -81,19 +81,13 @@ export const CartPage: React.FC<{ onNavigate: (href: string) => void }> = ({
           </div>
         ) : (
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1.25fr 0.75fr",
-              gap: "3rem",
-              alignItems: "start",
-            }}
-            className="cart-layout-grid"
+            className="cart-grid"
           >
             {/* Left Items Table */}
             <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
               <div
                 style={{
-                  backgroundColor: "#FFFFFF",
+                  backgroundColor: "var(--bg-surface)",
                   border: "1px solid var(--border-subtle)",
                   overflow: "hidden",
                 }}
@@ -104,10 +98,6 @@ export const CartPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                     style={{
                       padding: "1.75rem",
                       borderBottom: "1px solid var(--border-subtle)",
-                      display: "grid",
-                      gridTemplateColumns: "100px 1fr auto",
-                      gap: "1.5rem",
-                      alignItems: "center",
                     }}
                     className="cart-item-row"
                   >
@@ -196,7 +186,7 @@ export const CartPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                           display: "inline-flex",
                           alignItems: "center",
                           border: "1px solid var(--border-medium)",
-                          backgroundColor: "#FFFFFF",
+                          backgroundColor: "var(--bg-surface)",
                         }}
                       >
                         <button
@@ -223,7 +213,7 @@ export const CartPage: React.FC<{ onNavigate: (href: string) => void }> = ({
               {/* Keepsake Packaging Option */}
               <div
                 style={{
-                  backgroundColor: "#FFFFFF",
+                  backgroundColor: "var(--bg-surface)",
                   padding: "1.25rem 1.5rem",
                   border: "1px solid var(--border-subtle)",
                   display: "flex",
@@ -255,7 +245,7 @@ export const CartPage: React.FC<{ onNavigate: (href: string) => void }> = ({
             {/* Right Summary Box */}
             <div
               style={{
-                backgroundColor: "#FFFFFF",
+                backgroundColor: "var(--bg-surface)",
                 padding: "2rem",
                 border: "1px solid var(--border-subtle)",
                 boxShadow: "var(--shadow-subtle)",
@@ -361,16 +351,7 @@ export const CartPage: React.FC<{ onNavigate: (href: string) => void }> = ({
         )}
       </div>
 
-      <style>{`
-        @media (max-width: 900px) {
-          .cart-layout-grid {
-            grid-template-columns: 1fr !important;
-          }
-          .cart-item-row {
-            grid-template-columns: 80px 1fr !important;
-          }
-        }
-      `}</style>
+
     </div>
   );
 };

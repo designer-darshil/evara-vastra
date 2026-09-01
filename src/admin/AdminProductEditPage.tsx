@@ -140,7 +140,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
           alignItems: "center",
           justifyContent: "space-between",
           gap: "1rem",
-          borderBottom: "1px solid #E5DFD5",
+          borderBottom: "1px solid var(--admin-border)",
           paddingBottom: "1rem",
         }}
       >
@@ -150,7 +150,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
             onClick={() => onNavigate("/admin/products")}
             style={{
               padding: "0.5rem 0.75rem",
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--admin-surface)",
               border: "1px solid #D9D2C7",
               cursor: "pointer",
               display: "flex",
@@ -162,7 +162,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
             <ArrowLeft size={14} /> Back to Catalog
           </button>
           <div>
-            <h1 className="font-serif" style={{ fontSize: "1.8rem", color: "#171513", margin: 0 }}>
+            <h1 className="font-serif" style={{ fontSize: "1.8rem", color: "var(--admin-text)", margin: 0 }}>
               {isEditing ? `Edit: ${formData.title || "Untitled"}` : "Create New Handcrafted Saree"}
             </h1>
             <span style={{ fontSize: "0.75rem", color: "#8E8276" }}>
@@ -211,7 +211,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
       )}
 
       {/* Tabs Selector */}
-      <div style={{ display: "flex", gap: "0.5rem", borderBottom: "1px solid #E5DFD5" }}>
+      <div style={{ display: "flex", gap: "0.5rem", borderBottom: "1px solid var(--admin-border)" }}>
         {[
           { id: "general", label: "1. General Information" },
           { id: "pricing", label: "2. Pricing & Inventory" },
@@ -242,9 +242,9 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
 
       {/* Tab 1: General */}
       {activeTab === "general" && (
-        <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid #E5DFD5", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+        <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
               Saree Title *
             </label>
             <input
@@ -259,7 +259,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
                 URL Slug *
               </label>
               <input
@@ -272,7 +272,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
             </div>
 
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
                 SKU / Atelier Code *
               </label>
               <input
@@ -285,13 +285,13 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
             </div>
 
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
                 Primary Category *
               </label>
               <select
                 value={formData.category || "silk"}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem", backgroundColor: "#FFFFFF" }}
+                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem", backgroundColor: "var(--admin-surface)" }}
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.slug}>
@@ -304,13 +304,13 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
                 Assigned Collection
               </label>
               <select
                 value={formData.collection || "silk-edit"}
                 onChange={(e) => setFormData({ ...formData, collection: e.target.value })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem", backgroundColor: "#FFFFFF" }}
+                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem", backgroundColor: "var(--admin-surface)" }}
               >
                 {collections.map((col) => (
                   <option key={col.id} value={col.slug}>
@@ -321,7 +321,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
             </div>
 
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
                 Fabric Name *
               </label>
               <input
@@ -335,7 +335,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
             </div>
 
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
                 Color Name & Hex *
               </label>
               <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -356,7 +356,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
               Short Tagline / Teaser Description
             </label>
             <input
@@ -369,7 +369,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
               Full Editorial Product Story
             </label>
             <textarea
@@ -384,10 +384,10 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
 
       {/* Tab 2: Pricing & Stock */}
       {activeTab === "pricing" && (
-        <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid #E5DFD5", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+        <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1.5rem" }}>
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
                 Price (INR ₹) *
               </label>
               <input
@@ -400,7 +400,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
             </div>
 
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
                 Compare-at Original Price (Optional)
               </label>
               <input
@@ -413,7 +413,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
             </div>
 
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
                 Inventory Count (Physical Stock) *
               </label>
               <input
@@ -431,13 +431,13 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", borderTop: "1px solid #F0EBE1", paddingTop: "1.5rem" }}>
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.5rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.5rem" }}>
                 Publication Status *
               </label>
               <select
                 value={formData.status || "published"}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem", backgroundColor: "#FFFFFF" }}
+                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem", backgroundColor: "var(--admin-surface)" }}
               >
                 <option value="published">Published (Visible on storefront)</option>
                 <option value="draft">Draft (Hidden from customers)</option>
@@ -446,7 +446,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
             </div>
 
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.5rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.5rem" }}>
                 Badges & Merchandising
               </label>
               <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
@@ -485,10 +485,10 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
 
       {/* Tab 3: Specs & Blouse */}
       {activeTab === "specs" && (
-        <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid #E5DFD5", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+        <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
                 Saree Length
               </label>
               <input
@@ -499,7 +499,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
               />
             </div>
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
                 Saree Width
               </label>
               <input
@@ -510,13 +510,13 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
               />
             </div>
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
                 Blouse Piece Included?
               </label>
               <select
                 value={formData.details?.blousePiece ? "yes" : "no"}
                 onChange={(e) => setFormData({ ...formData, details: { ...formData.details!, blousePiece: e.target.value === "yes" } })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", backgroundColor: "#FFFFFF" }}
+                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface)" }}
               >
                 <option value="yes">Yes (Included in pack)</option>
                 <option value="no">No (Saree Only)</option>
@@ -525,7 +525,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
               Blouse Piece Description
             </label>
             <input
@@ -539,7 +539,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
                 Weaving Technique
               </label>
               <input
@@ -550,7 +550,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
               />
             </div>
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
                 Zari Type
               </label>
               <input
@@ -561,7 +561,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
               />
             </div>
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
                 Origin & Cluster
               </label>
               <input
@@ -575,7 +575,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
                 Curator Styling Advice
               </label>
               <textarea
@@ -586,7 +586,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
               />
             </div>
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
                 Draping Masterclass Tip
               </label>
               <textarea
@@ -602,7 +602,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
 
       {/* Tab 4: Media Gallery */}
       {activeTab === "media" && (
-        <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid #E5DFD5", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+        <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           <div>
             <h3 className="font-serif" style={{ fontSize: "1.2rem", margin: "0 0 0.5rem 0" }}>
               Product Image Gallery
@@ -639,7 +639,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
                 style={{
                   position: "relative",
                   border: idx === 0 ? "2px solid #7C2430" : "1px solid #E5DFD5",
-                  backgroundColor: "#FAF8F5",
+                  backgroundColor: "var(--admin-surface-subtle)",
                   overflow: "hidden",
                 }}
               >
@@ -691,9 +691,9 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
 
       {/* Tab 5: SEO */}
       {activeTab === "seo" && (
-        <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid #E5DFD5", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+        <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
               Custom SEO Title Tag
             </label>
             <input
@@ -706,7 +706,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.35rem" }}>
+            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
               SEO Meta Description
             </label>
             <textarea

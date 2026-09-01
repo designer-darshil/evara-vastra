@@ -47,7 +47,7 @@ export const AdminLoginPage: React.FC<{ onNavigate: (href: string) => void }> = 
         style={{
           width: "100%",
           maxWidth: "420px",
-          backgroundColor: "#FFFFFF",
+          backgroundColor: "var(--admin-surface)",
           padding: "2.5rem 2rem",
           boxShadow: "0 20px 40px rgba(0,0,0,0.4)",
           border: "1px solid rgba(255,255,255,0.1)",
@@ -70,11 +70,11 @@ export const AdminLoginPage: React.FC<{ onNavigate: (href: string) => void }> = 
           </span>
           <h1
             className="font-serif"
-            style={{ fontSize: "1.85rem", color: "#171513", margin: "0 0 0.4rem 0" }}
+            style={{ fontSize: "1.85rem", color: "var(--admin-text)", margin: "0 0 0.4rem 0" }}
           >
             EVARA VASTRA
           </h1>
-          <p style={{ fontSize: "0.8rem", color: "#6F6257" }}>
+          <p style={{ fontSize: "0.8rem", color: "var(--admin-text-secondary)" }}>
             Sign in to manage catalog, orders, and storefront content.
           </p>
         </div>
@@ -103,7 +103,7 @@ export const AdminLoginPage: React.FC<{ onNavigate: (href: string) => void }> = 
                 fontWeight: 700,
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
-                color: "#6F6257",
+                color: "var(--admin-text-secondary)",
                 marginBottom: "0.35rem",
               }}
             >
@@ -131,7 +131,7 @@ export const AdminLoginPage: React.FC<{ onNavigate: (href: string) => void }> = 
                   border: "1px solid #D9D2C7",
                   fontSize: "0.875rem",
                   outline: "none",
-                  backgroundColor: "#FAF8F5",
+                  backgroundColor: "var(--admin-surface-subtle)",
                 }}
               />
             </div>
@@ -145,7 +145,7 @@ export const AdminLoginPage: React.FC<{ onNavigate: (href: string) => void }> = 
                 fontWeight: 700,
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
-                color: "#6F6257",
+                color: "var(--admin-text-secondary)",
                 marginBottom: "0.35rem",
               }}
             >
@@ -173,7 +173,7 @@ export const AdminLoginPage: React.FC<{ onNavigate: (href: string) => void }> = 
                   border: "1px solid #D9D2C7",
                   fontSize: "0.875rem",
                   outline: "none",
-                  backgroundColor: "#FAF8F5",
+                  backgroundColor: "var(--admin-surface-subtle)",
                 }}
               />
             </div>

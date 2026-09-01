@@ -41,7 +41,7 @@ export const AdminMediaPage: React.FC<{ onNavigate: (href: string) => void }> = 
           <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7C2430", display: "block" }}>
             DIGITAL ASSET MANAGEMENT
           </span>
-          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "#171513", margin: "0.2rem 0 0 0" }}>
+          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: "0.2rem 0 0 0" }}>
             Media Library ({mediaAssets.length})
           </h1>
           <p style={{ fontSize: "0.8rem", color: "#8E8276", margin: "0.25rem 0 0 0" }}>
@@ -87,8 +87,8 @@ export const AdminMediaPage: React.FC<{ onNavigate: (href: string) => void }> = 
           <div
             key={asset.id}
             style={{
-              backgroundColor: "#FFFFFF",
-              border: "1px solid #E5DFD5",
+              backgroundColor: "var(--admin-surface)",
+              border: "1px solid var(--admin-border)",
               overflow: "hidden",
               boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
               display: "flex",
@@ -115,7 +115,7 @@ export const AdminMediaPage: React.FC<{ onNavigate: (href: string) => void }> = 
             </div>
 
             <div style={{ padding: "1rem", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-              <strong style={{ fontSize: "0.825rem", color: "#171513", display: "block", marginBottom: "0.5rem" }}>
+              <strong style={{ fontSize: "0.825rem", color: "var(--admin-text)", display: "block", marginBottom: "0.5rem" }}>
                 {asset.title}
               </strong>
 
@@ -167,7 +167,7 @@ export const AdminMediaPage: React.FC<{ onNavigate: (href: string) => void }> = 
         >
           <div
             style={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--admin-surface)",
               padding: "2rem",
               maxWidth: "460px",
               width: "100%",
@@ -181,7 +181,7 @@ export const AdminMediaPage: React.FC<{ onNavigate: (href: string) => void }> = 
 
             <form onSubmit={handleAddMedia} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   Asset Title *
                 </label>
                 <input
@@ -194,13 +194,13 @@ export const AdminMediaPage: React.FC<{ onNavigate: (href: string) => void }> = 
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   Category
                 </label>
                 <select
                   value={newAsset.category}
                   onChange={(e) => setNewAsset({ ...newAsset, category: e.target.value as any })}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", backgroundColor: "#FFFFFF" }}
+                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface)" }}
                 >
                   <option value="products">Product Drapes</option>
                   <option value="hero">Hero & Banners</option>
@@ -210,7 +210,7 @@ export const AdminMediaPage: React.FC<{ onNavigate: (href: string) => void }> = 
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   Image URL (https://...) *
                 </label>
                 <input

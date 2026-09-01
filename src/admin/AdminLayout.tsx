@@ -43,7 +43,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       <div
         style={{
           minHeight: "100vh",
-          backgroundColor: "#FAF7F5",
+          backgroundColor: "var(--admin-bg)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -52,21 +52,21 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       >
         <div
           style={{
-            backgroundColor: "#FFFFFF",
+            backgroundColor: "var(--admin-surface)",
             padding: "3rem",
             maxWidth: "440px",
             width: "100%",
             textAlign: "center",
             boxShadow: "0 10px 25px -5px rgba(0,0,0,0.08)",
-            border: "1px solid #E5DFD5",
+            border: "1px solid var(--admin-border)",
             borderRadius: "6px",
           }}
         >
           <ShieldAlert size={44} style={{ color: "#7C2430", margin: "0 auto 1.5rem auto" }} />
-          <h2 style={{ fontSize: "1.5rem", color: "#171513", marginBottom: "0.5rem" }}>
+          <h2 style={{ fontSize: "1.5rem", color: "var(--admin-text)", marginBottom: "0.5rem" }}>
             Admin Access Required
           </h2>
-          <p style={{ fontSize: "0.875rem", color: "#6F6257", marginBottom: "2rem", lineHeight: 1.5 }}>
+          <p style={{ fontSize: "0.875rem", color: "var(--admin-text-secondary)", marginBottom: "2rem", lineHeight: 1.5 }}>
             You must be authenticated to access the EVARA VASTRA administration suite.
           </p>
           <button
@@ -119,8 +119,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       style={{
         display: "flex",
         minHeight: "100vh",
-        backgroundColor: "#F7F5F0",
-        color: "#171513",
+        backgroundColor: "var(--admin-bg)",
+        color: "var(--admin-text)",
       }}
     >
       {/* Sidebar Desktop */}
@@ -296,8 +296,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         <header
           style={{
             height: "64px",
-            backgroundColor: "#FFFFFF",
-            borderBottom: "1px solid #E5DFD5",
+            backgroundColor: "var(--admin-surface)",
+            borderBottom: "1px solid var(--admin-border)",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -315,7 +315,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             >
               <Menu size={22} />
             </button>
-            <h1 style={{ fontSize: "1.15rem", fontWeight: 700, margin: 0, color: "#171513" }}>
+            <h1 style={{ fontSize: "1.15rem", fontWeight: 700, margin: 0, color: "var(--admin-text)" }}>
               {pageTitle || "Atelier Admin Control Suite"}
             </h1>
           </div>
@@ -324,8 +324,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             <button
               onClick={() => onNavigate("/")}
               style={{
-                backgroundColor: "#FAF7F5",
-                border: "1px solid #E5DFD5",
+                backgroundColor: "var(--admin-surface-subtle)",
+                border: "1px solid var(--admin-border)",
                 borderRadius: "4px",
                 padding: "0.35rem 0.75rem",
                 fontSize: "0.78rem",

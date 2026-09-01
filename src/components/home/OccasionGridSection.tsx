@@ -99,7 +99,7 @@ export const OccasionGridSection: React.FC<{
                   flexDirection: "column",
                   justifyContent: "flex-end",
                   padding: "1.75rem",
-                  color: "#F8F4EE",
+                  color: "var(--text-inverse)",
                 }}
               >
                 <span
@@ -116,7 +116,7 @@ export const OccasionGridSection: React.FC<{
                 </span>
                 <h3
                   className="font-serif"
-                  style={{ fontSize: "1.6rem", color: "#F8F4EE", lineHeight: 1.2 }}
+                  style={{ fontSize: "1.6rem", color: "var(--text-inverse)", lineHeight: 1.2 }}
                 >
                   {occ.name}
                 </h3>

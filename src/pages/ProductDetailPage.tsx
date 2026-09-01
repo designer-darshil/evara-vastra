@@ -266,7 +266,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                     opacity: activeImageIndex === idx ? 1 : 0.65,
                     transition: "all 0.2s ease",
                     cursor: "pointer",
-                    backgroundColor: "#FAF7F5",
+                    backgroundColor: "var(--bg-muted)",
                     padding: 0,
                     borderRadius: "3px",
                   }}
@@ -281,7 +281,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               style={{
                 position: "relative",
                 aspectRatio: "3/4",
-                backgroundColor: "#FAF7F5",
+                backgroundColor: "var(--bg-muted)",
                 overflow: "hidden",
                 boxShadow: "var(--shadow-medium)",
                 borderRadius: "4px",
@@ -348,7 +348,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 {product.details?.blousePiece && (
                   <span
                     style={{
-                      backgroundColor: "#FFFFFF",
+                      backgroundColor: "var(--bg-surface)",
                       color: "var(--text-primary)",
                       fontSize: "0.68rem",
                       fontWeight: 700,
@@ -389,7 +389,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 <span
                   style={{
                     fontSize: "0.72rem",
-                    color: "#2E7D32",
+                    color: "var(--success-text)",
                     fontWeight: 600,
                     display: "flex",
                     alignItems: "center",
@@ -636,9 +636,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   justifyContent: "center",
                   gap: "0.5rem",
                   padding: "0.75rem",
-                  backgroundColor: "#E8F5E9",
-                  color: "#1B5E20",
-                  border: "1px solid #C8E6C9",
+                  backgroundColor: "var(--success-bg)",
+                  color: "var(--success-text)",
+                  border: "1px solid var(--success-bg)",
                   borderRadius: "3px",
                   fontSize: "0.85rem",
                   fontWeight: 600,
@@ -662,7 +662,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   onChange={(e) => setPincode(e.target.value)}
                   placeholder="Enter 6-digit PIN code..."
                   className="input-field"
-                  style={{ flex: 1, backgroundColor: "#FFFFFF" }}
+                  style={{ flex: 1, backgroundColor: "var(--bg-surface)" }}
                 />
                 <button type="submit" className="btn btn-primary" style={{ padding: "0 1.25rem", fontSize: "0.8rem" }}>
                   Check

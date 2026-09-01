@@ -48,7 +48,7 @@ export const AdminContentHubPage: React.FC<{ onNavigate: (href: string) => void 
         <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7C2430", display: "block" }}>
           EDITORIAL & DIGITAL BRANDING
         </span>
-        <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "#171513", margin: "0.2rem 0 0 0" }}>
+        <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: "0.2rem 0 0 0" }}>
           Content Management Hub
         </h1>
         <p style={{ fontSize: "0.85rem", color: "#8E8276", margin: "0.25rem 0 0 0" }}>
@@ -64,8 +64,8 @@ export const AdminContentHubPage: React.FC<{ onNavigate: (href: string) => void 
               key={idx}
               onClick={() => onNavigate(mod.href)}
               style={{
-                backgroundColor: "#FFFFFF",
-                border: "1px solid #E5DFD5",
+                backgroundColor: "var(--admin-surface)",
+                border: "1px solid var(--admin-border)",
                 padding: "1.75rem",
                 boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
                 cursor: "pointer",
@@ -96,10 +96,10 @@ export const AdminContentHubPage: React.FC<{ onNavigate: (href: string) => void 
                   </span>
                 </div>
 
-                <h3 className="font-serif" style={{ fontSize: "1.35rem", color: "#171513", margin: "0 0 0.4rem 0" }}>
+                <h3 className="font-serif" style={{ fontSize: "1.35rem", color: "var(--admin-text)", margin: "0 0 0.4rem 0" }}>
                   {mod.title}
                 </h3>
-                <p style={{ fontSize: "0.825rem", color: "#6F6257", lineHeight: 1.5, margin: 0 }}>
+                <p style={{ fontSize: "0.825rem", color: "var(--admin-text-secondary)", lineHeight: 1.5, margin: 0 }}>
                   {mod.description}
                 </p>
               </div>

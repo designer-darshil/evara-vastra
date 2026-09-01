@@ -85,7 +85,7 @@ export const AdminNavigationPage: React.FC<{ onNavigate: (href: string) => void 
         {/* Navigation List */}
         <div
           style={{
-            backgroundColor: "#FFFFFF",
+            backgroundColor: "var(--admin-surface)",
             border: "1px solid var(--border-subtle)",
             borderRadius: "6px",
             boxShadow: "var(--shadow-subtle)",
@@ -176,7 +176,7 @@ export const AdminNavigationPage: React.FC<{ onNavigate: (href: string) => void 
         {/* Add New Link Card */}
         <div
           style={{
-            backgroundColor: "#FFFFFF",
+            backgroundColor: "var(--admin-surface)",
             border: "1px solid var(--border-subtle)",
             borderRadius: "6px",
             boxShadow: "var(--shadow-subtle)",

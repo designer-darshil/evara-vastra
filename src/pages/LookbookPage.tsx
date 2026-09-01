@@ -43,7 +43,7 @@ export const LookbookPage: React.FC<{ onNavigate: (href: string) => void }> = ({
               <div
                 key={look.id}
                 style={{
-                  backgroundColor: "#FFFFFF",
+                  backgroundColor: "var(--bg-surface)",
                   border: "1px solid var(--border-subtle)",
                   display: "grid",
                   gridTemplateColumns: isEven ? "1.1fr 0.9fr" : "0.9fr 1.1fr",
@@ -58,7 +58,7 @@ export const LookbookPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                     order: isEven ? 1 : 2,
                     aspectRatio: "3/4",
                     overflow: "hidden",
-                    backgroundColor: "#EDE7DD",
+                    backgroundColor: "var(--bg-surface-subtle)",
                   }}
                 >
                   <img

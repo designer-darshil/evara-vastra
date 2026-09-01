@@ -70,7 +70,7 @@ export const AdminCouponsPage: React.FC<{ onNavigate: (href: string) => void }> 
           <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7C2430", display: "block" }}>
             MERCHANDISING & PROMOTIONS
           </span>
-          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "#171513", margin: "0.2rem 0 0 0" }}>
+          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: "0.2rem 0 0 0" }}>
             Privilege Coupons & Discounts ({coupons.length})
           </h1>
           <p style={{ fontSize: "0.8rem", color: "#8E8276", margin: "0.25rem 0 0 0" }}>
@@ -89,8 +89,8 @@ export const AdminCouponsPage: React.FC<{ onNavigate: (href: string) => void }> 
           <div
             key={coupon.id}
             style={{
-              backgroundColor: "#FFFFFF",
-              border: "1px solid #E5DFD5",
+              backgroundColor: "var(--admin-surface)",
+              border: "1px solid var(--admin-border)",
               padding: "1.5rem",
               boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
               display: "flex",
@@ -105,7 +105,7 @@ export const AdminCouponsPage: React.FC<{ onNavigate: (href: string) => void }> 
                     fontSize: "1.1rem",
                     fontWeight: 700,
                     letterSpacing: "0.08em",
-                    color: "#171513",
+                    color: "var(--admin-text)",
                     backgroundColor: "rgba(124, 36, 48, 0.08)",
                     padding: "0.3rem 0.6rem",
                     border: "1px dashed #7C2430",
@@ -130,7 +130,7 @@ export const AdminCouponsPage: React.FC<{ onNavigate: (href: string) => void }> 
                 </button>
               </div>
 
-              <div style={{ fontSize: "0.85rem", color: "#6F6257", display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+              <div style={{ fontSize: "0.85rem", color: "var(--admin-text-secondary)", display: "flex", flexDirection: "column", gap: "0.35rem" }}>
                 <div>
                   <strong>Discount:</strong>{" "}
                   {coupon.discountType === "percentage" ? `${coupon.discountValue}% OFF` : `₹${coupon.discountValue} OFF`}
@@ -155,13 +155,13 @@ export const AdminCouponsPage: React.FC<{ onNavigate: (href: string) => void }> 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem", marginTop: "1.25rem", paddingTop: "0.75rem", borderTop: "1px solid #F0EAE1" }}>
               <button
                 onClick={() => handleOpenModal(coupon)}
-                style={{ padding: "0.4rem 0.75rem", fontSize: "0.75rem", border: "1px solid #D9D2C7", backgroundColor: "#FAF8F5", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.3rem" }}
+                style={{ padding: "0.4rem 0.75rem", fontSize: "0.75rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface-subtle)", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.3rem" }}
               >
                 <Edit2 size={12} /> Edit
               </button>
               <button
                 onClick={() => deleteCoupon(coupon.id)}
-                style={{ padding: "0.4rem", color: "#7C2430", border: "1px solid #E8C8C8", backgroundColor: "#FAF8F5", cursor: "pointer" }}
+                style={{ padding: "0.4rem", color: "#7C2430", border: "1px solid #E8C8C8", backgroundColor: "var(--admin-surface-subtle)", cursor: "pointer" }}
               >
                 <Trash2 size={13} />
               </button>
@@ -187,7 +187,7 @@ export const AdminCouponsPage: React.FC<{ onNavigate: (href: string) => void }> 
         >
           <div
             style={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--admin-surface)",
               padding: "2rem",
               maxWidth: "460px",
               width: "100%",
@@ -201,7 +201,7 @@ export const AdminCouponsPage: React.FC<{ onNavigate: (href: string) => void }> 
 
             <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                   Coupon Promo Code *
                 </label>
                 <input
@@ -216,20 +216,20 @@ export const AdminCouponsPage: React.FC<{ onNavigate: (href: string) => void }> 
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                 <div>
-                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                     Discount Type
                   </label>
                   <select
                     value={form.discountType}
                     onChange={(e) => setForm({ ...form, discountType: e.target.value as any })}
-                    style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", backgroundColor: "#FFFFFF" }}
+                    style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface)" }}
                   >
                     <option value="percentage">Percentage (%)</option>
                     <option value="fixed">Fixed Amount (₹)</option>
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                     Discount Value *
                   </label>
                   <input
@@ -244,7 +244,7 @@ export const AdminCouponsPage: React.FC<{ onNavigate: (href: string) => void }> 
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                 <div>
-                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                     Min Order Value (₹)
                   </label>
                   <input
@@ -255,7 +255,7 @@ export const AdminCouponsPage: React.FC<{ onNavigate: (href: string) => void }> 
                   />
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "#6F6257", marginBottom: "0.3rem" }}>
+                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
                     Expiry Date
                   </label>
                   <input
