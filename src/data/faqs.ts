@@ -2,7 +2,7 @@ export interface FAQItem {
   id: string;
   question: string;
   answer: string;
-  category: "shipping" | "craft" | "care" | "returns" | "blouse";
+  category: "shipping" | "craft" | "care" | "returns" | "sizing";
 }
 
 export const faqs: FAQItem[] = [
@@ -20,9 +20,9 @@ export const faqs: FAQItem[] = [
   },
   {
     id: "faq-3",
-    category: "blouse",
-    question: "Is the blouse piece included with the saree?",
-    answer: "Yes, all our sarees include an unstitched matching or complementary blouse piece (0.8m to 1.0m in length) attached to the end of the drape, unless explicitly specified otherwise in the product details. We also offer bespoke blouse tailoring services upon request through our concierge.",
+    category: "sizing",
+    question: "How do I choose the correct size for co-ord and kurta sets?",
+    answer: "Our ready-to-wear kurta and co-ord sets follow standard Indian sizing (S to 3XL) with comfortable ease. Please refer to the size measurements listed on each product page or connect with our concierge for styling guidance.",
   },
   {
     id: "faq-4",
@@ -40,18 +40,18 @@ export const faqs: FAQItem[] = [
     id: "faq-6",
     category: "returns",
     question: "What is your return and exchange policy?",
-    answer: "We offer a 7-day hassle-free exchange and return window for unstitched, unworn sarees in their original packaging with intact security tags. Simply initiate a return from your Account page or email concierge@evarasarees.com.",
+    answer: "We offer a 7-day hassle-free exchange and replacement window for unworn garments in their original packaging with intact security tags. Simply initiate an exchange from your Account page or contact care@evaravastra.com.",
   },
   {
     id: "faq-7",
     category: "shipping",
     question: "Do you offer Cash on Delivery (COD)?",
-    answer: "Yes, Cash on Delivery is available for domestic orders up to ₹25,000 across serviceable pin codes in India.",
+    answer: "Yes, Cash on Delivery is available for domestic orders across serviceable pin codes in India.",
   },
   {
     id: "faq-8",
     category: "craft",
     question: "Can I customize a saree or order bespoke bridal weaves?",
-    answer: "Our master weaving ateliers in Varanasi accept custom bridal commissions with a minimum lead time of 6 to 8 weeks. You can book an appointment with our Creative Director via our Contact page or WhatsApp Concierge.",
+    answer: "Our master weaving ateliers accept custom commissions with advance notice. You can book an appointment with our team via our Contact page or WhatsApp Concierge.",
   },
 ];

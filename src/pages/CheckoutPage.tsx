@@ -1,19 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useShop, CartItem } from "../context/ShopContext";
 import { useData } from "../context/DataContext";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
-import { CheckCircle2, ArrowRight, CreditCard, Smartphone, Building, Truck, Lock } from "lucide-react";
+import { CheckCircle2, ArrowRight, CreditCard, Smartphone, Building, Truck, Lock, Loader2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Card, CardContent } from "../components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { cn } from "../lib/utils";
+import { shippingProvider, ShippingEstimate } from "../lib/shiprocket";
 
 export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
   onNavigate,
 }) => {
   const { cart, cartSubtotal, clearCart, showToast } = useShop();
-  const { addOrder } = useData();
+  const { addOrder, createShipmentForOrder } = useData();
   const navigate = useNavigate();
 
   const handleNav = (href: string) => {
@@ -39,6 +40,39 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmedOrder, setConfirmedOrder] = useState<any | null>(null);
+  const [confirmedShipment, setConfirmedShipment] = useState<any | null>(null);
+
+  // Logistics & Serviceability
+  const [serviceability, setServiceability] = useState<ShippingEstimate | null>(null);
+  const [isCheckingServiceability, setIsCheckingServiceability] = useState(false);
+
+  const checkPincode = useCallback(async (pin: string) => {
+    if (pin.trim().length !== 6) {
+      setServiceability(null);
+      return;
+    }
+    setIsCheckingServiceability(true);
+    try {
+      const result = await shippingProvider.checkServiceability({
+        deliveryPincode: pin,
+        orderValue: cartSubtotal,
+      });
+      setServiceability(result);
+    } catch {
+      setServiceability(null);
+    } finally {
+      setIsCheckingServiceability(false);
+    }
+  }, [cartSubtotal]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (formData.pincode && formData.pincode.length === 6) {
+        checkPincode(formData.pincode);
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [formData.pincode, checkPincode]);
 
   const formatINR = (amount: number) =>
     new Intl.NumberFormat("en-IN", {
@@ -50,15 +84,20 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
   const shippingCost = formData.shippingMethod === "express" ? 450 : 0;
   const grandTotal = cartSubtotal + shippingCost;
 
-  const handleSubmitOrder = (e: React.FormEvent) => {
+  const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.firstName || !formData.address || !formData.pincode) {
       showToast("Please fill in required delivery information.", "info");
       return;
     }
 
+    if (serviceability && !serviceability.serviceable) {
+      showToast("Selected PIN code is currently not serviceable for courier dispatch.", "info");
+      return;
+    }
+
     setIsSubmitting(true);
-    setTimeout(() => {
+    try {
       // Create persistent order record in DataContext
       const orderItems = cart.map((item) => ({
         id: item.product.id,
@@ -68,7 +107,7 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
         quantity: item.quantity,
         image: item.product.images[0],
         fabric: item.product.fabric,
-        blouseOptIn: item.product.details.blousePiece,
+        size: item.selectedSize,
       }));
 
       const paymentMethodLabel =
@@ -96,17 +135,29 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
         state: formData.state,
         pincode: formData.pincode,
         country: formData.country,
-        trackingNumber: `BD-${Math.floor(10000000 + Math.random() * 90000000)}`,
-        carrier: "Blue Dart Express Insured",
+        trackingNumber: `SR-${Math.floor(10000000 + Math.random() * 90000000)}`,
+        carrier: serviceability?.availableCouriers[0]?.courierName || "Shiprocket Express Air",
         items: orderItems,
       });
 
+      // Create Shiprocket shipment & allocate courier
+      let shipmentResult = null;
+      try {
+        shipmentResult = await createShipmentForOrder(createdOrder);
+      } catch (shipErr) {
+        console.warn("Shiprocket automated dispatch queued in background:", shipErr);
+      }
+
       setConfirmedOrder(createdOrder);
+      setConfirmedShipment(shipmentResult);
       clearCart();
-      setIsSubmitting(false);
-      showToast(`Order ${createdOrder.orderNumber} confirmed successfully!`, "info");
+      showToast(`Order ${createdOrder.orderNumber} placed & confirmed!`, "info");
       window.scrollTo(0, 0);
-    }, 600);
+    } catch (err: any) {
+      showToast(err?.message || "Failed to process order. Please try again.", "info");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Order Confirmed State
@@ -120,7 +171,7 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
             </div>
 
             <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-primary block mb-1">
-              ORDER CONFIRMED & REGISTERED IN ATELIER DATABASE
+              ORDER CONFIRMED & LOGISTICS MANIFEST GENERATED
             </span>
 
             <h1 className="font-serif text-4xl text-foreground mb-2 m-0">
@@ -141,9 +192,15 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
                 <span className="text-foreground text-right">{confirmedOrder.shippingAddress}, {confirmedOrder.city} {confirmedOrder.pincode}</span>
               </div>
               <div className="flex justify-between mb-2">
-                <span className="text-muted-foreground">Tracking Courier</span>
-                <strong className="text-foreground">{confirmedOrder.carrier} <br/> (#{confirmedOrder.trackingNumber})</strong>
+                <span className="text-muted-foreground">Carrier / Logistics</span>
+                <strong className="text-foreground">{confirmedShipment?.courierName || confirmedOrder.carrier}</strong>
               </div>
+              {confirmedShipment?.awb && (
+                <div className="flex justify-between mb-2">
+                  <span className="text-muted-foreground">Shiprocket AWB</span>
+                  <span className="text-accent font-mono font-bold">{confirmedShipment.awb}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Payment Method</span>
                 <span className="text-foreground text-right">{confirmedOrder.paymentMethod}</span>
@@ -152,7 +209,7 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button onClick={() => handleNav("/account/orders")} variant="secondary" className="h-12 px-6">
-                View Order History
+                View Order Tracking
               </Button>
               <Button onClick={() => handleNav("/shop")} className="h-12 px-6">
                 Continue Shopping <ArrowRight className="w-4 h-4 ml-2" />
@@ -305,12 +362,44 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
                           </label>
                           <Input
                             type="text"
+                            maxLength={6}
                             required
                             value={formData.pincode}
-                            onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
+                            onChange={(e) => setFormData({ ...formData, pincode: e.target.value.replace(/\D/g, "") })}
                           />
                         </div>
                       </div>
+
+                      {/* Serviceability & Express SLA Status */}
+                      {isCheckingServiceability && (
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground bg-secondary/50 p-3 rounded-sm">
+                          <Loader2 className="w-4 h-4 animate-spin text-accent" />
+                          <span>Checking Shiprocket courier serviceability for {formData.pincode}...</span>
+                        </div>
+                      )}
+
+                      {!isCheckingServiceability && serviceability && (
+                        <div
+                          className={cn(
+                            "p-3.5 rounded-sm border text-xs leading-relaxed flex items-start gap-2.5",
+                            serviceability.serviceable
+                              ? "bg-green-500/10 border-green-500/30 text-green-800 dark:text-green-300"
+                              : "bg-red-500/10 border-red-500/30 text-red-800 dark:text-red-300"
+                          )}
+                        >
+                          <Truck className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <strong className="block font-bold">
+                              {serviceability.serviceable ? "✓ Express Delivery Available" : "✕ Delivery Currently Unavailable"}
+                            </strong>
+                            <p className="m-0 mt-0.5 opacity-90">
+                              {serviceability.serviceable
+                                ? `Estimated Delivery: ${serviceability.estimatedDays} business days via ${serviceability.availableCouriers[0]?.courierName || "Express Courier"}. Complimentary pan-India shipping.`
+                                : serviceability.message || "We could not find an active courier route for this PIN code."}
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

@@ -61,7 +61,7 @@ export const media = {
     {
       id: "look-02",
       title: "Look 02 — Morning in Chettinad",
-      subtitle: "Soft Mulmul Cotton in Terracotta with a contemporary linen slip blouse",
+      subtitle: "Soft Mulmul Cotton in Terracotta draped in an effortless contemporary silhouette",
       image: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?q=80&w=1000&auto=format&fit=crop",
       productSlug: "meera-cotton-saree",
     },

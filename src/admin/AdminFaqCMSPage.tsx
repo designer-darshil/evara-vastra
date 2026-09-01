@@ -198,8 +198,8 @@ export const AdminFaqCMSPage: React.FC<{ onNavigate: (href: string) => void }> =
                   style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface)" }}
                 >
                   <option value="shipping">Shipping & Express Delivery</option>
-                  <option value="blouse">Blouse Piece & Measurements</option>
-                  <option value="craft">Authenticity & Pit Loom Craft</option>
+                  <option value="sizing">Garment Sizing & Fit</option>
+                  <option value="craft">Authenticity & Craft</option>
                   <option value="care">Silk Care & Storage</option>
                   <option value="returns">Returns & Exchanges</option>
                 </select>

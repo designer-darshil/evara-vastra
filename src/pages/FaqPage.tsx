@@ -56,7 +56,7 @@ export const FaqPage: React.FC<{ onNavigate: (href: string) => void }> = ({
             Frequently Asked Questions
           </h1>
           <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", marginTop: "0.5rem" }}>
-            Everything you need to know about our handloom heritage, express delivery times, unstitched blouse pieces, and saree care.
+            Everything you need to know about our handloom heritage, express delivery times, sizing, and garment care.
           </p>
 
           {/* Search Bar */}
@@ -74,7 +74,7 @@ export const FaqPage: React.FC<{ onNavigate: (href: string) => void }> = ({
             <Search size={18} style={{ color: "var(--text-muted)" }} />
             <input
               type="text"
-              placeholder="Search questions (e.g. shipping, blouse, returns, dry clean)..."
+              placeholder="Search questions (e.g. shipping, sizing, returns, dry clean)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{ width: "100%", border: "none", outline: "none", fontSize: "0.9rem" }}
@@ -95,7 +95,7 @@ export const FaqPage: React.FC<{ onNavigate: (href: string) => void }> = ({
           {[
             { id: "all", label: "All Questions" },
             { id: "shipping", label: "Shipping & Delivery" },
-            { id: "blouse", label: "Blouse Piece & Sizing" },
+            { id: "sizing", label: "Garment Sizing & Fit" },
             { id: "craft", label: "Craft & Authenticity" },
             { id: "care", label: "Care & Storage" },
             { id: "returns", label: "Returns & Exchanges" },

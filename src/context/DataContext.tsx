@@ -23,6 +23,9 @@ import {
   FAQItem,
   LookbookItem,
   CraftsmanshipCMS,
+  Shipment,
+  PickupLocation,
+  ShippingSettings,
 } from "../types";
 import {
   initialSiteSettings,
@@ -45,7 +48,11 @@ import {
   initialFAQs,
   initialLookbookItems,
   initialCraftsmanshipCMS,
+  initialShipments,
+  initialPickupLocations,
+  initialShippingSettings,
 } from "../data/initialData";
+import { shippingProvider } from "../lib/shiprocket";
 
 interface DataContextType {
   // Products
@@ -171,6 +178,20 @@ interface DataContextType {
     newState?: any
   ) => void;
 
+  // Shipping & Logistics (Shiprocket)
+  shipments: Shipment[];
+  pickupLocations: PickupLocation[];
+  shippingSettings: ShippingSettings;
+  createShipmentForOrder: (order: Order) => Promise<Shipment>;
+  assignCourierAndAWB: (shipmentId: string, courierId?: number) => Promise<Shipment>;
+  requestPickup: (shipmentId: string) => Promise<Shipment>;
+  cancelShipment: (shipmentId: string) => Promise<Shipment>;
+  syncTracking: (shipmentId: string) => Promise<Shipment>;
+  updateShippingSettings: (settings: Partial<ShippingSettings>) => void;
+  addPickupLocation: (loc: Omit<PickupLocation, "id">) => PickupLocation;
+  updatePickupLocation: (id: string, updates: Partial<PickupLocation>) => void;
+  deletePickupLocation: (id: string) => void;
+
   // System
   resetToDefaultData: () => void;
 }
@@ -196,6 +217,9 @@ const STORAGE_KEYS = {
   ADMIN_USERS: "evara_v3_admin_users",
   AUDIT_LOGS: "evara_v3_audit_logs",
   INVENTORY_ADJUSTMENTS: "evara_v3_inv_adj",
+  SHIPMENTS: "evara_v3_shipments",
+  PICKUP_LOCATIONS: "evara_v3_pickup_locs",
+  SHIPPING_SETTINGS: "evara_v3_shipping_settings",
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -279,6 +303,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [inventoryAdjustments, setInventoryAdjustments] = useState<InventoryAdjustment[]>(() =>
     loadStored(STORAGE_KEYS.INVENTORY_ADJUSTMENTS, initialInventoryAdjustments)
   );
+  const [shipments, setShipments] = useState<Shipment[]>(() =>
+    loadStored(STORAGE_KEYS.SHIPMENTS, initialShipments)
+  );
+  const [pickupLocations, setPickupLocations] = useState<PickupLocation[]>(() =>
+    loadStored(STORAGE_KEYS.PICKUP_LOCATIONS, initialPickupLocations)
+  );
+  const [shippingSettings, setShippingSettings] = useState<ShippingSettings>(() =>
+    loadStored(STORAGE_KEYS.SHIPPING_SETTINGS, initialShippingSettings)
+  );
 
   // Sync to localStorage
   useEffect(() => saveStored(STORAGE_KEYS.SITE_SETTINGS, siteSettings), [siteSettings]);
@@ -301,6 +334,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => saveStored(STORAGE_KEYS.ADMIN_USERS, adminUsers), [adminUsers]);
   useEffect(() => saveStored(STORAGE_KEYS.AUDIT_LOGS, auditLogs), [auditLogs]);
   useEffect(() => saveStored(STORAGE_KEYS.INVENTORY_ADJUSTMENTS, inventoryAdjustments), [inventoryAdjustments]);
+  useEffect(() => saveStored(STORAGE_KEYS.SHIPMENTS, shipments), [shipments]);
+  useEffect(() => saveStored(STORAGE_KEYS.PICKUP_LOCATIONS, pickupLocations), [pickupLocations]);
+  useEffect(() => saveStored(STORAGE_KEYS.SHIPPING_SETTINGS, shippingSettings), [shippingSettings]);
 
   // Derived Views
   const publishedProducts = products.filter((p) => p.status === "published");
@@ -860,6 +896,162 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAdminUser(null);
   };
 
+  // SHIPPING & LOGISTICS (SHIPROCKET) ACTIONS
+  const createShipmentForOrder = async (order: Order): Promise<Shipment> => {
+    try {
+      const defaultPickup =
+        pickupLocations.find((p) => p.id === shippingSettings.defaultPickupLocationId) ||
+        pickupLocations[0];
+
+      let initialShipment = await shippingProvider.createShipmentOrder({
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        customerName: order.customerName,
+        customerEmail: order.customerEmail,
+        customerPhone: order.customerPhone,
+        shippingAddress: order.shippingAddress,
+        city: order.city,
+        state: order.state,
+        pincode: order.pincode,
+        country: order.country || "India",
+        paymentMethod: order.paymentMethod.toLowerCase().includes("cash") || order.paymentMethod.toLowerCase().includes("cod") ? "cod" : "prepaid",
+        items: order.items.map((i) => ({
+          id: i.id,
+          title: i.title,
+          price: i.price,
+          quantity: i.quantity,
+          fabric: i.fabric,
+        })),
+        subtotal: order.subtotal,
+        total: order.total,
+        packageWeightKg: shippingSettings.defaultWeightKg,
+        dimensionsCm: shippingSettings.defaultDimensionsCm,
+        pickupLocationName: defaultPickup?.name || "Surat Atelier Primary",
+      });
+
+      // If auto-generate AWB is enabled in settings, immediately allocate courier
+      if (shippingSettings.autoGenerateAwb) {
+        try {
+          initialShipment = await shippingProvider.assignCourierAndGenerateAWB(initialShipment);
+        } catch (awbErr) {
+          console.warn("Auto AWB assignment delayed:", awbErr);
+        }
+      }
+
+      setShipments((prev) => [initialShipment, ...prev.filter((s) => s.orderId !== order.id)]);
+
+      addAuditLog(
+        "CREATE_SHIPMENT",
+        "order",
+        `Created ${initialShipment.provider} shipment for order ${order.orderNumber} (Status: ${initialShipment.status})`,
+        order.id,
+        order.orderNumber,
+        "info"
+      );
+
+      return initialShipment;
+    } catch (error: any) {
+      addAuditLog(
+        "SHIPMENT_CREATION_FAILED",
+        "order",
+        `Failed to create shipment for order ${order.orderNumber}: ${error?.message}`,
+        order.id,
+        order.orderNumber,
+        "warning"
+      );
+      throw error;
+    }
+  };
+
+  const assignCourierAndAWB = async (shipmentId: string, courierId?: number): Promise<Shipment> => {
+    const shipment = shipments.find((s) => s.id === shipmentId);
+    if (!shipment) throw new Error("Shipment not found");
+
+    const updated = await shippingProvider.assignCourierAndGenerateAWB(shipment, courierId);
+    setShipments((prev) => prev.map((s) => (s.id === shipmentId ? updated : s)));
+
+    addAuditLog(
+      "ASSIGN_AWB",
+      "order",
+      `Assigned courier ${updated.courierName} and generated AWB ${updated.awb} for shipment ${shipment.orderNumber}`,
+      shipment.orderId,
+      shipment.orderNumber,
+      "info"
+    );
+
+    return updated;
+  };
+
+  const requestPickup = async (shipmentId: string): Promise<Shipment> => {
+    const shipment = shipments.find((s) => s.id === shipmentId);
+    if (!shipment) throw new Error("Shipment not found");
+
+    const updated = await shippingProvider.requestPickup(shipment);
+    setShipments((prev) => prev.map((s) => (s.id === shipmentId ? updated : s)));
+
+    addAuditLog(
+      "REQUEST_PICKUP",
+      "order",
+      `Requested courier pickup for shipment ${shipment.orderNumber} at ${updated.pickupLocationName}`,
+      shipment.orderId,
+      shipment.orderNumber,
+      "info"
+    );
+
+    return updated;
+  };
+
+  const cancelShipment = async (shipmentId: string): Promise<Shipment> => {
+    const shipment = shipments.find((s) => s.id === shipmentId);
+    if (!shipment) throw new Error("Shipment not found");
+
+    const updated = await shippingProvider.cancelShipment(shipment);
+    setShipments((prev) => prev.map((s) => (s.id === shipmentId ? updated : s)));
+
+    addAuditLog(
+      "CANCEL_SHIPMENT",
+      "order",
+      `Cancelled shipment for order ${shipment.orderNumber}`,
+      shipment.orderId,
+      shipment.orderNumber,
+      "warning"
+    );
+
+    return updated;
+  };
+
+  const syncTracking = async (shipmentId: string): Promise<Shipment> => {
+    const shipment = shipments.find((s) => s.id === shipmentId);
+    if (!shipment) throw new Error("Shipment not found");
+
+    const updated = await shippingProvider.syncTracking(shipment);
+    setShipments((prev) => prev.map((s) => (s.id === shipmentId ? updated : s)));
+    return updated;
+  };
+
+  const updateShippingSettings = (settings: Partial<ShippingSettings>) => {
+    setShippingSettings((prev) => ({ ...prev, ...settings }));
+    addAuditLog("UPDATE_SHIPPING_SETTINGS", "settings", "Updated Shiprocket logistics and shipping rules", undefined, undefined, "info");
+  };
+
+  const addPickupLocation = (loc: Omit<PickupLocation, "id">): PickupLocation => {
+    const id = `pickup-${Date.now()}`;
+    const newLoc: PickupLocation = { ...loc, id };
+    setPickupLocations((prev) => [...prev, newLoc]);
+    addAuditLog("ADD_PICKUP_LOCATION", "settings", `Added pickup location: ${newLoc.name} (${newLoc.pincode})`, id, newLoc.name, "info");
+    return newLoc;
+  };
+
+  const updatePickupLocation = (id: string, updates: Partial<PickupLocation>) => {
+    setPickupLocations((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
+    addAuditLog("UPDATE_PICKUP_LOCATION", "settings", `Updated pickup location #${id}`, id, undefined, "info");
+  };
+
+  const deletePickupLocation = (id: string) => {
+    setPickupLocations((prev) => prev.filter((p) => p.id !== id));
+    addAuditLog("DELETE_PICKUP_LOCATION", "settings", `Deleted pickup location #${id}`, id, undefined, "warning");
+  };
+
   // SYSTEM RESET
   const resetToDefaultData = () => {
     localStorage.clear();
@@ -883,6 +1075,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAdminUser(initialAdminUser);
     setAuditLogs(initialAuditLogs);
     setInventoryAdjustments(initialInventoryAdjustments);
+    setShipments(initialShipments);
+    setPickupLocations(initialPickupLocations);
+    setShippingSettings(initialShippingSettings);
   };
 
   return (
@@ -977,6 +1172,19 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         auditLogs,
         addAuditLog,
+
+        shipments,
+        pickupLocations,
+        shippingSettings,
+        createShipmentForOrder,
+        assignCourierAndAWB,
+        requestPickup,
+        cancelShipment,
+        syncTracking,
+        updateShippingSettings,
+        addPickupLocation,
+        updatePickupLocation,
+        deletePickupLocation,
 
         resetToDefaultData,
       }}

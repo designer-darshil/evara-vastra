@@ -183,9 +183,9 @@ export const CartDrawer: React.FC<{ onNavigate?: (href: string) => void }> = ({
                       <p className="text-xs text-muted-foreground mt-1">
                         {item.product.fabric} • {item.product.color}
                       </p>
-                      {item.product.details.blousePiece && (
-                        <span className="inline-block text-[10px] text-primary font-bold uppercase mt-1">
-                          + Unstitched Blouse Piece
+                      {item.selectedSize && (
+                        <span className="inline-block text-[10px] text-neutral-600 font-semibold uppercase mt-1">
+                          Size: {item.selectedSize}
                         </span>
                       )}
                     </div>

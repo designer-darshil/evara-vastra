@@ -51,7 +51,7 @@ export const ReturnsPolicyPage: React.FC<{ onNavigate?: (href: string) => void }
             <ul className="list-disc pl-5 flex flex-col gap-1.5 m-0 marker:text-muted-foreground">
               <li>Unused, unworn, unwashed, and undamaged.</li>
               <li>In the original brand packaging with all tags and labels intact.</li>
-              <li>Sarees with unstitched blouse pieces must have the blouse fabric attached and uncut.</li>
+              <li>Garments and sarees must have original fabric intact and unaltered.</li>
             </ul>
           </div>
 

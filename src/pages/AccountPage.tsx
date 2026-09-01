@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
-import { User, Package, MapPin, Scissors, Heart } from "lucide-react";
+import { User, Package, MapPin, Heart } from "lucide-react";
 import { useShop } from "../context/ShopContext";
 
 export const AccountPage: React.FC<{ onNavigate: (href: string) => void }> = ({
@@ -8,7 +8,7 @@ export const AccountPage: React.FC<{ onNavigate: (href: string) => void }> = ({
 }) => {
   const { wishlistCount, showToast } = useShop();
 
-  const [activeTab, setActiveTab] = useState<"profile" | "addresses" | "measurements">("profile");
+  const [activeTab, setActiveTab] = useState<"profile" | "addresses">("profile");
 
   const [profile, setProfile] = useState({
     name: "Devika Srinivasan",
@@ -16,15 +16,6 @@ export const AccountPage: React.FC<{ onNavigate: (href: string) => void }> = ({
     phone: "+91 98201 44520",
     city: "Mumbai",
   });
-
-  const measurements = {
-    bust: "36 inches",
-    waist: "30 inches",
-    shoulder: "14.5 inches",
-    sleeveLength: "11 inches (Elbow)",
-    neckDepthFront: "7.5 inches",
-    neckDepthBack: "9 inches (Deep V)",
-  };
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,7 +70,7 @@ export const AccountPage: React.FC<{ onNavigate: (href: string) => void }> = ({
               { id: "profile", label: "Client Profile", icon: User },
               { id: "orders", label: "My Orders & Tracking", icon: Package, isLink: "/account/orders" },
               { id: "addresses", label: "Saved Addresses", icon: MapPin },
-              { id: "measurements", label: "Bespoke Blouse Sizes", icon: Scissors },
+              /* { id: "measurements", label: "Bespoke Measurements", icon: Scissors }, - Disabled */
               { id: "wishlist", label: `Saved Pieces (${wishlistCount})`, icon: Heart, isLink: "/wishlist" },
             ].map((tab) => {
               const Icon = tab.icon;
@@ -229,27 +220,18 @@ export const AccountPage: React.FC<{ onNavigate: (href: string) => void }> = ({
               </div>
             )}
 
+            {/*
+              ============================================================
+              COMMENTED OUT: Bespoke Blouse Measurement Profile
+              ============================================================
             {activeTab === "measurements" && (
               <div>
                 <h3 className="font-serif" style={{ fontSize: "1.6rem", marginBottom: "0.5rem" }}>
-                  Bespoke Blouse Measurement Profile
+                  Bespoke Measurement Profile
                 </h3>
-                <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "1.5rem" }}>
-                  Stored for bespoke blouse stitching orders coordinated through our atelier concierge.
-                </p>
-
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
-                  {Object.entries(measurements).map(([k, v]) => (
-                    <div key={k} style={{ backgroundColor: "var(--bg-primary)", padding: "1rem", border: "1px solid var(--border-subtle)" }}>
-                      <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", textTransform: "uppercase", display: "block" }}>
-                        {k.replace(/([A-Z])/g, " $1")}
-                      </span>
-                      <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>{v}</strong>
-                    </div>
-                  ))}
-                </div>
               </div>
             )}
+            */}
           </main>
         </div>
       </div>

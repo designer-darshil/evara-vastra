@@ -49,7 +49,7 @@ export const lookbookItems: LookbookItem[] = [
     productFabric: "Pure Mulmul Cotton",
     stylingDetails: [
       "Loose, casual seedha pallu drape",
-      "Relaxed oversized linen slip blouse",
+      "Relaxed contemporary artisanal linen silhouette",
       "Vintage silver kadas and silver toe rings",
       "Barefoot morning tea aesthetic",
     ],
@@ -69,7 +69,7 @@ export const lookbookItems: LookbookItem[] = [
     stylingDetails: [
       "Classic royal Nivi drape with pinned gold pallu",
       "Heavy uncut polki choker and heritage jhumkas",
-      "All-over gold brocade high-neck blouse",
+      "Regal gold zari border detailing",
       "Crimson alta-stained fingertips",
     ],
   },

@@ -111,9 +111,9 @@ export const CartPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
                         <p className="text-[13px] text-muted-foreground mt-1 mb-0">
                           {item.product.fabric} • {item.product.color}
                         </p>
-                        {item.product.details.blousePiece && (
-                          <p className="text-xs text-green-700 dark:text-green-500 font-semibold mt-1.5 mb-0">
-                            ✓ Includes unstitched matching blouse fabric
+                        {item.selectedSize && (
+                          <p className="text-xs text-neutral-600 font-medium mt-1 mb-0">
+                            Size: {item.selectedSize}
                           </p>
                         )}
 

@@ -53,9 +53,6 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
     details: {
       length: "5.5 metres",
       width: "45 inches (1.14 m)",
-      blousePiece: true,
-      blouseLength: "0.8 metres (Unstitched)",
-      blouseDescription: "Matching silk fabric with woven zari border cuff detail",
       weaveType: "Handloom Kadwa Weave",
       zariType: "Antique Tested Gold Zari",
       weight: "540 grams",
@@ -64,9 +61,9 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
       care: "Professional dry clean only. Wrap in breathable cotton muslin.",
       palluDetails: "Richly woven geometric and floral jaal in gold zari",
       borderDetails: "3-inch temple border with delicate chevron selvedge",
-      boxIncludes: "Saree, Unstitched Blouse Piece, Cotton Preservation Pouch, Artisan Card",
+      boxIncludes: "Garment / Saree, Cotton Preservation Pouch, Artisan Card",
     },
-    stylingNotes: "Pair with classic raw silk or velvet corset blouse and uncut polki jewellery.",
+    stylingNotes: "Pair with handcrafted gold jewellery and statement footwear.",
     drapeTip: "Make 5–6 structured pleats at the waist for an upright, commanding silhouette.",
     seoTitle: "",
     seoDescription: "",
@@ -215,7 +212,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
         {[
           { id: "general", label: "1. General Information" },
           { id: "pricing", label: "2. Pricing & Inventory" },
-          { id: "specs", label: "3. Specifications & Blouse" },
+          { id: "specs", label: "3. Specifications" },
           { id: "media", label: `4. Images (${formData.images?.length || 0})` },
           { id: "seo", label: "5. SEO & Metadata" },
         ].map((tab) => (
@@ -483,13 +480,13 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
         </div>
       )}
 
-      {/* Tab 3: Specs & Blouse */}
+      {/* Tab 3: Specifications */}
       {activeTab === "specs" && (
         <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
             <div>
               <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Saree Length
+                Garment Length
               </label>
               <input
                 type="text"
@@ -500,7 +497,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
             </div>
             <div>
               <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Saree Width
+                Width / Dimensions
               </label>
               <input
                 type="text"
@@ -511,28 +508,26 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
             </div>
             <div>
               <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Blouse Piece Included?
+                Fit Type
               </label>
-              <select
-                value={formData.details?.blousePiece ? "yes" : "no"}
-                onChange={(e) => setFormData({ ...formData, details: { ...formData.details!, blousePiece: e.target.value === "yes" } })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface)" }}
-              >
-                <option value="yes">Yes (Included in pack)</option>
-                <option value="no">No (Saree Only)</option>
-              </select>
+              <input
+                type="text"
+                value={formData.details?.fit || "Comfortable & Regular Fit"}
+                onChange={(e) => setFormData({ ...formData, details: { ...formData.details!, fit: e.target.value } })}
+                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
+              />
             </div>
           </div>
 
           <div>
             <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-              Blouse Piece Description
+              Package Details
             </label>
             <input
               type="text"
-              value={formData.details?.blouseDescription || ""}
-              onChange={(e) => setFormData({ ...formData, details: { ...formData.details!, blouseDescription: e.target.value } })}
-              placeholder="e.g. Matching wine silk with woven zari border cuff detail"
+              value={formData.details?.packageDetails || "1 Complete Outfit / Set"}
+              onChange={(e) => setFormData({ ...formData, details: { ...formData.details!, packageDetails: e.target.value } })}
+              placeholder="e.g. 1 Saree, 1 Cotton Preservation Pouch, Artisan Card"
               style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
             />
           </div>

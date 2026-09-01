@@ -7,7 +7,11 @@ import {
   CheckCircle2,
   Save,
   User,
+  Truck,
+  RefreshCw,
+  Printer,
 } from "lucide-react";
+import { Button } from "../components/ui/button";
 
 interface AdminOrderDetailPageProps {
   orderId: string;
@@ -18,13 +22,23 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
   orderId,
   onNavigate,
 }) => {
-  const { orders, updateOrderStatus } = useData();
+  const {
+    orders,
+    updateOrderStatus,
+    shipments,
+    assignCourierAndAWB,
+    requestPickup,
+    syncTracking,
+    createShipmentForOrder,
+  } = useData();
 
   const order = orders.find((o) => o.id === orderId) || orders[0];
+  const relatedShipment = shipments.find((s) => s.orderId === order?.id);
 
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus>(order?.status || "Confirmed");
   const [timelineNote, setTimelineNote] = useState("");
   const [isSavedNotice, setIsSavedNotice] = useState(false);
+  const [isShipmentBusy, setIsShipmentBusy] = useState(false);
 
   if (!order) {
     return (
@@ -98,91 +112,84 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
       )}
 
       {/* Main 2-Col Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left 2 Cols: Order Items & Breakdown */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        {/* Left 2 Cols: Items & History */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Purchased Line Items */}
+          {/* Order Items Table Card */}
           <div className="bg-white border border-neutral-200 rounded-sm shadow-xs overflow-hidden">
-            <div className="p-4 border-b border-neutral-200">
+            <div className="p-4 border-b border-neutral-100 bg-neutral-50 flex items-center justify-between">
               <h3 className="text-sm font-bold text-neutral-900 m-0">
-                Purchased Sarees & Ensembles ({order.items.length})
+                Purchased Pieces ({order.items.length})
               </h3>
+              <span className="text-xs text-neutral-500 font-mono">
+                Total: {formatINR(order.total)}
+              </span>
             </div>
 
-            <div className="divide-y divide-neutral-100 p-4 space-y-3">
+            <div className="divide-y divide-neutral-100 text-xs">
               {order.items.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-4 pt-3 first:pt-0">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-14 h-18 object-cover rounded-xs border border-neutral-200 shrink-0 bg-neutral-100"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-neutral-900 text-xs truncate m-0" title={item.title}>
-                      {item.title}
-                    </h4>
-                    <span className="text-[11px] text-neutral-500 block mt-0.5">
-                      {item.fabric ? `${item.fabric} • ` : ""}Qty: {item.quantity}
-                    </span>
-                    {item.blouseOptIn && (
-                      <span className="text-[10px] text-brand font-bold uppercase block mt-0.5">
-                        ✓ Unstitched Blouse Piece Included
+                <div key={idx} className="p-4 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-12 h-16 object-cover rounded-xs border border-neutral-200"
+                    />
+                    <div>
+                      <strong className="text-neutral-900 text-xs block font-bold">
+                        {item.title}
+                      </strong>
+                      <span className="text-neutral-500 block text-[11px]">
+                        Fabric: {item.fabric} {item.size ? `• Size: ${item.size}` : ""}
                       </span>
-                    )}
+                    </div>
                   </div>
+
                   <div className="text-right">
-                    <span className="font-mono font-bold text-neutral-900 text-xs block">
+                    <span className="text-neutral-900 font-bold block text-sm">
                       {formatINR(item.price * item.quantity)}
                     </span>
-                    {item.quantity > 1 && (
-                      <span className="text-[10px] text-neutral-400 font-mono block">
-                        {formatINR(item.price)} each
-                      </span>
-                    )}
+                    <span className="text-[11px] text-neutral-400">
+                      {formatINR(item.price)} × {item.quantity}
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Financial Totals */}
-            <div className="bg-neutral-50/80 p-4 border-t border-neutral-200 space-y-2 text-xs">
+            {/* Financial Summary */}
+            <div className="p-4 bg-neutral-50 border-t border-neutral-100 text-xs space-y-1.5">
               <div className="flex justify-between text-neutral-600">
-                <span>Subtotal ({order.items.reduce((s, i) => s + i.quantity, 0)} items)</span>
-                <span className="font-mono">{formatINR(order.subtotal)}</span>
+                <span>Subtotal:</span>
+                <span className="font-semibold">{formatINR(order.subtotal)}</span>
               </div>
               {order.discount > 0 && (
                 <div className="flex justify-between text-emerald-700">
-                  <span>Privilege Coupon Discount</span>
-                  <span className="font-mono">- {formatINR(order.discount)}</span>
+                  <span>Discount:</span>
+                  <span>- {formatINR(order.discount)}</span>
                 </div>
               )}
-              {order.prepaidDiscount && order.prepaidDiscount > 0 ? (
-                <div className="flex justify-between text-emerald-700">
-                  <span>Prepaid Express Discount (10%)</span>
-                  <span className="font-mono">- {formatINR(order.prepaidDiscount)}</span>
-                </div>
-              ) : null}
               <div className="flex justify-between text-neutral-600">
-                <span>Pan-India Insured Delivery</span>
-                <span className="font-semibold text-emerald-700">FREE</span>
+                <span>Shipping Fee:</span>
+                <span className="text-emerald-700 font-semibold">Complimentary</span>
               </div>
               <div className="flex justify-between text-sm font-bold text-neutral-900 pt-2 border-t border-neutral-200">
-                <span>Grand Total</span>
-                <span className="font-mono text-brand">{formatINR(order.total)}</span>
+                <span>Total Amount:</span>
+                <span className="text-[#734E06]">{formatINR(order.total)}</span>
               </div>
             </div>
           </div>
 
-          {/* Timeline Audit Events */}
-          <div className="bg-white p-5 border border-neutral-200 rounded-sm shadow-xs">
-            <h3 className="text-sm font-bold text-neutral-900 mb-4 m-0">
-              Fulfillment Journey & Event Timeline
+          {/* Timeline / Progress */}
+          <div className="bg-white p-5 border border-neutral-200 rounded-sm shadow-xs space-y-4">
+            <h3 className="text-sm font-bold text-neutral-900 m-0 pb-2 border-b border-neutral-100">
+              Fulfillment Journey
             </h3>
 
-            <div className="space-y-4 relative before:absolute before:left-3.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-neutral-200">
+            <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-neutral-200">
               {order.timeline && order.timeline.length > 0 ? (
                 order.timeline.map((event, idx) => (
-                  <div key={idx} className="flex items-start gap-3 relative z-10 text-xs">
+                  <div key={idx} className="relative">
                     <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 border ${
                       event.completed
                         ? "bg-emerald-50 border-emerald-300 text-emerald-700"
@@ -214,18 +221,18 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
           </div>
         </div>
 
-        {/* Right 1 Col: Customer Details & Status Control */}
+        {/* Right 1 Col: Logistics & Customer Information */}
         <div className="space-y-6">
           {/* Status Update Form */}
           <div className="bg-white p-5 border border-neutral-200 rounded-sm shadow-xs space-y-4">
             <h3 className="text-sm font-bold text-neutral-900 m-0 pb-2 border-b border-neutral-100">
-              Fulfillment Action
+              Internal Order Status
             </h3>
 
             <form onSubmit={handleSaveStatus} className="space-y-3 text-xs">
               <div>
                 <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                  Order Status
+                  Order State
                 </label>
                 <select
                   value={selectedStatus}
@@ -244,13 +251,13 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
 
               <div>
                 <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                  Waybill / Tracking Note
+                  Status Note / Memo
                 </label>
                 <input
                   type="text"
                   value={timelineNote}
                   onChange={(e) => setTimelineNote(e.target.value)}
-                  placeholder="e.g. BlueDart AWB #98801920"
+                  placeholder="e.g. Quality inspection completed"
                   className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 text-neutral-900 text-xs rounded-sm focus:bg-white focus:border-brand outline-none"
                 />
               </div>
@@ -262,6 +269,139 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
                 <Save className="w-3.5 h-3.5" /> Update Order Status
               </button>
             </form>
+          </div>
+
+          {/* Shiprocket Logistics Card */}
+          <div className="bg-white p-5 border border-neutral-200 rounded-sm shadow-xs space-y-3 text-xs">
+            <div className="flex items-center justify-between pb-2 border-b border-neutral-100">
+              <h3 className="text-sm font-bold text-neutral-900 m-0 flex items-center gap-2">
+                <Truck className="w-4 h-4 text-[#734E06]" />
+                Shiprocket Logistics
+              </h3>
+              {relatedShipment && (
+                <span className="text-[10px] font-mono text-neutral-400">
+                  ID: #{relatedShipment.providerOrderId || "—"}
+                </span>
+              )}
+            </div>
+
+            {relatedShipment ? (
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-neutral-500">Carrier:</span>
+                  <strong className="text-neutral-900">{relatedShipment.courierName || "Pending Allocation"}</strong>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-neutral-500">AWB Number:</span>
+                  {relatedShipment.awb ? (
+                    <span className="font-mono text-accent font-bold">{relatedShipment.awb}</span>
+                  ) : (
+                    <span className="text-neutral-400 italic">Not Assigned</span>
+                  )}
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-neutral-500">Shipment Status:</span>
+                  <span className="font-bold px-2 py-0.5 rounded text-[10px] uppercase bg-neutral-100 text-neutral-800">
+                    {relatedShipment.status}
+                  </span>
+                </div>
+
+                <div className="pt-2 border-t border-neutral-100 flex flex-col gap-2">
+                  {relatedShipment.status === "CREATED" && (
+                    <Button
+                      size="sm"
+                      disabled={isShipmentBusy}
+                      onClick={async () => {
+                        setIsShipmentBusy(true);
+                        try {
+                          await assignCourierAndAWB(relatedShipment.id);
+                        } finally {
+                          setIsShipmentBusy(false);
+                        }
+                      }}
+                      className="w-full bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs h-8"
+                    >
+                      Assign Courier & Generate AWB
+                    </Button>
+                  )}
+
+                  {relatedShipment.status === "AWB_ASSIGNED" && (
+                    <Button
+                      size="sm"
+                      disabled={isShipmentBusy}
+                      onClick={async () => {
+                        setIsShipmentBusy(true);
+                        try {
+                          await requestPickup(relatedShipment.id);
+                        } finally {
+                          setIsShipmentBusy(false);
+                        }
+                      }}
+                      className="w-full bg-neutral-900 hover:bg-neutral-800 text-white text-xs h-8"
+                    >
+                      Request Courier Pickup
+                    </Button>
+                  )}
+
+                  {relatedShipment.awb && (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={isShipmentBusy}
+                        onClick={async () => {
+                          setIsShipmentBusy(true);
+                          try {
+                            await syncTracking(relatedShipment.id);
+                          } finally {
+                            setIsShipmentBusy(false);
+                          }
+                        }}
+                        className="flex-1 text-xs h-8"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 mr-1 ${isShipmentBusy ? "animate-spin" : ""}`} />
+                        Sync Tracking
+                      </Button>
+
+                      {relatedShipment.labelUrl && (
+                        <a
+                          href={relatedShipment.labelUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex-1 inline-flex items-center justify-center border border-neutral-300 bg-white hover:bg-neutral-50 text-neutral-800 rounded-sm text-xs font-semibold h-8"
+                        >
+                          <Printer className="w-3.5 h-3.5 mr-1" />
+                          Label
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3 text-center py-2">
+                <p className="text-neutral-500 m-0 text-xs">
+                  No Shiprocket manifest currently active for this order.
+                </p>
+                <Button
+                  size="sm"
+                  disabled={isShipmentBusy}
+                  onClick={async () => {
+                    setIsShipmentBusy(true);
+                    try {
+                      await createShipmentForOrder(order);
+                    } finally {
+                      setIsShipmentBusy(false);
+                    }
+                  }}
+                  className="w-full bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs h-8"
+                >
+                  <Truck className="w-3.5 h-3.5 mr-1.5" /> Create Shiprocket Shipment
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Customer Profile Card */}

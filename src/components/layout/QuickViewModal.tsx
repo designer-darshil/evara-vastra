@@ -258,10 +258,10 @@ export const QuickViewModal: React.FC<{ onNavigate: (href: string) => void }> = 
               </div>
               <div>
                 <span style={{ color: "var(--text-muted)", display: "block" }}>
-                  Blouse Piece
+                  Craft Heritage
                 </span>
                 <strong style={{ color: "var(--accent-gold)" }}>
-                  {quickViewProduct.details.blousePiece ? "Included" : "Not Included"}
+                  {quickViewProduct.craft || quickViewProduct.details.craft || "Artisan Handloom"}
                 </strong>
               </div>
             </div>

@@ -1,9 +1,6 @@
 export interface ProductDetails {
   length: string;
   width: string;
-  blousePiece: boolean;
-  blouseLength: string;
-  blouseDescription: string;
   weaveType: string;
   zariType?: string;
   weight: string;
@@ -72,9 +69,6 @@ export const products: Product[] = [
     details: {
       length: "5.5 metres",
       width: "45 inches (1.14 m)",
-      blousePiece: true,
-      blouseLength: "0.8 metres (Unstitched)",
-      blouseDescription: "Matching wine silk with woven zari border cuff detail",
       weaveType: "Handloom Kadwa Weave",
       zariType: "Antique Tested Gold Zari",
       weight: "580 grams",
@@ -83,9 +77,9 @@ export const products: Product[] = [
       care: "Professional dry clean only. Wrap in breathable cotton muslin.",
       palluDetails: "Richly woven geometric and floral jaal in antique gold zari",
       borderDetails: "3.5-inch temple border with delicate chevron selvedge",
-      boxIncludes: "Saree, Unstitched Blouse Piece, Cotton Preservation Pouch, Artisan Authenticity Card",
+      boxIncludes: "Saree, Cotton Preservation Pouch, Artisan Authenticity Card",
     },
-    stylingNotes: "Pair with a sleeveless sweetheart blouse or structured raw silk corset. Accentuate with uncut polki or antique temple gold jewellery.",
+    stylingNotes: "Pair with classic gold jewellery and uncut polki accents.",
     drapeTip: "Make 5–6 wide pleats at the waist for a structured, regal silhouette that holds shape effortlessly.",
   },
   {
@@ -117,9 +111,6 @@ export const products: Product[] = [
     details: {
       length: "5.5 metres",
       width: "46 inches (1.16 m)",
-      blousePiece: true,
-      blouseLength: "0.85 metres (Unstitched)",
-      blouseDescription: "Solid contrast charcoal mulmul cotton fabric",
       weaveType: "100-Count Handspun Shuttle Loom",
       weight: "340 grams",
       origin: "Chettinad / Phulia Cluster",
@@ -127,9 +118,9 @@ export const products: Product[] = [
       care: "Gentle cold hand wash with organic detergent. Dry in shade.",
       palluDetails: "Subtle linear woven stripes with hand-tied tassels",
       borderDetails: "1.5-inch micro-selvedge in organic charcoal",
-      boxIncludes: "Saree, Unstitched Blouse Piece, Herbal Fragrance Sachet, Care Booklet",
+      boxIncludes: "Saree, Herbal Fragrance Sachet, Care Booklet",
     },
-    stylingNotes: "Style with silver jhumkas, a crisp high-neck linen shirt or a relaxed boat-neck blouse for gallery visits and warm workdays.",
+    stylingNotes: "Style with silver jhumkas or a crisp contemporary linen shirt for gallery visits and warm workdays.",
     drapeTip: "Iron lightly on medium-warm cotton setting for a crisp, flowing drape with soft natural movement.",
   },
   {
@@ -161,9 +152,6 @@ export const products: Product[] = [
     details: {
       length: "5.5 metres",
       width: "45 inches (1.14 m)",
-      blousePiece: true,
-      blouseLength: "1.0 metre (Unstitched brocade)",
-      blouseDescription: "All-over heavy zari buti brocade in matching gold katan silk",
       weaveType: "Authentic Kadwa Pit Loom Weave",
       zariType: "Real Tested Metallic Gold Zari",
       weight: "740 grams",
@@ -172,7 +160,7 @@ export const products: Product[] = [
       care: "Strictly dry clean only. Store wrapped in silk cloth inside an archival cedar box.",
       palluDetails: "Grand Mughal paisley jaal with dense gold zari craftsmanship",
       borderDetails: "5-inch ornate scalloped floral kadi border",
-      boxIncludes: "Saree, Heavy Brocade Blouse Piece, Silk Preservation Bag, Master Artisan Certificate",
+      boxIncludes: "Saree, Silk Preservation Bag, Master Artisan Certificate",
     },
     stylingNotes: "A showstopper for the wedding mandap or sangeet night. Complement with antique gold heritage choker and fresh jasmine gajra.",
     drapeTip: "Pin securely with velvet-lined safety pins to preserve the delicate tested zari threads.",
@@ -206,9 +194,6 @@ export const products: Product[] = [
     details: {
       length: "5.5 metres",
       width: "44 inches (1.12 m)",
-      blousePiece: true,
-      blouseLength: "0.8 metres (Unstitched)",
-      blouseDescription: "Heavy embroidered raw silk blouse piece in matching blush tone",
       weaveType: "Fine Silk Organza with Zardozi/Thread Embellishment",
       weight: "290 grams",
       origin: "Chanderi / Kolkata Workshop",
@@ -216,9 +201,9 @@ export const products: Product[] = [
       care: "Dry clean only. Roll on padded tube to store without creasing.",
       palluDetails: "Hand-scalloped end with cascading micro-floral sprays",
       borderDetails: "2.5-inch continuous floral cut-work embroidery",
-      boxIncludes: "Saree, Embroidered Blouse Piece, Premium Satin Bag, Care Guide",
+      boxIncludes: "Saree, Premium Satin Bag, Care Guide",
     },
-    stylingNotes: "Wear with an embellished bustier or pearl-embossed bralette. Ideal for sunset cocktails and destination summer nuptials.",
+    stylingNotes: "Wear with elegant gemstone jewellery. Ideal for sunset cocktails and destination summer nuptials.",
     drapeTip: "Allow the pallu to fall freely over the arm rather than tightly pleating to showcase the translucent drape.",
   },
   {
@@ -250,9 +235,6 @@ export const products: Product[] = [
     details: {
       length: "5.5 metres",
       width: "47 inches (1.19 m)",
-      blousePiece: true,
-      blouseLength: "0.85 metres (Unstitched)",
-      blouseDescription: "Pure woven charcoal-ivory melange linen fabric",
       weaveType: "60-Lea Handloom Shuttle Weave",
       weight: "440 grams",
       origin: "Bhagalpur Handloom Cluster",
@@ -260,9 +242,9 @@ export const products: Product[] = [
       care: "Dry clean first wash. Later gentle cold hand wash with eco-soap.",
       palluDetails: "Minimalist alternating pinstripes with raw fringe hem",
       borderDetails: "1-inch contrast charcoal graphic selvedge",
-      boxIncludes: "Saree, Unstitched Blouse Piece, Cotton Storage Bag, Linen Care Manual",
+      boxIncludes: "Saree, Cotton Storage Bag, Linen Care Manual",
     },
-    stylingNotes: "Pairs strikingly with a tailored linen blazer, ceramic buttons, and sleek leather loafers or minimalist tan sandals.",
+    stylingNotes: "Pairs strikingly with a tailored linen jacket, ceramic buttons, and sleek leather loafers or minimalist tan sandals.",
     drapeTip: "A wide, relaxed 4-pleat front drape creates a modern structured column look.",
   },
   {
@@ -294,9 +276,6 @@ export const products: Product[] = [
     details: {
       length: "5.5 metres",
       width: "45 inches (1.14 m)",
-      blousePiece: true,
-      blouseLength: "0.8 metres (Unstitched)",
-      blouseDescription: "Plain emerald Chanderi silk with gold zari border",
       weaveType: "Chanderi Handloom with Eknal Weave",
       zariType: "Fine Antique Gold Zari",
       weight: "360 grams",
@@ -305,9 +284,9 @@ export const products: Product[] = [
       care: "Dry clean only. Air out occasionally in a shaded airy room.",
       palluDetails: "Traditional nakshi border with gold tissue bands",
       borderDetails: "2.5-inch antique gold zari kadi border",
-      boxIncludes: "Saree, Unstitched Blouse Piece, Cotton Storage Sleeve, Authenticity Tag",
+      boxIncludes: "Saree, Cotton Storage Sleeve, Authenticity Tag",
     },
-    stylingNotes: "Accompany with uncut emerald studs, gold kadas, and an elbow-length high-neck blouse.",
+    stylingNotes: "Accompany with uncut emerald studs, gold kadas, and fine heritage choker.",
     drapeTip: "The natural bounce of Chanderi silk holds pleats crisply without slipping.",
   },
   {
@@ -339,9 +318,6 @@ export const products: Product[] = [
     details: {
       length: "5.5 metres",
       width: "46 inches (1.16 m)",
-      blousePiece: true,
-      blouseLength: "0.8 metres (Unstitched)",
-      blouseDescription: "Indigo handspun cotton with Jamdani sleeve cuff motif",
       weaveType: "Heritage Jamdani Handloom",
       weight: "380 grams",
       origin: "Fulia & Nadia Weaving Guilds",
@@ -349,9 +325,9 @@ export const products: Product[] = [
       care: "Dry clean for first two washes to set natural indigo. Gentle hand wash thereafter.",
       palluDetails: "Intricate geometric Jamdani jaal depicting celestial starbursts",
       borderDetails: "Subtle silver zari needlework selvedge",
-      boxIncludes: "Saree, Unstitched Blouse Piece, Indigo Artisan Story Card, Muslin Pouch",
+      boxIncludes: "Saree, Indigo Artisan Story Card, Muslin Pouch",
     },
-    stylingNotes: "Team with oxidized silver jewellery, Kohl-rimmed eyes, and an ivory raw silk halter blouse.",
+    stylingNotes: "Team with oxidized silver jewellery and Kohl-rimmed eyes.",
     drapeTip: "Drape loosely with an open floating pallu to highlight the intricate transparency of the Jamdani work.",
   },
   {
@@ -383,9 +359,6 @@ export const products: Product[] = [
     details: {
       length: "5.5 metres",
       width: "45 inches (1.14 m)",
-      blousePiece: true,
-      blouseLength: "1.0 metre (Unstitched)",
-      blouseDescription: "Heavy zari jaal katan silk with Meenakari border accents",
       weaveType: "Authentic Kadwa Meenakari",
       zariType: "Real Antique Tested Gold Zari",
       weight: "820 grams",
@@ -394,7 +367,7 @@ export const products: Product[] = [
       care: "Strictly dry clean only. Store in original cotton preservation case.",
       palluDetails: "Monumental floral bouquet and peacock motifs in gold zari and resham",
       borderDetails: "6-inch broad heritage border",
-      boxIncludes: "Saree, Heavy Blouse Piece, Silk Pouch, Certificate of Authenticity",
+      boxIncludes: "Saree, Silk Pouch, Certificate of Authenticity",
     },
     stylingNotes: "The ultimate bridal statement. Pair with traditional kundan polki neckpiece and mathapatti.",
     drapeTip: "Use structured box pleating to ensure the heavy brocade fall sits impeccably flat and regal.",
@@ -428,9 +401,6 @@ export const products: Product[] = [
     details: {
       length: "5.5 metres",
       width: "45 inches (1.14 m)",
-      blousePiece: true,
-      blouseLength: "0.8 metres (Unstitched)",
-      blouseDescription: "Natural raw tussar silk with woven temple border",
       weaveType: "Handloom Tussar Gicha Weave",
       weight: "510 grams",
       origin: "Bhagalpur, Bihar",
@@ -438,9 +408,9 @@ export const products: Product[] = [
       care: "Dry clean only to maintain raw silk texture and golden sheen.",
       palluDetails: "Broad horizontal bands of raw gicha silk with hand-twisted fringes",
       borderDetails: "2-inch subtle antique gold zari selvedge",
-      boxIncludes: "Saree, Unstitched Blouse Piece, Cotton Bag, Wild Silk Origin Card",
+      boxIncludes: "Saree, Cotton Bag, Wild Silk Origin Card",
     },
-    stylingNotes: "Pairs beautifully with brass geometric ear cuffs and a deep chocolate brown or rust silk blouse.",
+    stylingNotes: "Pairs beautifully with brass geometric ear cuffs and statement earrings.",
     drapeTip: "Tussar silk drapes with a crisp, commanding volume that elongates the frame.",
   },
   {
@@ -472,9 +442,6 @@ export const products: Product[] = [
     details: {
       length: "5.5 metres",
       width: "44 inches (1.12 m)",
-      blousePiece: true,
-      blouseLength: "0.8 metres (Unstitched)",
-      blouseDescription: "Obsidian velvet-silk blend unstitched fabric",
       weaveType: "Sheer Organza with Fine Zari Weft",
       weight: "310 grams",
       origin: "Varanasi / Delhi Studio",
@@ -482,9 +449,9 @@ export const products: Product[] = [
       care: "Dry clean only. Do not steam press directly on zari.",
       palluDetails: "Cascading metallic silver stripes with soft tassel edge",
       borderDetails: "2-inch micro-piped satin border",
-      boxIncludes: "Saree, Velvet Blouse Piece, Silk Sleeve, Designer Box",
+      boxIncludes: "Saree, Silk Sleeve, Designer Box",
     },
-    stylingNotes: "Wear with a structured black blazer draped over shoulders or an off-shoulder corset blouse.",
+    stylingNotes: "Wear with a structured black blazer draped over shoulders or architectural statement jewellery.",
     drapeTip: "Pin at the shoulder with a clean minimal brooch and let the sheer pallu trail gracefully.",
   },
   {
@@ -516,9 +483,6 @@ export const products: Product[] = [
     details: {
       length: "5.5 metres",
       width: "46 inches (1.16 m)",
-      blousePiece: true,
-      blouseLength: "0.85 metres (Unstitched)",
-      blouseDescription: "Matching hand-blocked chevron print mulmul cotton",
       weaveType: "120-Count Cotton with Hand-Carved Teak Block Print",
       weight: "280 grams",
       origin: "Bagru, Rajasthan",
@@ -526,9 +490,9 @@ export const products: Product[] = [
       care: "Gentle cold hand wash separately. Dry in shade.",
       palluDetails: "Dense Mughal floral buta bouquet framed by twin stripes",
       borderDetails: "1-inch running floral vine border",
-      boxIncludes: "Saree, Unstitched Blouse Piece, Fragrant Lavender Sachet, Care Note",
+      boxIncludes: "Saree, Fragrant Lavender Sachet, Care Note",
     },
-    stylingNotes: "Style with handcrafted terracotta earrings, Kolhapuri flats, and a relaxed cotton kurta blouse.",
+    stylingNotes: "Style with handcrafted terracotta earrings, Kolhapuri flats, and minimalist styling.",
     drapeTip: "Super soft texture wraps the body like a second skin with zero bulk.",
   },
   {
@@ -560,9 +524,6 @@ export const products: Product[] = [
     details: {
       length: "5.5 metres",
       width: "47 inches (1.19 m)",
-      blousePiece: true,
-      blouseLength: "0.85 metres (Unstitched)",
-      blouseDescription: "Terracotta slub linen with gold zari border",
       weaveType: "60-Lea Handloom Weave",
       zariType: "Fine Tested Gold Zari",
       weight: "460 grams",
@@ -571,9 +532,9 @@ export const products: Product[] = [
       care: "Dry clean first wash. Gentle cold wash thereafter.",
       palluDetails: "Classic handloom alternating bands with hand-knotted fringe",
       borderDetails: "1.5-inch antique gold zari border",
-      boxIncludes: "Saree, Unstitched Blouse Piece, Linen Bag, Artisan Story Card",
+      boxIncludes: "Saree, Linen Bag, Artisan Story Card",
     },
-    stylingNotes: "Pairs with a tailored linen waist-coat or a simple black sleeveless blouse for work-to-dinner transitions.",
+    stylingNotes: "Pairs with a tailored linen waist-coat or minimalist accents for work-to-dinner transitions.",
     drapeTip: "Creates clean, architectural folds that stay crisp throughout an 8-hour day.",
   },
 ];

@@ -27,6 +27,7 @@ import {
   BookOpen,
   HelpCircle,
   Lock,
+  Truck,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -51,6 +52,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     products,
     reviews,
     orders,
+    shipments,
     hasPermission,
   } = useData();
 
@@ -89,6 +91,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     if (path.startsWith("/admin/collections")) return "products";
     if (path.startsWith("/admin/inventory")) return "inventory";
     if (path.startsWith("/admin/orders")) return "orders";
+    if (path.startsWith("/admin/shipments")) return "orders";
     if (path.startsWith("/admin/customers")) return "customers";
     if (path.startsWith("/admin/coupons")) return "coupons";
     if (path.startsWith("/admin/reviews")) return "reviews";
@@ -107,6 +110,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   ).length;
   const pendingReviewsCount = reviews.filter((r) => r.status === "pending").length;
   const pendingOrdersCount = orders.filter((o) => o.status === "Pending").length;
+  const pendingShipmentsCount = shipments.filter((s) => s.status === "CREATED" || s.status === "AWB_ASSIGNED").length;
 
   interface NavItem {
     label?: string;
@@ -129,6 +133,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     
     { section: "COMMERCE & FULFILLMENT" },
     { label: "Orders", href: "/admin/orders", icon: ShoppingBag, badge: pendingOrdersCount > 0 ? `${pendingOrdersCount} new` : undefined, badgeVariant: "brand", module: "orders" },
+    { label: "Shipments (Shiprocket)", href: "/admin/shipments", icon: Truck, badge: pendingShipmentsCount > 0 ? `${pendingShipmentsCount} queue` : undefined, badgeVariant: "brand", module: "orders" },
     { label: "Customers", href: "/admin/customers", icon: Users, module: "customers" },
     { label: "Coupons & Discounts", href: "/admin/coupons", icon: Ticket, module: "coupons" },
     

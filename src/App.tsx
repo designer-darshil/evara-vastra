@@ -61,6 +61,7 @@ import { AdminSettingsPage } from "./admin/AdminSettingsPage";
 import { AdminAnalyticsPage } from "./admin/AdminAnalyticsPage";
 import { AdminUsersPage } from "./admin/AdminUsersPage";
 import { AdminAuditLogsPage } from "./admin/AdminAuditLogsPage";
+import { AdminShipmentsPage } from "./admin/AdminShipmentsPage";
 import { AdminLayout } from "./admin/AdminLayout";
 
 // New Storefront Pages
@@ -179,6 +180,9 @@ const AppContent: React.FC = () => {
       }
       if (currentPath === "/admin/orders") {
         return <AdminOrdersPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/shipments") {
+        return <AdminShipmentsPage onNavigate={navigate} />;
       }
       if (currentPath.startsWith("/admin/orders/")) {
         const ordId = currentPath.replace("/admin/orders/", "");

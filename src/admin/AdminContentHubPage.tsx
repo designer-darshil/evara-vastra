@@ -35,7 +35,7 @@ export const AdminContentHubPage: React.FC<{ onNavigate: (href: string) => void 
     },
     {
       title: "FAQ & Patron Knowledge Base",
-      description: "Manage client questions regarding unstitched blouse pieces, pure silk care, and express delivery.",
+      description: "Manage client questions regarding garment sizing, pure silk care, and express delivery.",
       href: "/admin/content/faq",
       icon: FileText,
       badge: "Support",

@@ -440,3 +440,7 @@ export interface InventoryAdjustment {
   actorEmail: string;
   timestamp: string;
 }
+
+// Re-export shipping and logistics domain models
+export * from "../lib/shiprocket/types";
+
