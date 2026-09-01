@@ -38,6 +38,8 @@ export interface ProductDetails {
   palluDetails?: string;
   borderDetails?: string;
   boxIncludes?: string;
+  fit?: string;
+  occasion?: string;
 }
 
 export interface Product {
