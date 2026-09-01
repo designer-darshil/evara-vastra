@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useData } from "../../context/DataContext";
-import { X, Shield } from "lucide-react";
+import { X, Shield, Phone, MapPin } from "lucide-react";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -15,6 +15,17 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
 }) => {
   const { activeCategories, siteSettings, isAdminAuthenticated } = useData();
 
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleLink = (href: string) => {
@@ -27,22 +38,25 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
       style={{
         position: "fixed",
         inset: 0,
-        backgroundColor: "rgba(23, 21, 19, 0.6)",
+        backgroundColor: "rgba(23, 21, 19, 0.65)",
         backdropFilter: "blur(4px)",
         zIndex: 99999,
         display: "flex",
         justifyContent: "flex-start",
       }}
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Navigation Menu"
     >
       <div
         style={{
           backgroundColor: "#FFFFFF",
-          width: "85%",
+          width: "88%",
           maxWidth: "380px",
           height: "100%",
           overflowY: "auto",
-          padding: "2rem 1.5rem",
+          padding: "1.75rem 1.25rem",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
@@ -59,135 +73,205 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
               justifyContent: "space-between",
               borderBottom: "1px solid var(--border-subtle)",
               paddingBottom: "1.25rem",
-              marginBottom: "1.5rem",
+              marginBottom: "1.25rem",
             }}
           >
             <div>
-              <span className="font-serif" style={{ fontSize: "1.5rem", fontWeight: 600, color: "var(--text-primary)" }}>
+              <span className="font-serif" style={{ fontSize: "1.35rem", fontWeight: 700, letterSpacing: "0.1em", color: "var(--text-primary)" }}>
                 {siteSettings.name || "EVARA VASTRA"}
               </span>
-              <span style={{ fontSize: "0.6rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--accent-gold)", display: "block" }}>
-                CONTEMPORARY INDIAN SAREES
+              <span style={{ fontSize: "0.62rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--accent-gold)", display: "block", marginTop: "0.1rem" }}>
+                CONTEMPORARY INDIAN WOMENSWEAR
               </span>
             </div>
 
-            <button onClick={onClose} aria-label="Close menu" style={{ color: "var(--text-primary)" }}>
-              <X size={22} />
+            <button
+              onClick={onClose}
+              aria-label="Close navigation menu"
+              style={{
+                color: "var(--text-primary)",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: "0.5rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: "44px",
+                minHeight: "44px",
+              }}
+            >
+              <X size={24} />
             </button>
           </div>
 
-          {/* Nav List */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          {/* Quick Category Navigation */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
             <button
               onClick={() => handleLink("/shop")}
               style={{
                 textAlign: "left",
-                fontSize: "1.1rem",
-                fontWeight: 600,
+                fontSize: "1rem",
+                fontWeight: 700,
                 color: "var(--text-primary)",
+                padding: "0.6rem 0.5rem",
+                minHeight: "44px",
+                display: "flex",
+                alignItems: "center",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
               }}
             >
-              All Sarees
+              Shop All Products
             </button>
 
-            {/* Categories */}
-            <div style={{ paddingLeft: "0.5rem", display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-              <span style={{ fontSize: "0.68rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--accent-gold)" }}>
-                Master Categories
-              </span>
-              {activeCategories.slice(0, 5).map((cat) => (
+            {/* Individual Categories */}
+            <div style={{ paddingLeft: "0.75rem", display: "flex", flexDirection: "column", gap: "0.15rem", borderLeft: "2px solid var(--accent-wine-subtle)", marginLeft: "0.5rem", marginBottom: "0.75rem" }}>
+              {activeCategories.map((cat) => (
                 <button
                   key={cat.id}
                   onClick={() => handleLink(`/shop/${cat.slug}`)}
-                  style={{ textAlign: "left", fontSize: "0.875rem", color: "var(--text-secondary)" }}
+                  style={{
+                    textAlign: "left",
+                    fontSize: "0.9rem",
+                    color: "var(--text-secondary)",
+                    padding: "0.45rem 0.5rem",
+                    minHeight: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
                 >
                   {cat.name}
                 </button>
               ))}
+              <button
+                onClick={() => handleLink("/shop?filter=newArrival")}
+                style={{
+                  textAlign: "left",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  color: "var(--accent-wine)",
+                  padding: "0.45rem 0.5rem",
+                  minHeight: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                ★ New Season Drops
+              </button>
             </div>
 
             <button
               onClick={() => handleLink("/collections")}
               style={{
                 textAlign: "left",
-                fontSize: "1.1rem",
+                fontSize: "0.95rem",
                 fontWeight: 600,
                 color: "var(--text-primary)",
+                padding: "0.6rem 0.5rem",
+                minHeight: "44px",
+                display: "flex",
+                alignItems: "center",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
               }}
             >
-              Collections
+              Curated Collections
             </button>
 
             <button
-              onClick={() => handleLink("/craftsmanship")}
+              onClick={() => handleLink("/orders")}
               style={{
                 textAlign: "left",
-                fontSize: "1.1rem",
+                fontSize: "0.95rem",
                 fontWeight: 600,
                 color: "var(--text-primary)",
+                padding: "0.6rem 0.5rem",
+                minHeight: "44px",
+                display: "flex",
+                alignItems: "center",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
               }}
             >
-              Artisanal Craftsmanship
-            </button>
-
-            <button
-              onClick={() => handleLink("/lookbook")}
-              style={{
-                textAlign: "left",
-                fontSize: "1.1rem",
-                fontWeight: 600,
-                color: "var(--text-primary)",
-              }}
-            >
-              Campaign Lookbook
+              Track Your Order
             </button>
 
             <button
               onClick={() => handleLink("/about")}
               style={{
                 textAlign: "left",
-                fontSize: "1.1rem",
+                fontSize: "0.95rem",
                 fontWeight: 600,
                 color: "var(--text-primary)",
+                padding: "0.6rem 0.5rem",
+                minHeight: "44px",
+                display: "flex",
+                alignItems: "center",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
               }}
             >
-              Our Story & Atelier
+              Our Story & Heritage
             </button>
 
             <button
               onClick={() => handleLink("/contact")}
               style={{
                 textAlign: "left",
-                fontSize: "1.1rem",
+                fontSize: "0.95rem",
                 fontWeight: 600,
                 color: "var(--text-primary)",
+                padding: "0.6rem 0.5rem",
+                minHeight: "44px",
+                display: "flex",
+                alignItems: "center",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
               }}
             >
-              Atelier Appointments
+              Customer Care & Contact
             </button>
           </div>
         </div>
 
-        {/* Bottom Client Actions & Admin Link */}
-        <div style={{ borderTop: "1px solid var(--border-subtle)", paddingTop: "1.25rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-          <button
-            onClick={() => handleLink("/account")}
-            style={{ textAlign: "left", fontSize: "0.85rem", color: "var(--text-secondary)" }}
-          >
-            My Client Account
-          </button>
-          <button
-            onClick={() => handleLink("/orders")}
-            style={{ textAlign: "left", fontSize: "0.85rem", color: "var(--text-secondary)" }}
-          >
-            Order Tracking
-          </button>
-          <button
-            onClick={() => handleLink("/wishlist")}
-            style={{ textAlign: "left", fontSize: "0.85rem", color: "var(--text-secondary)" }}
-          >
-            Saved Pieces
-          </button>
+        {/* Bottom Support & Admin Link */}
+        <div style={{ borderTop: "1px solid var(--border-subtle)", paddingTop: "1.25rem", marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8rem", color: "var(--text-secondary)" }}>
+            <Phone size={14} style={{ color: "var(--accent-wine)" }} />
+            <span>Care: +91-92743 44037</span>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8rem", color: "var(--text-secondary)" }}>
+            <MapPin size={14} style={{ color: "var(--accent-wine)" }} />
+            <span>Surat, Gujarat, India</span>
+          </div>
+
+          <div style={{ display: "flex", gap: "1rem", marginTop: "0.5rem", fontSize: "0.75rem", color: "var(--text-muted)" }}>
+            <button onClick={() => handleLink("/shipping")} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 0 }}>
+              Shipping
+            </button>
+            <span>•</span>
+            <button onClick={() => handleLink("/returns")} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 0 }}>
+              Exchange
+            </button>
+            <span>•</span>
+            <button onClick={() => handleLink("/privacy")} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 0 }}>
+              Privacy
+            </button>
+          </div>
+
           <button
             onClick={() => handleLink(isAdminAuthenticated ? "/admin" : "/admin/login")}
             style={{
@@ -199,11 +283,14 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
               alignItems: "center",
               gap: "0.4rem",
               marginTop: "0.5rem",
-              paddingTop: "0.5rem",
-              borderTop: "1px solid var(--border-subtle)",
+              padding: "0.6rem 0",
+              minHeight: "44px",
+              borderTop: "1px dashed var(--border-subtle)",
+              background: "none",
+              cursor: "pointer",
             }}
           >
-            <Shield size={13} />
+            <Shield size={14} />
             <span>{isAdminAuthenticated ? "Atelier Admin Dashboard" : "Atelier Admin Portal"}</span>
           </button>
         </div>

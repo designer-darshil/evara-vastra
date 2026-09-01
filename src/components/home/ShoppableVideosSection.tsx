@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useData } from "../../context/DataContext";
 import { Play, X, ShoppingBag, ArrowRight } from "lucide-react";
 import { ShoppableVideo } from "../../types";
@@ -6,6 +6,24 @@ import { ShoppableVideo } from "../../types";
 export const ShoppableVideosSection: React.FC<{ onNavigate: (href: string) => void }> = ({ onNavigate }) => {
   const { publishedVideos } = useData();
   const [activeVideo, setActiveVideo] = useState<ShoppableVideo | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && activeVideo) {
+        setActiveVideo(null);
+      }
+    };
+    if (activeVideo) {
+      document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", handleKeyDown);
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeVideo]);
 
   if (publishedVideos.length === 0) return null;
 

@@ -31,7 +31,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   const [selectedFabric, setSelectedFabric] = useState<string>(fabricParam || "all");
   const [selectedColor, setSelectedColor] = useState<string>("all");
   const [selectedOccasion, setSelectedOccasion] = useState<string>(occasionParam || "all");
-  const [maxPrice, setMaxPrice] = useState<number>(35000);
+  const [maxPrice, setMaxPrice] = useState<number>(10000);
   const [onlyNewArrivals, setOnlyNewArrivals] = useState<boolean>(filterParam === "newArrival");
   const [onlyBestsellers, setOnlyBestsellers] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<string>("featured");
@@ -569,9 +569,9 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               </div>
               <input
                 type="range"
-                min="5000"
-                max="35000"
-                step="1000"
+                min="1000"
+                max="10000"
+                step="250"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(Number(e.target.value))}
                 style={{ width: "100%", accentColor: "var(--accent-wine)" }}
@@ -591,19 +591,19 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                 }}
               >
                 <h3 className="font-serif" style={{ fontSize: "1.85rem", color: "var(--text-primary)" }}>
-                  No Sarees Match Selected Filters
+                  No Products Match Selected Filters
                 </h3>
                 <p
                   style={{
                     fontSize: "0.9rem",
                     color: "var(--text-secondary)",
-                    maxWidth: "400px",
+                    maxWidth: "420px",
                     margin: "0.5rem auto 1.5rem auto",
                   }}
                 >
-                  Try clearing some of your filter selections or explore our complete silk collection.
+                  Try clearing some of your filter criteria or explore our complete contemporary collection.
                 </p>
-                <button onClick={resetAllFilters} className="btn-wine">
+                <button onClick={resetAllFilters} className="btn btn-primary">
                   Reset All Filters
                 </button>
               </div>

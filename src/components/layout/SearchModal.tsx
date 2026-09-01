@@ -13,17 +13,25 @@ export const SearchModal: React.FC<{ onNavigate: (href: string) => void }> = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isSearchOpen) {
+        closeSearch();
+      }
+    };
+
     if (isSearchOpen) {
       setTimeout(() => inputRef.current?.focus(), 50);
       document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", handleKeyDown);
     } else {
       document.body.style.overflow = "unset";
       setQuery("");
     }
     return () => {
       document.body.style.overflow = "unset";
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isSearchOpen]);
+  }, [isSearchOpen, closeSearch]);
 
   if (!isSearchOpen) return null;
 

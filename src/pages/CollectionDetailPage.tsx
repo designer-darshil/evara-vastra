@@ -26,9 +26,33 @@ export const CollectionDetailPage: React.FC<{
     );
   }
 
-  const collectionProducts = publishedProducts.filter(
-    (p) => p.collection === collection.slug || p.category === (collection.slug.includes("silk") ? "silk" : "banarasi")
-  );
+  const collectionProducts = publishedProducts.filter((p) => {
+    if (collection.productIds && collection.productIds.length > 0 && collection.productIds.includes(p.id)) {
+      return true;
+    }
+    if (p.collections && Array.isArray(p.collections) && p.collections.includes(collection.slug)) {
+      return true;
+    }
+    if (p.collection === collection.slug) {
+      return true;
+    }
+    if (collection.slug === "premium-collection-saree" && p.category === "sarees") {
+      return true;
+    }
+    if (collection.slug === "aurelia-saree" && (p.title.toLowerCase().includes("aurelia") || p.title.toLowerCase().includes("fendy") || p.title.toLowerCase().includes("tissue") || p.title.toLowerCase().includes("saree"))) {
+      return true;
+    }
+    if (collection.slug === "everyday-elegance" && (p.category === "coord-sets" || p.category === "everyday-elegance" || p.category === "dresses")) {
+      return true;
+    }
+    if (collection.slug === "new-arrivals" && p.newArrival) {
+      return true;
+    }
+    if (collection.slug === "bestsellers" && p.bestseller) {
+      return true;
+    }
+    return false;
+  });
 
   const relatedCollections = collections
     .filter((c) => c.id !== collection.id && c.isPublished)

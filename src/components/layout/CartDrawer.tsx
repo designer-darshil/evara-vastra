@@ -16,15 +16,23 @@ export const CartDrawer: React.FC<{ onNavigate: (href: string) => void }> = ({
   } = useShop();
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isCartDrawerOpen) {
+        closeCartDrawer();
+      }
+    };
+
     if (isCartDrawerOpen) {
       document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", handleKeyDown);
     } else {
       document.body.style.overflow = "unset";
     }
     return () => {
       document.body.style.overflow = "unset";
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isCartDrawerOpen]);
+  }, [isCartDrawerOpen, closeCartDrawer]);
 
   if (!isCartDrawerOpen) return null;
 

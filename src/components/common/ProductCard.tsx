@@ -64,7 +64,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         display: "flex",
         flexDirection: "column",
         cursor: "pointer",
-        animationDelay: `${(index % 8) * 0.08}s`,
+        animationDelay: `${(index % 8) * 0.06}s`,
       }}
     >
       {/* Visual Image Container */}
@@ -76,6 +76,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           overflow: "hidden",
           backgroundColor: "#EDE7DD",
           marginBottom: "0.85rem",
+          borderRadius: "2px",
         }}
       >
         <img
@@ -87,7 +88,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            transition: "transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease",
+            transition: "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease",
           }}
         />
 
@@ -104,7 +105,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               height: "100%",
               objectFit: "cover",
               opacity: 0,
-              transition: "opacity 0.6s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)",
+              transition: "opacity 0.5s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           />
         )}
@@ -113,52 +114,58 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <div
           style={{
             position: "absolute",
-            top: "0.75rem",
-            left: "0.75rem",
+            top: "0.6rem",
+            left: "0.6rem",
             display: "flex",
             flexDirection: "column",
-            gap: "0.35rem",
+            gap: "0.3rem",
             zIndex: 2,
           }}
         >
           {isOutOfStock ? (
-            <span className="badge-tag" style={{ backgroundColor: "#171513", color: "#FFFFFF" }}>
+            <span className="badge-tag" style={{ backgroundColor: "#171513", color: "#FFFFFF", fontSize: "0.65rem", padding: "0.2rem 0.45rem" }}>
               SOLD OUT
             </span>
           ) : isLowStock ? (
-            <span className="badge-tag badge-tag-wine">
+            <span className="badge-tag badge-tag-wine" style={{ fontSize: "0.65rem", padding: "0.2rem 0.45rem" }}>
               ONLY {product.inventoryCount} LEFT
             </span>
           ) : product.bestseller ? (
-            <span className="badge-tag badge-tag-wine">BESTSELLER</span>
+            <span className="badge-tag badge-tag-wine" style={{ fontSize: "0.65rem", padding: "0.2rem 0.45rem" }}>
+              BESTSELLER
+            </span>
           ) : product.newArrival ? (
-            <span className="badge-tag">NEW SEASON</span>
-          ) : (
-            <span className="badge-tag">{product.craft.split(" ")[0]}</span>
-          )}
+            <span className="badge-tag" style={{ fontSize: "0.65rem", padding: "0.2rem 0.45rem" }}>
+              NEW SEASON
+            </span>
+          ) : null}
         </div>
 
         {/* Wishlist Button */}
         <button
           onClick={handleWishlistClick}
-          aria-label={isSaved ? "Remove from wishlist" : "Add to wishlist"}
+          aria-label={isSaved ? `Remove ${product.title} from wishlist` : `Add ${product.title} to wishlist`}
           className="wishlist-btn"
           style={{
             position: "absolute",
-            top: "0.75rem",
-            right: "0.75rem",
+            top: "0.6rem",
+            right: "0.6rem",
             zIndex: 3,
-            width: "36px",
-            height: "36px",
+            width: "38px",
+            height: "38px",
+            minWidth: "38px",
+            minHeight: "38px",
             borderRadius: "50%",
-            backgroundColor: "rgba(248, 244, 238, 0.9)",
+            backgroundColor: "rgba(255, 255, 255, 0.9)",
             backdropFilter: "blur(4px)",
-            border: "none",
+            border: "1px solid rgba(0,0,0,0.06)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             color: isSaved ? "var(--accent-wine)" : "var(--text-primary)",
             transition: "transform 0.2s ease, background-color 0.2s ease",
+            cursor: "pointer",
+            boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
           }}
         >
           <Heart size={16} fill={isSaved ? "var(--accent-wine)" : "none"} strokeWidth={1.75} />
@@ -173,35 +180,37 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               bottom: 0,
               left: 0,
               right: 0,
-              padding: "0.75rem",
+              padding: "0.6rem",
               display: "flex",
-              gap: "0.5rem",
+              gap: "0.4rem",
               zIndex: 3,
               transform: "translateY(100%)",
-              transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+              transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           >
             <button
               onClick={handleQuickAdd}
-              className="btn-primary"
+              aria-label={`Add ${product.title} to bag`}
+              className="btn btn-primary"
               style={{
                 flex: 1,
-                padding: "0.6rem 0.75rem",
-                fontSize: "0.72rem",
+                padding: "0.55rem 0.6rem",
+                fontSize: "0.75rem",
                 justifyContent: "center",
-                backgroundColor: "var(--accent-wine)",
-                color: "#FFFFFF",
-                borderColor: "var(--accent-wine)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.35rem",
               }}
             >
               <ShoppingBag size={14} /> Quick Add
             </button>
             <button
               onClick={handleQuickViewClick}
-              className="btn-secondary"
+              aria-label={`Quick view ${product.title}`}
+              className="btn btn-secondary"
               title="Quick Preview"
               style={{
-                padding: "0.6rem 0.75rem",
+                padding: "0.55rem 0.65rem",
                 backgroundColor: "#FFFFFF",
                 display: "flex",
                 alignItems: "center",
@@ -215,12 +224,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       </div>
 
       {/* Product Metadata Details */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem" }}>
         <span
           style={{
             fontSize: "0.68rem",
             fontWeight: 600,
-            letterSpacing: "0.14em",
+            letterSpacing: "0.12em",
             textTransform: "uppercase",
             color: "var(--accent-gold)",
           }}
@@ -228,22 +237,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {product.fabric} • {product.color}
         </span>
 
+        {/* 2-line clamped title for uniform grid alignment */}
         <h3
           style={{
-            fontSize: "0.95rem",
+            fontSize: "0.9rem",
             fontWeight: 500,
             color: "var(--text-primary)",
             lineHeight: 1.35,
-            transition: "color 0.2s ease",
             margin: 0,
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            minHeight: "2.45rem",
           }}
+          title={product.title}
         >
           {product.title}
         </h3>
 
-        {/* Pricing */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginTop: "0.2rem" }}>
-          <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text-primary)" }}>
+        {/* Price & Discount Hierarchy */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.2rem" }}>
+          <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text-primary)" }}>
             {formattedPrice}
           </span>
           {formattedComparePrice && (
@@ -257,6 +272,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               {formattedComparePrice}
             </span>
           )}
+          {product.discountPercentage && product.discountPercentage > 0 ? (
+            <span
+              style={{
+                fontSize: "0.68rem",
+                fontWeight: 700,
+                color: "#2E7D32",
+                backgroundColor: "#E8F5E9",
+                padding: "0.1rem 0.35rem",
+                borderRadius: "2px",
+                lineHeight: 1.2,
+              }}
+            >
+              {product.discountPercentage}% OFF
+            </span>
+          ) : null}
         </div>
       </div>
     </article>

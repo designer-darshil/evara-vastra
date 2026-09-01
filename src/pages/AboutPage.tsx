@@ -122,13 +122,13 @@ export const AboutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
         {/* CTA Banner */}
         <div style={{ textAlign: "center", maxWidth: "600px", margin: "0 auto" }}>
           <h3 className="font-serif" style={{ fontSize: "2rem", marginBottom: "0.75rem" }}>
-            Discover the Saree That Speaks to You
+            Discover the Ensemble That Speaks to You
           </h3>
           <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", marginBottom: "1.5rem" }}>
-            Explore our curated catalog or visit our Bandra West studio by appointment.
+            Explore our curated catalog of Sarees, Co-ord Sets, and Kurta ensembles handcrafted in Surat.
           </p>
-          <button onClick={() => onNavigate("/shop")} className="btn-wine">
-            Explore All Sarees <ArrowRight size={15} />
+          <button onClick={() => onNavigate("/shop")} className="btn btn-primary">
+            Explore Full Catalog <ArrowRight size={15} />
           </button>
         </div>
       </div>

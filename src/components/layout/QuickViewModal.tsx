@@ -17,17 +17,25 @@ export const QuickViewModal: React.FC<{ onNavigate: (href: string) => void }> = 
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && quickViewProduct) {
+        closeQuickView();
+      }
+    };
+
     setActiveImageIndex(0);
     setQuantity(1);
     if (quickViewProduct) {
       document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", handleKeyDown);
     } else {
       document.body.style.overflow = "unset";
     }
     return () => {
       document.body.style.overflow = "unset";
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [quickViewProduct]);
+  }, [quickViewProduct, closeQuickView]);
 
   if (!quickViewProduct) return null;
 

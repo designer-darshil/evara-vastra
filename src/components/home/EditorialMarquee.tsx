@@ -2,14 +2,14 @@ import React from "react";
 
 export const EditorialMarquee: React.FC = () => {
   const marqueeItems = [
-    "PURE MULBERRY SILK",
-    "KADWA PIT LOOM WEAVE",
-    "TESTED GOLD ZARI",
-    "100-COUNT HANDSPUN MULMUL",
-    "CHANDERE SILK",
-    "ORGANIC LINEN DRAPES",
-    "GENUINE SILK MARK CERTIFIED",
-    "DIRECT FROM WEAVER GUILDS",
+    "AUTHENTIC SURAT ATELIER WEAVES",
+    "PURE CHINON & FANDY SATIN SILK",
+    "HANDCRAFTED ZARI & RESHAM WORK",
+    "CONTEMPORARY CO-ORD SETS",
+    "GENUINE QUALITY ASSURED",
+    "FREE SHIPPING PAN INDIA",
+    "EXTRA 10% OFF PREPAID ORDERS",
+    "7-DAY HASSLE-FREE EXCHANGE",
   ];
 
   return (
@@ -23,11 +23,12 @@ export const EditorialMarquee: React.FC = () => {
         display: "flex",
         alignItems: "center",
       }}
+      aria-label="Atelier Highlights"
     >
       <div
         style={{
           display: "inline-flex",
-          animation: "marqueeScroll 35s linear infinite",
+          animation: "marqueeScroll 38s linear infinite",
           gap: "2.5rem",
           alignItems: "center",
         }}
@@ -39,9 +40,9 @@ export const EditorialMarquee: React.FC = () => {
               display: "inline-flex",
               alignItems: "center",
               gap: "2.5rem",
-              fontSize: "0.75rem",
+              fontSize: "0.74rem",
               fontWeight: 600,
-              letterSpacing: "0.2em",
+              letterSpacing: "0.18em",
               textTransform: "uppercase",
             }}
           >
@@ -55,6 +56,11 @@ export const EditorialMarquee: React.FC = () => {
         @keyframes marqueeScroll {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          div[style*="animation: marqueeScroll"] {
+            animation: none !important;
+          }
         }
       `}</style>
     </div>
