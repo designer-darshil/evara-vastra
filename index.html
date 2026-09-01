@@ -14,15 +14,9 @@
   </head>
   <body>
     <script>
-      // Prevent theme flash (FOUC) — runs synchronously before React
+      // Active storefront uses Light Theme
       (function() {
-        try {
-          var saved = localStorage.getItem('evara_theme');
-          var theme = (saved === 'dark' || saved === 'light') ? saved : 'light';
-          document.documentElement.setAttribute('data-theme', theme);
-        } catch(e) {
-          document.documentElement.setAttribute('data-theme', 'light');
-        }
+        document.documentElement.setAttribute('data-theme', 'light');
       })();
     </script>
     <div id="root"></div>

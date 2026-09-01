@@ -46,11 +46,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
             </p>
 
             {/* Call To Actions */}
-            <div className="flex flex-wrap items-center gap-5 mt-2">
+            <div className="flex flex-wrap items-center gap-4 sm:gap-5 mt-2">
               <MagneticButton>
                 <Button
                   onClick={() => handleNav(homepageCMS.primaryCtaLink || "/shop")}
-                  className="px-8 py-6 text-sm font-semibold rounded-sm bg-accent text-accent-foreground hover:bg-accent/90"
+                  className="px-7 sm:px-8 py-5 sm:py-6 text-xs sm:text-sm font-semibold rounded-sm bg-brand text-brand-foreground hover:bg-brand-hover tracking-wider uppercase"
                 >
                   {homepageCMS.primaryCtaText || "Shop The Collection"}
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -60,7 +60,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
               <Button
                 variant="link"
                 onClick={() => handleNav(homepageCMS.secondaryCtaLink || "/craftsmanship")}
-                className="text-sm px-0 h-auto font-semibold text-foreground hover:text-accent transition-colors"
+                className="text-xs sm:text-sm px-0 h-auto font-semibold text-foreground hover:text-brand transition-colors tracking-wider uppercase"
               >
                 {homepageCMS.secondaryCtaText || "Explore The Craft"}
                 <ArrowRight className="w-4 h-4 ml-1" />
@@ -68,15 +68,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
             </div>
 
             {/* Trust Assurances */}
-            <div className="flex flex-wrap items-center gap-7 mt-6 pt-6 border-t border-border">
+            <div className="flex flex-wrap items-center gap-6 sm:gap-7 mt-4 sm:mt-6 pt-5 sm:pt-6 border-t border-border">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-primary" />
+                <ShieldCheck className="w-4 h-4 text-brand" />
                 <span className="text-xs text-muted-foreground">
                   Pure Silk Mark Certified
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-primary text-sm">✦</span>
+                <span className="text-brand text-sm">✦</span>
                 <span className="text-xs text-muted-foreground">
                   Kadwa Pit Loom Weave
                 </span>
@@ -86,20 +86,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
 
           {/* Right Visual Image */}
           <div className="relative flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-[460px] aspect-[3/4] shadow-xl overflow-hidden bg-secondary/50 rounded-sm">
+            <div className="relative w-full max-w-[460px] aspect-[3/4] border border-border overflow-hidden bg-secondary rounded-sm">
               <img
                 src={homepageCMS.heroImage}
                 alt="Evara Vastra Saree"
                 fetchPriority="high"
-                className="w-full h-full object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-105"
+                className="w-full h-full object-cover transition-transform duration-1000 ease-out hover:scale-105"
               />
 
               {/* Floating Craftsmanship Badge */}
-              <div className="absolute bottom-6 left-6 right-6 bg-background/80 backdrop-blur-md p-5 border border-border shadow-sm rounded-sm">
-                <span className="text-[10px] font-bold tracking-[0.18em] uppercase text-accent block mb-1">
+              <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6 bg-white p-4 sm:p-5 border border-border shadow-md rounded-sm">
+                <span className="text-[10px] font-bold tracking-[0.18em] uppercase text-brand block mb-1">
                   FEATURED DRAPE
                 </span>
-                <p className="font-serif text-[17px] text-foreground m-0 leading-snug">
+                <p className="font-serif text-base sm:text-[17px] text-foreground m-0 leading-snug">
                   Raga Katan Silk in Deep Wine
                 </p>
                 <span className="text-[11px] text-muted-foreground block mt-1">

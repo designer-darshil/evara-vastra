@@ -66,7 +66,7 @@ export const CartDrawer: React.FC<{ onNavigate?: (href: string) => void }> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[99999] flex justify-end animate-in fade-in duration-200"
+      className="fixed inset-0 bg-black/60 z-[99999] flex justify-end animate-in fade-in duration-200"
       onClick={closeCartDrawer}
     >
       <div
@@ -76,7 +76,7 @@ export const CartDrawer: React.FC<{ onNavigate?: (href: string) => void }> = ({
         {/* Header */}
         <div className="p-6 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <ShoppingBag className="w-6 h-6 text-accent" />
+            <ShoppingBag className="w-6 h-6 text-brand" />
             <h3 className="font-serif text-2xl text-foreground m-0">
               Shopping Bag ({cart.reduce((a, b) => a + b.quantity, 0)})
             </h3>

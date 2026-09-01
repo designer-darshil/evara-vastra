@@ -61,7 +61,7 @@ export const Footer: React.FC<{ onNavigate?: (href: string) => void }> = ({ onNa
                 <li key={cat.id}>
                   <button
                     onClick={() => handleNav(`/shop/${cat.slug}`)}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-sm text-muted-foreground hover:text-brand transition-colors text-left"
                   >
                     {cat.name}
                   </button>
@@ -70,7 +70,7 @@ export const Footer: React.FC<{ onNavigate?: (href: string) => void }> = ({ onNa
               <li>
                 <button
                   onClick={() => handleNav("/shop?filter=newArrival")}
-                  className="text-sm font-semibold text-primary hover:text-accent transition-colors mt-1"
+                  className="text-sm font-semibold text-brand hover:underline transition-colors mt-1 text-left"
                 >
                   ★ New Season Drops
                 </button>
@@ -96,7 +96,7 @@ export const Footer: React.FC<{ onNavigate?: (href: string) => void }> = ({ onNa
                 <li key={item.label}>
                   <button
                     onClick={() => handleNav(item.href)}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-sm text-muted-foreground hover:text-brand transition-colors text-left"
                   >
                     {item.label}
                   </button>
@@ -112,7 +112,7 @@ export const Footer: React.FC<{ onNavigate?: (href: string) => void }> = ({ onNa
             </h4>
             <div className="flex flex-col gap-4">
               <div className="flex items-start gap-3">
-                <Truck className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                <Truck className="h-4 w-4 text-brand shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-[13px] text-foreground block font-semibold">Free Pan-India Delivery</strong>
                   <span className="text-[12px] text-muted-foreground">Insured delivery to 28,000+ pin codes.</span>
@@ -120,7 +120,7 @@ export const Footer: React.FC<{ onNavigate?: (href: string) => void }> = ({ onNa
               </div>
 
               <div className="flex items-start gap-3">
-                <ShieldCheck className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                <ShieldCheck className="h-4 w-4 text-brand shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-[13px] text-foreground block font-semibold">COD & 10% Prepaid Off</strong>
                   <span className="text-[12px] text-muted-foreground">Instant savings on UPI and card orders.</span>
@@ -128,7 +128,7 @@ export const Footer: React.FC<{ onNavigate?: (href: string) => void }> = ({ onNa
               </div>
 
               <div className="flex items-start gap-3">
-                <RefreshCw className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                <RefreshCw className="h-4 w-4 text-brand shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-[13px] text-foreground block font-semibold">7-Day Easy Exchange</strong>
                   <span className="text-[12px] text-muted-foreground">Doorstep reverse pickup assistance.</span>
@@ -144,13 +144,13 @@ export const Footer: React.FC<{ onNavigate?: (href: string) => void }> = ({ onNa
             © {new Date().getFullYear()} EVARA VASTRA. ALL RIGHTS RESERVED. SURAT, GUJARAT, INDIA.
           </div>
           <div className="flex gap-6">
-            <button onClick={() => handleNav("/privacy")} className="hover:text-foreground transition-colors">
+            <button onClick={() => handleNav("/privacy-policy")} className="hover:text-brand transition-colors">
               Privacy
             </button>
-            <button onClick={() => handleNav("/terms")} className="hover:text-foreground transition-colors">
+            <button onClick={() => handleNav("/terms-of-service")} className="hover:text-brand transition-colors">
               Terms
             </button>
-            <button onClick={() => handleNav("/admin")} className="font-semibold text-primary hover:text-accent transition-colors">
+            <button onClick={() => handleNav("/admin")} className="font-semibold text-primary hover:text-brand transition-colors">
               Admin Portal
             </button>
           </div>

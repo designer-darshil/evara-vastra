@@ -74,7 +74,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           src={product.images[0]}
           alt={product.title}
           loading="lazy"
-          className="w-full h-full object-cover transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+          className="w-full h-full object-cover transition-all duration-700 ease-out"
         />
 
         {product.images[1] && (
@@ -82,7 +82,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             src={product.images[1]}
             alt={`${product.title} detail`}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-100 group-hover:scale-105"
+            className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 ease-out group-hover:opacity-100 group-hover:scale-105"
           />
         )}
 
@@ -105,7 +105,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           aria-label={isSaved ? `Remove ${product.title} from wishlist` : `Add ${product.title} to wishlist`}
           className={cn(
             "absolute top-2 right-2 z-20 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 shadow-sm border",
-            isSaved ? "bg-background border-border text-accent" : "bg-background/80 backdrop-blur-sm border-transparent text-foreground hover:bg-background hover:scale-105"
+            isSaved ? "bg-white border-border text-brand" : "bg-white/90 border-border/50 text-foreground hover:bg-white hover:scale-105"
           )}
         >
           <Heart className="h-4 w-4" fill={isSaved ? "currentColor" : "none"} strokeWidth={isSaved ? 0 : 2} />
@@ -113,10 +113,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Hover Quick Action Drawer */}
         {!isOutOfStock && (
-          <div className="absolute bottom-0 left-0 right-0 p-2 flex gap-1 z-20 translate-y-full transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-y-0">
+          <div className="absolute bottom-0 left-0 right-0 p-2 flex gap-1 z-20 translate-y-full transition-transform duration-300 ease-out group-hover:translate-y-0">
             <Button
               onClick={handleQuickAdd}
-              className="flex-1 h-9 text-xs rounded-sm bg-background text-foreground hover:bg-background/90"
+              className="flex-1 h-9 text-xs rounded-sm bg-white text-foreground hover:bg-brand hover:text-brand-foreground transition-colors"
               variant="outline"
             >
               <ShoppingBag className="h-3 w-3 mr-1.5" /> Quick Add
@@ -124,7 +124,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <Button
               onClick={handleQuickViewClick}
               size="icon"
-              className="h-9 w-9 rounded-sm bg-background text-foreground hover:bg-background/90"
+              className="h-9 w-9 rounded-sm bg-white text-foreground hover:bg-brand hover:text-brand-foreground transition-colors"
               variant="outline"
               title="Quick Preview"
             >
@@ -136,7 +136,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
       {/* Product Metadata Details */}
       <div className="flex flex-col gap-1">
-        <span className="text-[10px] font-bold tracking-widest uppercase text-accent">
+        <span className="text-[10px] font-bold tracking-widest uppercase text-brand">
           {product.fabric} • {product.color}
         </span>
 

@@ -24,11 +24,11 @@ export const SearchModal: React.FC<{ onNavigate: (href: string) => void }> = ({
       document.body.style.overflow = "hidden";
       window.addEventListener("keydown", handleKeyDown);
     } else {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = "";
       setQuery("");
     }
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isSearchOpen, closeSearch]);
@@ -66,119 +66,51 @@ export const SearchModal: React.FC<{ onNavigate: (href: string) => void }> = ({
 
   return (
     <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        backgroundColor: "rgba(23, 21, 19, 0.75)",
-        backdropFilter: "blur(8px)",
-        zIndex: 99999,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        paddingTop: "clamp(2rem, 8vh, 5rem)",
-        animation: "fadeIn 0.2s ease-out forwards",
-      }}
+      className="fixed inset-0 bg-black/65 z-[99999] flex flex-col items-center justify-start pt-12 sm:pt-20 px-3 sm:px-6 animate-in fade-in duration-200"
       onClick={closeSearch}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Search Catalog"
     >
       <div
-        style={{
-          width: "100%",
-          maxWidth: "760px",
-          padding: "0 1.5rem",
-        }}
+        className="w-full max-w-[680px]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Bar Input Container */}
-        <div
-          style={{
-            backgroundColor: "var(--bg-surface)",
-            boxShadow: "var(--shadow-elevated)",
-            padding: "1rem 1.5rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "1rem",
-            border: "1px solid var(--border-medium)",
-            borderRadius: "4px",
-          }}
-        >
-          <Search size={22} style={{ color: "var(--accent-wine)" }} />
-          <form onSubmit={handleSearchSubmit} style={{ flex: 1 }}>
+        <div className="bg-white text-foreground shadow-2xl p-3 sm:p-4 flex items-center gap-3 border border-border rounded-sm">
+          <Search className="h-5 w-5 text-brand shrink-0" />
+          <form onSubmit={handleSearchSubmit} className="flex-1 min-w-0">
             <input
               ref={inputRef}
               type="text"
-              placeholder="Search by weave, fabric, color, or ensemble..."
+              placeholder="Search by drape, weave, fabric, color..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              style={{
-                width: "100%",
-                border: "none",
-                outline: "none",
-                fontSize: "1.05rem",
-                color: "var(--text-primary)",
-                fontFamily: "var(--font-sans)",
-                backgroundColor: "transparent",
-              }}
+              className="w-full border-none outline-none text-sm sm:text-base text-foreground bg-transparent placeholder:text-muted-foreground"
             />
           </form>
           <button
             onClick={closeSearch}
             aria-label="Close search"
-            style={{
-              padding: "0.4rem",
-              color: "var(--text-muted)",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              transition: "color 0.2s ease",
-            }}
+            className="p-1.5 text-muted-foreground hover:text-brand transition-colors rounded-sm flex items-center justify-center min-h-[36px] min-w-[36px]"
           >
-            <X size={20} />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Popular Search Suggestions */}
         {!query && (
-          <div
-            style={{
-              backgroundColor: "var(--bg-surface)",
-              color: "var(--text-primary)",
-              padding: "1.5rem",
-              marginTop: "0.5rem",
-              borderRadius: "4px",
-              border: "1px solid var(--border-subtle)",
-              boxShadow: "var(--shadow-medium)",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "0.72rem",
-                fontWeight: 600,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: "var(--text-muted)",
-                display: "block",
-                marginBottom: "0.75rem",
-              }}
-            >
-              Curator Suggestions
+          <div className="bg-white text-foreground p-4 sm:p-5 mt-2 rounded-sm border border-border shadow-xl">
+            <span className="text-[10px] sm:text-[11px] font-bold tracking-[0.18em] uppercase text-muted-foreground block mb-3">
+              Popular Searches
             </span>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {["Sarees", "Co-ord Sets", "Kurta Sets", "Anarkali", "Fendy Satin", "Chinon Silk", "Wedding", "Wine"].map(
                 (tag) => (
                   <button
                     key={tag}
                     onClick={() => handleQuickTagClick(tag)}
-                    style={{
-                      padding: "0.4rem 0.85rem",
-                      fontSize: "0.8rem",
-                      backgroundColor: "var(--bg-surface-subtle)",
-                      border: "1px solid var(--border-medium)",
-                      color: "var(--text-primary)",
-                      cursor: "pointer",
-                      borderRadius: "2px",
-                      transition: "all 0.2s ease",
-                    }}
+                    className="px-3 py-1.5 text-xs bg-secondary hover:bg-brand hover:text-brand-foreground text-foreground border border-border/80 rounded-sm transition-colors"
                   >
                     {tag}
                   </button>
@@ -190,100 +122,44 @@ export const SearchModal: React.FC<{ onNavigate: (href: string) => void }> = ({
 
         {/* Live Search Results */}
         {query && (
-          <div
-            style={{
-              backgroundColor: "var(--bg-surface)",
-              color: "var(--text-primary)",
-              padding: "1.5rem",
-              marginTop: "0.5rem",
-              maxHeight: "60vh",
-              overflowY: "auto",
-              borderRadius: "4px",
-              border: "1px solid var(--border-subtle)",
-              boxShadow: "var(--shadow-medium)",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "1rem",
-                paddingBottom: "0.5rem",
-                borderBottom: "1px solid var(--border-subtle)",
-              }}
-            >
-              <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>
-                Found {filteredProducts.length} matching saree(s)
+          <div className="bg-white text-foreground p-4 sm:p-5 mt-2 max-h-[60vh] overflow-y-auto rounded-sm border border-border shadow-xl">
+            <div className="flex justify-between items-center mb-3 pb-2 border-b border-border text-xs">
+              <span className="text-muted-foreground">
+                Found {filteredProducts.length} matching product(s)
               </span>
               <button
                 onClick={handleSearchSubmit}
-                style={{
-                  fontSize: "0.75rem",
-                  fontWeight: 600,
-                  textTransform: "uppercase",
-                  color: "var(--accent-wine)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.25rem",
-                }}
+                className="font-semibold uppercase tracking-wider text-brand hover:underline flex items-center gap-1 text-[11px]"
               >
-                View all in Catalog <ArrowRight size={13} />
+                View all in Catalog <ArrowRight className="h-3 w-3" />
               </button>
             </div>
 
             {filteredProducts.length === 0 ? (
-              <div style={{ padding: "2rem 0", textAlign: "center", color: "var(--text-secondary)" }}>
-                <p>No sarees match "{query}".</p>
+              <div className="py-8 text-center text-muted-foreground text-sm">
+                <p>No products match "{query}".</p>
               </div>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                {filteredProducts.map((p) => (
+              <div className="flex flex-col gap-2">
+                {filteredProducts.slice(0, 8).map((p) => (
                   <div
                     key={p.id}
                     onClick={() => handleSelectProduct(p.slug)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "1rem",
-                      padding: "0.6rem",
-                      cursor: "pointer",
-                      transition: "background-color 0.15s ease",
-                    }}
-                    className="search-result-item"
+                    className="flex items-center gap-3 p-2 hover:bg-secondary/60 rounded-sm cursor-pointer transition-colors"
                   >
                     <img
                       src={p.images[0]}
                       alt={p.title}
-                      style={{
-                        width: "48px",
-                        height: "64px",
-                        objectFit: "cover",
-                        backgroundColor: "var(--bg-surface-subtle)",
-                      }}
+                      className="w-12 h-16 object-cover rounded-sm bg-secondary shrink-0"
                     />
-                    <div style={{ flex: 1 }}>
-                      <span
-                        style={{
-                          fontSize: "0.68rem",
-                          letterSpacing: "0.1em",
-                          textTransform: "uppercase",
-                          color: "var(--accent-gold)",
-                          fontWeight: 600,
-                        }}
-                      >
-                        {p.fabric}
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[10px] tracking-widest uppercase text-brand font-bold block">
+                        {p.fabric} • {p.color}
                       </span>
-                      <h4
-                        style={{
-                          fontSize: "0.95rem",
-                          color: "var(--text-primary)",
-                          margin: "0.1rem 0",
-                        }}
-                      >
+                      <h4 className="text-sm font-medium text-foreground truncate my-0.5">
                         {p.title}
                       </h4>
-                      <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-primary)" }}>
+                      <span className="text-xs font-bold text-foreground">
                         ₹{p.price.toLocaleString("en-IN")}
                       </span>
                     </div>
@@ -297,3 +173,4 @@ export const SearchModal: React.FC<{ onNavigate: (href: string) => void }> = ({
     </div>
   );
 };
+
