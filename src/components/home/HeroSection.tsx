@@ -3,6 +3,7 @@ import { useData } from "../../context/DataContext";
 import { ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
 import { MagneticButton } from "../common/MagneticButton";
 import { Button } from "../ui/button";
+import { PageContainer } from "../common/PageContainer";
 
 interface HeroSectionProps {
   onNavigate?: (href: string) => void;
@@ -16,9 +17,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
   };
 
   return (
-    <section className="relative min-h-[clamp(auto,70vh,calc(90vh-72px))] flex items-center overflow-hidden bg-background pt-10 pb-16">
-      <div className="container">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+    <section className="relative min-h-[clamp(auto,70vh,calc(90vh-72px))] flex items-center overflow-hidden bg-background pt-8 pb-12 sm:pt-10 sm:pb-16">
+      <PageContainer>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-8 items-center">
           {/* Left Narrative Column */}
           <div className="flex flex-col gap-6 z-10">
             {/* Season Badge */}
@@ -109,7 +110,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
             </div>
           </div>
         </div>
-      </div>
+      </PageContainer>
     </section>
   );
 };

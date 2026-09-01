@@ -342,7 +342,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const publishedProducts = products.filter((p) => p.status === "published");
   const activeCategories = categories.filter((c) => c.isEnabled);
   const activeCollections = collections.filter((c) => c.isPublished);
-  const publishedVideos = shoppableVideos.filter((v) => v.isPublished);
+  const publishedVideos = shoppableVideos
+    .filter((v) => v.isPublished)
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
   const approvedReviews = reviews.filter((r) => r.status === "approved");
   const featuredReviews = approvedReviews.filter((r) => r.isFeaturedOnHome);
   const publishedLookbookItems = lookbookItems.filter((l) => l.isPublished);

@@ -4,6 +4,8 @@ import { Star, CheckCircle, MessageSquarePlus, X } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Card, CardContent } from "../ui/card";
+import { Section } from "../common/Section";
+import { PageContainer } from "../common/PageContainer";
 
 export const CustomerReviewsSection: React.FC<{ onNavigate?: (href: string) => void }> = () => {
   const { featuredReviews, addReview, publishedProducts } = useData();
@@ -41,10 +43,10 @@ export const CustomerReviewsSection: React.FC<{ onNavigate?: (href: string) => v
   };
 
   return (
-    <section className="py-24 bg-secondary">
-      <div className="container">
+    <Section spacing="lg" className="bg-secondary">
+      <PageContainer>
         {/* Rating Header */}
-        <div className="flex flex-wrap justify-between items-end mb-14 gap-6">
+        <div className="flex flex-wrap justify-between items-end mb-10 md:mb-12 gap-6">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <div className="flex text-amber-500">
@@ -115,7 +117,7 @@ export const CustomerReviewsSection: React.FC<{ onNavigate?: (href: string) => v
             </Card>
           ))}
         </div>
-      </div>
+      </PageContainer>
 
       {/* Review Submission Modal */}
       {showModal && (
@@ -217,6 +219,6 @@ export const CustomerReviewsSection: React.FC<{ onNavigate?: (href: string) => v
           </div>
         </div>
       )}
-    </section>
+    </Section>
   );
 };

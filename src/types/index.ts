@@ -116,15 +116,23 @@ export interface Collection {
 export interface ShoppableVideo {
   id: string;
   title: string;
+  description?: string;
   videoUrl: string;
-  thumbnailUrl: string;
+  mobileVideoUrl?: string;
+  thumbnailUrl: string; // Used as poster image
+  posterUrl?: string;
   productId: string;
   productTitle: string;
   productPrice: number;
   productSlug: string;
   ctaText: string;
+  ctaUrl?: string;
   isPublished: boolean;
   order: number;
+  autoplay?: boolean;
+  muted?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Review {
