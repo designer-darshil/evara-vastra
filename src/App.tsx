@@ -96,6 +96,15 @@ const AppContent: React.FC = () => {
       document.title = siteSettings.seoDefaultTitle || "EVARA VASTRA — Contemporary Indian Womenswear | Sarees, Co-Ords & Kurta Sets";
     } else if (path.startsWith("/shop")) {
       document.title = "Shop Catalog | EVARA VASTRA";
+    } else if (path.startsWith("/colors/") || path.startsWith("/color/")) {
+      const colorName = path.replace(/^\/(colors|color)\//, "").replace(/[-_]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+      document.title = `${colorName} Edit | EVARA VASTRA`;
+    } else if (path.startsWith("/fabrics/") || path.startsWith("/fabric/")) {
+      const fabricName = path.replace(/^\/(fabrics|fabric)\//, "").replace(/[-_]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+      document.title = `${fabricName} Silk | EVARA VASTRA`;
+    } else if (path.startsWith("/occasions/") || path.startsWith("/occasion/")) {
+      const occName = path.replace(/^\/(occasions|occasion)\//, "").replace(/[-_]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+      document.title = `${occName} Collection | EVARA VASTRA`;
     } else if (path.startsWith("/product/")) {
       document.title = "Product Details | EVARA VASTRA";
     } else if (path.startsWith("/collections")) {
@@ -199,11 +208,20 @@ const AppContent: React.FC = () => {
     const occasionParam = url.searchParams.get("occasion") || undefined;
     const filterParam = url.searchParams.get("filter") || undefined;
 
-    if (currentPath === "/") {
+    // Normalize path by stripping trailing slashes (e.g. '/colors/celestial-cobalt/' -> '/colors/celestial-cobalt')
+    const cleanPath = currentPath.length > 1 && currentPath.endsWith("/")
+      ? currentPath.slice(0, -1)
+      : currentPath;
+
+    if (cleanPath === "") {
       return <HomePage onNavigate={navigate} />;
     }
 
-    if (currentPath === "/shop") {
+    if (cleanPath === "/" || cleanPath === "") {
+      return <HomePage onNavigate={navigate} />;
+    }
+
+    if (cleanPath === "/shop") {
       return (
         <ShopPage
           onNavigate={navigate}
@@ -215,8 +233,8 @@ const AppContent: React.FC = () => {
       );
     }
 
-    if (currentPath.startsWith("/shop/")) {
-      const categoryParam = currentPath.replace("/shop/", "");
+    if (cleanPath.startsWith("/shop/")) {
+      const categoryParam = cleanPath.replace("/shop/", "");
       return (
         <ShopPage
           categoryParam={categoryParam}
@@ -226,17 +244,53 @@ const AppContent: React.FC = () => {
       );
     }
 
-    if (currentPath.startsWith("/product/")) {
-      const slug = currentPath.replace("/product/", "");
+    // Color routes (e.g. /colors/celestial-cobalt or /color/wine)
+    if (cleanPath.startsWith("/colors/") || cleanPath.startsWith("/color/")) {
+      const colorSlug = cleanPath.replace(/^\/(colors|color)\//, "");
+      return (
+        <ShopPage
+          colorParam={colorSlug}
+          onNavigate={navigate}
+          searchParam={searchParam}
+        />
+      );
+    }
+
+    // Fabric routes (e.g. /fabrics/katan-silk or /fabric/fendy-satin)
+    if (cleanPath.startsWith("/fabrics/") || cleanPath.startsWith("/fabric/")) {
+      const fabricSlug = cleanPath.replace(/^\/(fabrics|fabric)\//, "");
+      return (
+        <ShopPage
+          fabricParam={fabricSlug}
+          onNavigate={navigate}
+          searchParam={searchParam}
+        />
+      );
+    }
+
+    // Occasion routes (e.g. /occasions/wedding or /occasion/festive)
+    if (cleanPath.startsWith("/occasions/") || cleanPath.startsWith("/occasion/")) {
+      const occasionSlug = cleanPath.replace(/^\/(occasions|occasion)\//, "");
+      return (
+        <ShopPage
+          occasionParam={occasionSlug}
+          onNavigate={navigate}
+          searchParam={searchParam}
+        />
+      );
+    }
+
+    if (cleanPath.startsWith("/product/")) {
+      const slug = cleanPath.replace("/product/", "");
       return <ProductDetailPage slug={slug} onNavigate={navigate} />;
     }
 
-    if (currentPath === "/collections") {
+    if (cleanPath === "/collections") {
       return <CollectionsListPage onNavigate={navigate} />;
     }
 
-    if (currentPath.startsWith("/collections/")) {
-      const collectionSlug = currentPath.replace("/collections/", "");
+    if (cleanPath.startsWith("/collections/")) {
+      const collectionSlug = cleanPath.replace("/collections/", "");
       return (
         <CollectionDetailPage
           collectionSlug={collectionSlug}
@@ -245,51 +299,51 @@ const AppContent: React.FC = () => {
       );
     }
 
-    if (currentPath === "/cart") {
+    if (cleanPath === "/cart") {
       return <CartPage onNavigate={navigate} />;
     }
 
-    if (currentPath === "/checkout") {
+    if (cleanPath === "/checkout") {
       return <CheckoutPage onNavigate={navigate} />;
     }
 
-    if (currentPath === "/wishlist") {
+    if (cleanPath === "/wishlist") {
       return <WishlistPage onNavigate={navigate} />;
     }
 
-    if (currentPath === "/account") {
+    if (cleanPath === "/account") {
       return <AccountPage onNavigate={navigate} />;
     }
 
-    if (currentPath === "/orders") {
+    if (cleanPath === "/orders") {
       return <OrdersPage onNavigate={navigate} />;
     }
 
-    if (currentPath === "/about") {
+    if (cleanPath === "/about") {
       return <AboutPage onNavigate={navigate} />;
     }
 
-    if (currentPath === "/contact") {
+    if (cleanPath === "/contact") {
       return <ContactPage onNavigate={navigate} />;
     }
 
-    if (currentPath === "/faq") {
+    if (cleanPath === "/faq") {
       return <FaqPage onNavigate={navigate} />;
     }
 
-    if (currentPath === "/shipping") {
+    if (cleanPath === "/shipping") {
       return <ShippingPolicyPage onNavigate={navigate} />;
     }
 
-    if (currentPath === "/returns") {
+    if (cleanPath === "/returns") {
       return <ReturnsPolicyPage onNavigate={navigate} />;
     }
 
-    if (currentPath === "/privacy") {
+    if (cleanPath === "/privacy") {
       return <PrivacyPolicyPage onNavigate={navigate} />;
     }
 
-    if (currentPath === "/terms") {
+    if (cleanPath === "/terms") {
       return <TermsPage onNavigate={navigate} />;
     }
 

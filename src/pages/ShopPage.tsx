@@ -14,6 +14,7 @@ interface ShopPageProps {
   fabricParam?: string;
   occasionParam?: string;
   filterParam?: string;
+  colorParam?: string;
 }
 
 export const ShopPage: React.FC<ShopPageProps> = ({
@@ -23,13 +24,52 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   fabricParam,
   occasionParam,
   filterParam,
+  colorParam,
 }) => {
   const { publishedProducts, activeCategories } = useData();
+
+  // Normalize color parameter slug (e.g. 'celestial-cobalt' -> 'indigo' / blue / cobalt)
+  const normalizeColorSlug = (slug?: string): string => {
+    if (!slug) return "all";
+    const clean = slug.toLowerCase().replace(/[-_]/g, " ").trim();
+    const matched = colors.find(
+      (c) =>
+        c.id.toLowerCase() === clean ||
+        c.name.toLowerCase().includes(clean) ||
+        clean.includes(c.id.toLowerCase())
+    );
+    if (matched) return matched.id;
+    if (clean.includes("cobalt") || clean.includes("blue") || clean.includes("indigo") || clean.includes("celestial") || clean.includes("peacock")) {
+      return "indigo";
+    }
+    if (clean.includes("maroon") || clean.includes("wine") || clean.includes("burgundy")) {
+      return "wine";
+    }
+    if (clean.includes("mustard") || clean.includes("gold") || clean.includes("yellow")) {
+      return "gold";
+    }
+    if (clean.includes("green") || clean.includes("emerald") || clean.includes("olive") || clean.includes("teal") || clean.includes("pista")) {
+      return "emerald";
+    }
+    if (clean.includes("blush") || clean.includes("rose") || clean.includes("pink") || clean.includes("mauve") || clean.includes("lavender") || clean.includes("purple")) {
+      return "rose";
+    }
+    if (clean.includes("rust") || clean.includes("terracotta") || clean.includes("orange")) {
+      return "rust";
+    }
+    if (clean.includes("ivory") || clean.includes("cream") || clean.includes("white")) {
+      return "ivory";
+    }
+    if (clean.includes("black") || clean.includes("charcoal") || clean.includes("obsidian")) {
+      return "charcoal";
+    }
+    return clean;
+  };
 
   // Filter States
   const [selectedCategory, setSelectedCategory] = useState<string>(categoryParam || "all");
   const [selectedFabric, setSelectedFabric] = useState<string>(fabricParam || "all");
-  const [selectedColor, setSelectedColor] = useState<string>("all");
+  const [selectedColor, setSelectedColor] = useState<string>(colorParam ? normalizeColorSlug(colorParam) : "all");
   const [selectedOccasion, setSelectedOccasion] = useState<string>(occasionParam || "all");
   const [maxPrice, setMaxPrice] = useState<number>(10000);
   const [onlyNewArrivals, setOnlyNewArrivals] = useState<boolean>(filterParam === "newArrival");
@@ -43,8 +83,9 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     if (categoryParam) setSelectedCategory(categoryParam);
     if (fabricParam) setSelectedFabric(fabricParam);
     if (occasionParam) setSelectedOccasion(occasionParam);
+    if (colorParam) setSelectedColor(normalizeColorSlug(colorParam));
     if (filterParam === "newArrival") setOnlyNewArrivals(true);
-  }, [categoryParam, fabricParam, occasionParam, filterParam]);
+  }, [categoryParam, fabricParam, occasionParam, colorParam, filterParam]);
 
   // Filtering Logic
   const filteredProducts = useMemo(() => {
@@ -72,8 +113,24 @@ export const ShopPage: React.FC<ShopPageProps> = ({
       }
 
       // Color
-      if (selectedColor !== "all" && !p.color.toLowerCase().includes(selectedColor.toLowerCase())) {
-        return false;
+      if (selectedColor !== "all") {
+        const normColor = selectedColor.toLowerCase();
+        const prodColor = (p.color || "").toLowerCase();
+        const prodDesc = (p.description || "").toLowerCase();
+        const prodTitle = (p.title || "").toLowerCase();
+
+        const matchesColor =
+          prodColor.includes(normColor) ||
+          prodDesc.includes(normColor) ||
+          prodTitle.includes(normColor) ||
+          (normColor === "indigo" && (prodColor.includes("blue") || prodColor.includes("teal") || prodColor.includes("indigo") || prodColor.includes("peacock") || prodDesc.includes("blue") || prodDesc.includes("cobalt"))) ||
+          (normColor === "emerald" && (prodColor.includes("green") || prodColor.includes("teal") || prodColor.includes("emerald") || prodColor.includes("pista") || prodColor.includes("olive"))) ||
+          (normColor === "wine" && (prodColor.includes("wine") || prodColor.includes("maroon") || prodColor.includes("red") || prodDesc.includes("wine") || prodDesc.includes("maroon"))) ||
+          (normColor === "rose" && (prodColor.includes("pink") || prodColor.includes("rose") || prodColor.includes("blush") || prodColor.includes("mauve") || prodColor.includes("purple") || prodColor.includes("lavender"))) ||
+          (normColor === "gold" && (prodColor.includes("gold") || prodColor.includes("mustard") || prodColor.includes("yellow"))) ||
+          (normColor === "rust" && (prodColor.includes("rust") || prodColor.includes("terracotta") || prodColor.includes("orange")));
+
+        if (!matchesColor) return false;
       }
 
       // Occasion
@@ -141,15 +198,19 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   const getPageTitle = () => {
     if (categoryParam) {
       const found = activeCategories.find((c) => c.slug === categoryParam);
-      return found ? found.name : "All Sarees";
+      return found ? found.name : "All Products";
+    }
+    if (colorParam) {
+      const formattedColor = colorParam.replace(/[-_]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+      return `${formattedColor} Collection`;
     }
     if (searchParam) return `Search Results: "${searchParam}"`;
     if (occasionParam) {
       const found = occasions.find((o) => o.id === occasionParam);
-      return found ? `${found.name} Sarees` : "Occasion Sarees";
+      return found ? `${found.name} Collection` : "Occasion Collection";
     }
     if (onlyNewArrivals) return "New Season Arrivals • 2026";
-    return "The Contemporary Saree Catalog";
+    return "The Contemporary Collection";
   };
 
   return (
@@ -166,7 +227,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
           <Breadcrumbs
             items={[
               { label: "Shop", href: "/shop" },
-              ...(categoryParam ? [{ label: getPageTitle() }] : []),
+              ...(categoryParam || colorParam ? [{ label: getPageTitle() }] : []),
             ]}
             onNavigate={onNavigate}
           />
