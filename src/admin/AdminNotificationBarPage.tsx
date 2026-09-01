@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useData } from "../context/DataContext";
 import { NotificationBarConfig } from "../types";
-import { Save, ArrowLeft, ExternalLink, Check } from "lucide-react";
+import { Breadcrumbs } from "../components/common/Breadcrumbs";
+import { Save, ExternalLink, Check, Sparkles } from "lucide-react";
 
-export const AdminNotificationBarPage: React.FC<{ onNavigate: (href: string) => void }> = ({
+export const AdminNotificationBarPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
   onNavigate,
 }) => {
   const { notificationBar, updateNotificationBar } = useData();
@@ -19,157 +20,164 @@ export const AdminNotificationBarPage: React.FC<{ onNavigate: (href: string) => 
   };
 
   return (
-    <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-      {/* Top Header */}
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem", borderBottom: "1px solid var(--admin-border)", paddingBottom: "1rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <button
-            type="button"
-            onClick={() => onNavigate("/admin/content")}
-            style={{ padding: "0.5rem 0.75rem", backgroundColor: "var(--admin-surface)", border: "1px solid #D9D2C7", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.8rem" }}
-          >
-            <ArrowLeft size={14} /> Content Hub
-          </button>
-          <div>
-            <h1 className="font-serif" style={{ fontSize: "1.8rem", color: "var(--admin-text)", margin: 0 }}>
-              Website Notification Ribbon
-            </h1>
-            <span style={{ fontSize: "0.75rem", color: "#8E8276" }}>
-              Controls the top banner across all pages on the customer storefront.
-            </span>
-          </div>
+    <form onSubmit={handleSave} className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <Breadcrumbs
+            items={[{ label: "Admin", href: "/admin" }, { label: "Notification Bar" }]}
+            onNavigate={onNavigate}
+          />
+          <h1 className="text-xl sm:text-2xl font-serif font-bold text-neutral-900 mt-1.5 m-0">
+            Storefront Announcement Bar Configuration
+          </h1>
+          <p className="text-xs text-neutral-500 mt-0.5">
+            Dynamically broadcast sitewide promotional banners, offers, and delivery assurances.
+          </p>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+        <div className="flex items-center gap-2.5 self-start sm:self-auto">
+          {onNavigate && (
+            <button
+              type="button"
+              onClick={() => onNavigate("/")}
+              className="flex items-center gap-1.5 px-3 py-2 bg-white border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-sm hover:border-neutral-400 transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" /> Preview Storefront
+            </button>
+          )}
           <button
-            type="button"
-            onClick={() => onNavigate("/")}
-            className="btn-secondary"
-            style={{ padding: "0.65rem 1rem", fontSize: "0.78rem" }}
+            type="submit"
+            className="flex items-center gap-2 px-4 py-2 bg-brand text-brand-foreground hover:bg-brand-hover text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs"
           >
-            <ExternalLink size={14} /> Preview Storefront
-          </button>
-          <button type="submit" className="btn-wine" style={{ padding: "0.65rem 1.4rem", fontSize: "0.825rem" }}>
-            <Save size={15} /> Save Announcement
+            <Save className="w-4 h-4" /> Save Banner
           </button>
         </div>
       </div>
 
       {saveSuccess && (
-        <div style={{ backgroundColor: "rgba(35,78,62,0.1)", border: "1px solid #234E3E", color: "#234E3E", padding: "0.75rem 1.25rem", fontSize: "0.85rem", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <Check size={16} /> Notification bar updated and live on storefront!
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-3.5 rounded-sm flex items-center gap-2 text-xs font-semibold">
+          <Check className="w-4 h-4 text-emerald-700" />
+          Notification ribbon updated successfully and synced across all storefront pages!
         </div>
       )}
 
       {/* Live Preview Box */}
-      <div style={{ backgroundColor: "var(--admin-surface)", padding: "1.5rem", border: "1px solid var(--admin-border)" }}>
-        <h3 className="font-serif" style={{ fontSize: "1.1rem", margin: "0 0 0.75rem 0", color: "var(--admin-text-secondary)" }}>
-          Live Preview on Storefront:
-        </h3>
+      <div className="bg-white p-5 border border-neutral-200 rounded-sm shadow-xs space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">
+            Live Storefront Simulation
+          </span>
+          <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-sm ${
+            form.isEnabled ? "bg-emerald-50 text-emerald-800 border border-emerald-200" : "bg-neutral-100 text-neutral-600"
+          }`}>
+            {form.isEnabled ? "Broadcasting Enabled" : "Ribbon Hidden"}
+          </span>
+        </div>
 
         <div
-          style={{
-            backgroundColor: form.backgroundStyle === "wine" ? "#7C2430" : form.backgroundStyle === "gold" ? "#8C6836" : "#171513",
-            color: "#FFFFFF",
-            padding: "0.75rem 1.5rem",
-            fontSize: "0.78rem",
-            textAlign: "center",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "0.75rem",
-          }}
+          className={`py-2.5 px-4 text-center text-xs flex items-center justify-center gap-2 rounded-xs transition-colors ${
+            form.backgroundStyle === "wine"
+              ? "bg-[#734E06] text-white"
+              : form.backgroundStyle === "gold"
+              ? "bg-[#B18A52] text-white"
+              : "bg-[#141210] text-white"
+          }`}
         >
-          <span>{form.message || "Enter your announcement message..."}</span>
+          <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+          <span className="font-medium tracking-wide">
+            {form.message || "Enter your announcement text below..."}
+          </span>
           {form.link && (
-            <span style={{ color: "#B18A52", fontWeight: 700, textDecoration: "underline" }}>
-              {form.linkText || "EXPLORE NOW →"}
+            <span className="underline font-bold text-amber-200 uppercase text-[11px] ml-1">
+              {form.linkText || "Shop Now →"}
             </span>
           )}
         </div>
       </div>
 
-      {/* Form Fields */}
-      <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem", paddingBottom: "1.25rem", borderBottom: "1px solid #F0EAE1" }}>
-          <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.9rem", fontWeight: 600, cursor: "pointer" }}>
-            <input
-              type="checkbox"
-              checked={form.isEnabled}
-              onChange={(e) => setForm({ ...form, isEnabled: e.target.checked })}
-              style={{ accentColor: "#7C2430", width: "18px", height: "18px" }}
-            />
-            <span>Enable Announcement Ribbon on Storefront</span>
+      {/* Form Settings */}
+      <div className="bg-white p-6 border border-neutral-200 rounded-sm shadow-xs space-y-5">
+        <div className="flex items-center gap-2 pb-4 border-b border-neutral-100">
+          <input
+            type="checkbox"
+            id="isEnabledCheckbox"
+            checked={form.isEnabled}
+            onChange={(e) => setForm({ ...form, isEnabled: e.target.checked })}
+            className="w-4 h-4 text-brand rounded-xs"
+          />
+          <label htmlFor="isEnabledCheckbox" className="text-xs font-bold uppercase tracking-wider text-neutral-900 cursor-pointer">
+            Enable Announcement Ribbon on Storefront
           </label>
         </div>
 
         <div>
-          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-            Announcement Message Text *
+          <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
+            Announcement Message Text
           </label>
           <input
             type="text"
             required
             value={form.message}
             onChange={(e) => setForm({ ...form, message: e.target.value })}
-            placeholder="e.g. COMPLIMENTARY INSURED SHIPPING ON ALL ORDERS ABOVE ₹10,000"
-            style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.875rem" }}
+            placeholder="e.g. COMPLIMENTARY EXPRESS SHIPPING ACROSS INDIA • COD AVAILABLE"
+            className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 text-xs focus:bg-white focus:border-brand focus:ring-1 focus:ring-brand outline-none"
           />
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-              Action Link Destination
+            <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
+              Call-to-Action Link (Optional)
             </label>
             <input
               type="text"
               value={form.link}
               onChange={(e) => setForm({ ...form, link: e.target.value })}
-              placeholder="/shop?filter=newArrival"
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.875rem" }}
+              placeholder="e.g. /shop or /collections/banarasi"
+              className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 text-xs focus:bg-white focus:border-brand outline-none"
             />
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-              Action Link Label
+            <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
+              CTA Link Button Label
             </label>
             <input
               type="text"
               value={form.linkText}
               onChange={(e) => setForm({ ...form, linkText: e.target.value })}
-              placeholder="EXPLORE NOW →"
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.875rem" }}
+              placeholder="e.g. EXPLORE NOW →"
+              className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 text-xs focus:bg-white focus:border-brand outline-none"
             />
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-              Visual Background Theme
+            <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
+              Visual Theme & Background Accent
             </label>
             <select
               value={form.backgroundStyle}
               onChange={(e) => setForm({ ...form, backgroundStyle: e.target.value as any })}
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface)" }}
+              className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 text-xs focus:bg-white focus:border-brand outline-none cursor-pointer"
             >
-              <option value="wine">Deep Wine Accent (#7C2430)</option>
-              <option value="dark">Charcoal Black (#171513)</option>
-              <option value="gold">Antique Gold Ochre (#8C6836)</option>
+              <option value="wine">Evara Brand Warm Gold (#734E06)</option>
+              <option value="gold">Antique Gold Zari (#B18A52)</option>
+              <option value="dark">Solid Charcoal Black (#141210)</option>
             </select>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", paddingTop: "1.2rem" }}>
-            <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.85rem", cursor: "pointer" }}>
+          <div className="flex flex-col justify-end space-y-2 pt-2">
+            <label className="flex items-center gap-2 text-xs text-neutral-700 cursor-pointer">
               <input
                 type="checkbox"
                 checked={form.isDismissible}
                 onChange={(e) => setForm({ ...form, isDismissible: e.target.checked })}
-                style={{ accentColor: "#7C2430" }}
+                className="w-4 h-4 text-brand rounded-xs"
               />
-              <span>Allow Patron to Dismiss Ribbon</span>
+              Allow Shoppers to Dismiss Ribbon
             </label>
           </div>
         </div>

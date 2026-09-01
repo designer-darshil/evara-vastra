@@ -27,7 +27,6 @@ import { CheckoutPage } from "./pages/CheckoutPage";
 import { WishlistPage } from "./pages/WishlistPage";
 import { AccountPage } from "./pages/AccountPage";
 import { OrdersPage } from "./pages/OrdersPage";
-import { AboutPage } from "./pages/AboutPage";
 import { ContactPage } from "./pages/ContactPage";
 import { FaqPage } from "./pages/FaqPage";
 import { ShippingPolicyPage } from "./pages/ShippingPolicyPage";
@@ -43,6 +42,7 @@ import { AdminProductsPage } from "./admin/AdminProductsPage";
 import { AdminProductEditPage } from "./admin/AdminProductEditPage";
 import { AdminCategoriesPage } from "./admin/AdminCategoriesPage";
 import { AdminCollectionsPage } from "./admin/AdminCollectionsPage";
+import { AdminInventoryPage } from "./admin/AdminInventoryPage";
 import { AdminOrdersPage } from "./admin/AdminOrdersPage";
 import { AdminOrderDetailPage } from "./admin/AdminOrderDetailPage";
 import { AdminCustomersPage } from "./admin/AdminCustomersPage";
@@ -52,6 +52,9 @@ import { AdminNotificationBarPage } from "./admin/AdminNotificationBarPage";
 import { AdminShoppableVideosPage } from "./admin/AdminShoppableVideosPage";
 import { AdminReviewsPage } from "./admin/AdminReviewsPage";
 import { AdminNavigationPage } from "./admin/AdminNavigationPage";
+import { AdminCraftsmanshipCMSPage } from "./admin/AdminCraftsmanshipCMSPage";
+import { AdminFaqCMSPage } from "./admin/AdminFaqCMSPage";
+import { AdminLookbookPage } from "./admin/AdminLookbookPage";
 import { AdminCouponsPage } from "./admin/AdminCouponsPage";
 import { AdminMediaPage } from "./admin/AdminMediaPage";
 import { AdminSettingsPage } from "./admin/AdminSettingsPage";
@@ -162,6 +165,9 @@ const AppContent: React.FC = () => {
       if (currentPath === "/admin/collections") {
         return <AdminCollectionsPage onNavigate={navigate} />;
       }
+      if (currentPath === "/admin/inventory") {
+        return <AdminInventoryPage onNavigate={navigate} />;
+      }
       if (currentPath === "/admin/shoppable-videos") {
         return <AdminShoppableVideosPage onNavigate={navigate} />;
       }
@@ -187,8 +193,21 @@ const AppContent: React.FC = () => {
       if (currentPath === "/admin/content/homepage") {
         return <AdminHomepageCMSPage onNavigate={navigate} />;
       }
-      if (currentPath === "/admin/content/notification-bar" || currentPath === "/admin/notification-bar") {
+      if (
+        currentPath === "/admin/content/notification-bar" ||
+        currentPath === "/admin/notification-bar" ||
+        currentPath === "/admin/notifications"
+      ) {
         return <AdminNotificationBarPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/craftsmanship" || currentPath === "/admin/content/craftsmanship") {
+        return <AdminCraftsmanshipCMSPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/faqs" || currentPath === "/admin/content/faqs") {
+        return <AdminFaqCMSPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/lookbook" || currentPath === "/admin/content/lookbook") {
+        return <AdminLookbookPage onNavigate={navigate} />;
       }
       if (currentPath === "/admin/coupons") {
         return <AdminCouponsPage onNavigate={navigate} />;
@@ -360,10 +379,6 @@ const AppContent: React.FC = () => {
     if (cleanPath.startsWith("/order-confirmation/")) {
       const orderId = cleanPath.replace("/order-confirmation/", "");
       return <OrderConfirmationPage orderId={orderId} onNavigate={navigate} />;
-    }
-
-    if (cleanPath === "/about") {
-      return <AboutPage onNavigate={navigate} />;
     }
 
     if (cleanPath === "/contact") {

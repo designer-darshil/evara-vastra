@@ -16,6 +16,8 @@ import {
   FAQItem,
   LookbookItem,
   CraftsmanshipCMS,
+  AuditLog,
+  InventoryAdjustment,
 } from "../types";
 
 export const initialSiteSettings: SiteSettings = {
@@ -282,7 +284,6 @@ export const initialNavigationItems: NavigationItem[] = [
   { id: "nav-kurtas", label: "Kurta Sets", href: "/shop/kurta-sets", order: 4, isEnabled: true },
   { id: "nav-dresses", label: "Dresses", href: "/shop/dresses", order: 5, isEnabled: true },
   { id: "nav-new", label: "New Arrivals", href: "/shop?filter=newArrival", order: 6, isEnabled: true },
-  { id: "nav-about", label: "About", href: "/about", order: 7, isEnabled: true },
 ];
 
 export const initialNotificationBar: NotificationBarConfig = {
@@ -562,13 +563,155 @@ export const initialMediaAssets: MediaAsset[] = [
   },
 ];
 
-export const initialAdminUser: AdminUser = {
-  id: "admin-1",
-  email: "admin@evaravastra.com",
-  name: "Atelier Director",
-  role: "superadmin",
-  avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
-};
+export const initialAdminUsers: AdminUser[] = [
+  {
+    id: "admin-1",
+    email: "admin@evaravastra.com",
+    name: "Aarav Mehta (Director)",
+    role: "superadmin",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
+    phone: "+91 92743 44037",
+    isActive: true,
+    lastLogin: "2026-09-01 10:45 AM",
+    createdAt: "2026-01-10",
+  },
+  {
+    id: "admin-2",
+    email: "store@evaravastra.com",
+    name: "Pooja Shah (Store Admin)",
+    role: "admin",
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop",
+    phone: "+91 98251 22340",
+    isActive: true,
+    lastLogin: "2026-09-01 09:12 AM",
+    createdAt: "2026-02-15",
+  },
+  {
+    id: "admin-3",
+    email: "fulfillment@evaravastra.com",
+    name: "Rohan Patel (Order Manager)",
+    role: "order_manager",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
+    phone: "+91 97129 88310",
+    isActive: true,
+    lastLogin: "2026-08-31 06:30 PM",
+    createdAt: "2026-03-01",
+  },
+  {
+    id: "admin-4",
+    email: "editor@evaravastra.com",
+    name: "Ananya Desai (Content Lead)",
+    role: "content_manager",
+    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop",
+    phone: "+91 98980 11456",
+    isActive: true,
+    lastLogin: "2026-08-30 04:15 PM",
+    createdAt: "2026-04-12",
+  },
+];
+
+export const initialAdminUser: AdminUser = initialAdminUsers[0];
+
+export const initialAuditLogs: AuditLog[] = [
+  {
+    id: "log-1",
+    actorId: "admin-1",
+    actorName: "Aarav Mehta (Director)",
+    actorEmail: "admin@evaravastra.com",
+    actorRole: "superadmin",
+    action: "UPDATE_NOTIFICATION_BAR",
+    entity: "notification",
+    details: "Activated festive banner: 'FREE EXPRESS SHIPPING ACROSS INDIA • COD AVAILABLE'",
+    timestamp: "2026-09-01 10:45 AM",
+    severity: "info",
+  },
+  {
+    id: "log-2",
+    actorId: "admin-1",
+    actorName: "Aarav Mehta (Director)",
+    actorEmail: "admin@evaravastra.com",
+    actorRole: "superadmin",
+    action: "ADJUST_INVENTORY",
+    entity: "inventory",
+    entityId: "prod-1",
+    entityName: "Aethelgard Crimson Pure Katan Silk Banarasi Saree",
+    details: "Restocked 5 units for Aethelgard Crimson Banarasi Saree. Previous: 1, New: 6.",
+    timestamp: "2026-09-01 09:30 AM",
+    severity: "info",
+  },
+  {
+    id: "log-3",
+    actorId: "admin-3",
+    actorName: "Rohan Patel (Order Manager)",
+    actorEmail: "fulfillment@evaravastra.com",
+    actorRole: "order_manager",
+    action: "UPDATE_ORDER_STATUS",
+    entity: "order",
+    entityId: "ord-1",
+    entityName: "EVR-2026-8890",
+    details: "Changed order status to 'Shipped'. Added BlueDart Waybill #BLUEDART-8891029.",
+    timestamp: "2026-08-31 06:15 PM",
+    severity: "info",
+  },
+  {
+    id: "log-4",
+    actorId: "admin-2",
+    actorName: "Pooja Shah (Store Admin)",
+    actorEmail: "store@evaravastra.com",
+    actorRole: "admin",
+    action: "CREATE_COUPON",
+    entity: "coupon",
+    entityId: "FESTIVE15",
+    entityName: "FESTIVE15",
+    details: "Created coupon FESTIVE15 with 15% discount for min order ₹2,999.",
+    timestamp: "2026-08-30 02:40 PM",
+    severity: "info",
+  },
+  {
+    id: "log-5",
+    actorId: "admin-4",
+    actorName: "Ananya Desai (Content Lead)",
+    actorEmail: "editor@evaravastra.com",
+    actorRole: "content_manager",
+    action: "MODERATE_REVIEW",
+    entity: "review",
+    entityId: "rev-1",
+    details: "Approved verified buyer review from Sunita Verma: 'Breathtaking pure zari work...'",
+    timestamp: "2026-08-29 11:20 AM",
+    severity: "info",
+  },
+];
+
+export const initialInventoryAdjustments: InventoryAdjustment[] = [
+  {
+    id: "adj-1",
+    productId: "prod-1",
+    productTitle: "Aethelgard Crimson Pure Katan Silk Banarasi Saree",
+    productSku: "EVR-KATAN-001",
+    previousInventory: 1,
+    newInventory: 6,
+    changeAmount: 5,
+    reason: "restock",
+    note: "Surat Atelier batch release #KAT-902",
+    actorName: "Aarav Mehta (Director)",
+    actorEmail: "admin@evaravastra.com",
+    timestamp: "2026-09-01 09:30 AM",
+  },
+  {
+    id: "adj-2",
+    productId: "prod-3",
+    productTitle: "Aurelia Gold Crunchy Saree with Cutwork",
+    productSku: "EVR-AURELIA-003",
+    previousInventory: 5,
+    newInventory: 4,
+    changeAmount: -1,
+    reason: "sale",
+    note: "Fulfillment for Order #EVR-2026-8890",
+    actorName: "System",
+    actorEmail: "system@evaravastra.com",
+    timestamp: "2026-08-31 05:10 PM",
+  },
+];
 
 export const initialFAQs: FAQItem[] = [
   {

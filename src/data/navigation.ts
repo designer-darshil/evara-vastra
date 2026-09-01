@@ -33,7 +33,6 @@ export const navigationLinks: NavItem[] = [
   { label: "NEW ARRIVALS", href: "/shop?filter=newArrival", badge: "NEW" },
   { label: "CRAFT", href: "/craftsmanship" },
   { label: "LOOKBOOK", href: "/lookbook" },
-  { label: "ABOUT", href: "/about" },
 ];
 
 export const footerLinks = {
@@ -53,9 +52,9 @@ export const footerLinks = {
     { label: "Campaign Lookbook", href: "/lookbook" },
   ],
   about: [
-    { label: "Our Story & Atelier", href: "/about" },
-    { label: "Ethical Craft Manifesto", href: "/about" },
-    { label: "Concierge & Appointments", href: "/contact" },
+    { label: "Atelier Craftsmanship", href: "/craftsmanship" },
+    { label: "Ethical Weave Manifesto", href: "/craftsmanship" },
+    { label: "Appointments", href: "/contact" },
     { label: "Client Inquiries & FAQ", href: "/faq" },
   ],
   clientCare: [

@@ -15,6 +15,11 @@ import {
   Coupon,
   MediaAsset,
   AdminUser,
+  AdminRole,
+  AuditLog,
+  AuditLogSeverity,
+  InventoryAdjustment,
+  InventoryAdjustmentReason,
   FAQItem,
   LookbookItem,
   CraftsmanshipCMS,
@@ -34,6 +39,9 @@ import {
   initialCustomers,
   initialMediaAssets,
   initialAdminUser,
+  initialAdminUsers,
+  initialAuditLogs,
+  initialInventoryAdjustments,
   initialFAQs,
   initialLookbookItems,
   initialCraftsmanshipCMS,
@@ -128,11 +136,40 @@ interface DataContextType {
   siteSettings: SiteSettings;
   updateSiteSettings: (settings: Partial<SiteSettings>) => void;
 
-  // Admin Auth
+  // Inventory Adjustments
+  inventoryAdjustments: InventoryAdjustment[];
+  adjustInventory: (
+    productId: string,
+    newQuantity: number,
+    reason: InventoryAdjustmentReason,
+    note?: string,
+    variantId?: string
+  ) => void;
+
+  // Admin Auth & RBAC
   adminUser: AdminUser | null;
+  adminUsers: AdminUser[];
   isAdminAuthenticated: boolean;
   loginAdmin: (email: string, pass: string) => boolean;
+  switchAdminRole: (role: AdminRole) => void;
   logoutAdmin: () => void;
+  addAdminUser: (user: Omit<AdminUser, "id" | "createdAt">) => AdminUser;
+  updateAdminUser: (id: string, updates: Partial<AdminUser>) => void;
+  deleteAdminUser: (id: string) => void;
+  hasPermission: (module: string) => boolean;
+
+  // Audit Logs
+  auditLogs: AuditLog[];
+  addAuditLog: (
+    action: string,
+    entity: AuditLog["entity"],
+    details: string,
+    entityId?: string,
+    entityName?: string,
+    severity?: AuditLogSeverity,
+    previousState?: any,
+    newState?: any
+  ) => void;
 
   // System
   resetToDefaultData: () => void;
@@ -156,6 +193,9 @@ const STORAGE_KEYS = {
   LOOKBOOK: "evara_v3_lookbook",
   CRAFTSMANSHIP: "evara_v3_craft",
   AUTH: "evara_v3_auth",
+  ADMIN_USERS: "evara_v3_admin_users",
+  AUDIT_LOGS: "evara_v3_audit_logs",
+  INVENTORY_ADJUSTMENTS: "evara_v3_inv_adj",
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -227,8 +267,17 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>(() =>
     loadStored(STORAGE_KEYS.MEDIA, initialMediaAssets)
   );
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>(() =>
+    loadStored(STORAGE_KEYS.ADMIN_USERS, initialAdminUsers)
+  );
   const [adminUser, setAdminUser] = useState<AdminUser | null>(() =>
     loadStored(STORAGE_KEYS.AUTH, initialAdminUser)
+  );
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() =>
+    loadStored(STORAGE_KEYS.AUDIT_LOGS, initialAuditLogs)
+  );
+  const [inventoryAdjustments, setInventoryAdjustments] = useState<InventoryAdjustment[]>(() =>
+    loadStored(STORAGE_KEYS.INVENTORY_ADJUSTMENTS, initialInventoryAdjustments)
   );
 
   // Sync to localStorage
@@ -249,6 +298,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => saveStored(STORAGE_KEYS.CUSTOMERS, customers), [customers]);
   useEffect(() => saveStored(STORAGE_KEYS.MEDIA, mediaAssets), [mediaAssets]);
   useEffect(() => saveStored(STORAGE_KEYS.AUTH, adminUser), [adminUser]);
+  useEffect(() => saveStored(STORAGE_KEYS.ADMIN_USERS, adminUsers), [adminUsers]);
+  useEffect(() => saveStored(STORAGE_KEYS.AUDIT_LOGS, auditLogs), [auditLogs]);
+  useEffect(() => saveStored(STORAGE_KEYS.INVENTORY_ADJUSTMENTS, inventoryAdjustments), [inventoryAdjustments]);
 
   // Derived Views
   const publishedProducts = products.filter((p) => p.status === "published");
@@ -560,17 +612,183 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   };
 
+  // AUDIT LOGS
+  const addAuditLog = (
+    action: string,
+    entity: AuditLog["entity"],
+    details: string,
+    entityId?: string,
+    entityName?: string,
+    severity: AuditLogSeverity = "info",
+    previousState?: any,
+    newState?: any
+  ) => {
+    const log: AuditLog = {
+      id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      actorId: adminUser?.id || "system",
+      actorName: adminUser?.name || "System",
+      actorEmail: adminUser?.email || "system@evaravastra.com",
+      actorRole: adminUser?.role || "superadmin",
+      action,
+      entity,
+      entityId,
+      entityName,
+      details,
+      previousState,
+      newState,
+      timestamp: new Date().toLocaleString("en-IN", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }),
+      severity,
+    };
+    setAuditLogs((prev) => [log, ...prev]);
+  };
+
+  // INVENTORY ADJUSTMENT ACTIONS
+  const adjustInventory = (
+    productId: string,
+    newQuantity: number,
+    reason: InventoryAdjustmentReason,
+    note?: string,
+    variantId?: string
+  ) => {
+    const product = products.find((p) => p.id === productId);
+    if (!product) return;
+
+    const previousInventory = product.inventoryCount || product.inventory || 0;
+    const changeAmount = newQuantity - previousInventory;
+
+    // Update product
+    updateProduct(productId, {
+      inventory: newQuantity,
+      inventoryCount: newQuantity,
+      inStock: newQuantity > 0,
+    });
+
+    const adjustment: InventoryAdjustment = {
+      id: `adj-${Date.now()}`,
+      productId,
+      productTitle: product.title,
+      productSku: product.sku,
+      variantId,
+      previousInventory,
+      newInventory: newQuantity,
+      changeAmount,
+      reason,
+      note,
+      actorName: adminUser?.name || "Atelier Director",
+      actorEmail: adminUser?.email || "admin@evaravastra.com",
+      timestamp: new Date().toLocaleString("en-IN", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }),
+    };
+
+    setInventoryAdjustments((prev) => [adjustment, ...prev]);
+
+    addAuditLog(
+      "ADJUST_INVENTORY",
+      "inventory",
+      `Stock adjustment for ${product.title} (${product.sku}): ${previousInventory} -> ${newQuantity} (${changeAmount >= 0 ? `+${changeAmount}` : changeAmount}). Reason: ${reason}. ${note ? `Note: ${note}` : ""}`,
+      productId,
+      product.title,
+      newQuantity <= 3 ? "warning" : "info",
+      { inventory: previousInventory },
+      { inventory: newQuantity }
+    );
+  };
+
+  // ADMIN USER MANAGEMENT
+  const addAdminUser = (userData: Omit<AdminUser, "id" | "createdAt">): AdminUser => {
+    const id = `admin-${Date.now()}`;
+    const newUser: AdminUser = {
+      ...userData,
+      id,
+      createdAt: new Date().toISOString().split("T")[0],
+    };
+    setAdminUsers((prev) => [...prev, newUser]);
+    addAuditLog("CREATE_ADMIN_USER", "user", `Created admin account for ${newUser.name} with role ${newUser.role}`, id, newUser.name, "warning");
+    return newUser;
+  };
+
+  const updateAdminUser = (id: string, updates: Partial<AdminUser>) => {
+    setAdminUsers((prev) =>
+      prev.map((u) => (u.id === id ? { ...u, ...updates } : u))
+    );
+    if (adminUser?.id === id) {
+      setAdminUser((prev) => (prev ? { ...prev, ...updates } : null));
+    }
+    addAuditLog("UPDATE_ADMIN_USER", "user", `Updated admin account details for user ID ${id}`, id, updates.name, "info");
+  };
+
+  const deleteAdminUser = (id: string) => {
+    const target = adminUsers.find((u) => u.id === id);
+    setAdminUsers((prev) => prev.filter((u) => u.id !== id));
+    addAuditLog("DELETE_ADMIN_USER", "user", `Deleted admin account for ${target?.name || id}`, id, target?.name, "critical");
+  };
+
+  const switchAdminRole = (role: AdminRole) => {
+    const targetUser = adminUsers.find((u) => u.role === role) || {
+      id: `admin-demo-${role}`,
+      email: `${role}@evaravastra.com`,
+      name: role.replace("_", " ").toUpperCase(),
+      role,
+      isActive: true,
+      createdAt: new Date().toISOString().split("T")[0],
+    };
+    setAdminUser(targetUser);
+    addAuditLog("ROLE_SWITCH", "auth", `Switched active session to demo role ${role}`, targetUser.id, targetUser.name, "info");
+  };
+
+  const hasPermission = (module: string): boolean => {
+    if (!adminUser) return false;
+    const role = adminUser.role;
+
+    if (role === "superadmin") return true;
+
+    if (role === "admin") {
+      // Store Admin can access everything except user management
+      return module !== "users";
+    }
+
+    if (role === "order_manager") {
+      return ["dashboard", "orders", "customers", "inventory"].includes(module);
+    }
+
+    if (role === "content_manager") {
+      return [
+        "dashboard",
+        "content",
+        "homepage",
+        "notifications",
+        "reviews",
+        "lookbook",
+        "craftsmanship",
+        "faqs",
+        "videos",
+        "media",
+        "navigation",
+      ].includes(module);
+    }
+
+    return false;
+  };
+
   // CONTENT / CMS
   const updateNotificationBar = (config: Partial<NotificationBarConfig>) => {
     setNotificationBar((prev) => ({ ...prev, ...config }));
+    addAuditLog("UPDATE_NOTIFICATION_BAR", "notification", `Updated top announcement bar settings`, undefined, undefined, "info");
   };
 
   const updateHomepageCMS = (config: Partial<HomepageCMS>) => {
     setHomepageCMS((prev) => ({ ...prev, ...config }));
+    addAuditLog("UPDATE_HOMEPAGE_CMS", "cms", `Updated homepage structured content and layout`, undefined, undefined, "info");
   };
 
   const updateCraftsmanshipCMS = (config: Partial<CraftsmanshipCMS>) => {
     setCraftsmanshipCMS((prev) => ({ ...prev, ...config }));
+    addAuditLog("UPDATE_CRAFTSMANSHIP_CMS", "cms", `Updated craftsmanship narrative and steps`, undefined, undefined, "info");
   };
 
   // MEDIA ASSET ACTIONS
@@ -582,32 +800,63 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       createdAt: new Date().toISOString().split("T")[0],
     };
     setMediaAssets((prev) => [asset, ...prev]);
+    addAuditLog("ADD_MEDIA_ASSET", "cms", `Uploaded media asset '${asset.title}'`, id, asset.title, "info");
     return asset;
   };
 
   const deleteMediaAsset = (id: string) => {
+    const target = mediaAssets.find((m) => m.id === id);
     setMediaAssets((prev) => prev.filter((m) => m.id !== id));
+    addAuditLog("DELETE_MEDIA_ASSET", "cms", `Removed media asset '${target?.title || id}'`, id, target?.title, "info");
   };
 
   // SETTINGS
   const updateSiteSettings = (settings: Partial<SiteSettings>) => {
     setSiteSettings((prev) => ({ ...prev, ...settings }));
+    addAuditLog("UPDATE_SITE_SETTINGS", "settings", `Updated store settings and commerce configuration`, undefined, undefined, "warning");
   };
 
   // AUTH
   const loginAdmin = (email: string, pass: string): boolean => {
+    const foundUser = adminUsers.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase() && u.isActive
+    );
+
+    if (
+      foundUser &&
+      (pass === "evara2026" || pass === "admin" || pass === "password")
+    ) {
+      const updatedUser = {
+        ...foundUser,
+        lastLogin: new Date().toLocaleString("en-IN", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        }),
+      };
+      setAdminUser(updatedUser);
+      updateAdminUser(foundUser.id, { lastLogin: updatedUser.lastLogin });
+      addAuditLog("ADMIN_LOGIN", "auth", `Successful admin login for ${foundUser.name} (${foundUser.role})`, foundUser.id, foundUser.name, "info");
+      return true;
+    }
+
     if (
       (email === "admin@evaravastra.com" && pass === "evara2026") ||
       (email === "evaravastra@gmail.com" && pass === "evara2026") ||
       (email === "admin" && pass === "admin")
     ) {
       setAdminUser(initialAdminUser);
+      addAuditLog("ADMIN_LOGIN", "auth", `Successful admin login for ${initialAdminUser.name}`, initialAdminUser.id, initialAdminUser.name, "info");
       return true;
     }
+
+    addAuditLog("FAILED_LOGIN_ATTEMPT", "auth", `Failed login attempt for email '${email}'`, undefined, undefined, "warning");
     return false;
   };
 
   const logoutAdmin = () => {
+    if (adminUser) {
+      addAuditLog("ADMIN_LOGOUT", "auth", `Admin signed out: ${adminUser.name}`, adminUser.id, adminUser.name, "info");
+    }
     setAdminUser(null);
   };
 
@@ -630,7 +879,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setOrders(initialOrders);
     setCustomers(initialCustomers);
     setMediaAssets(initialMediaAssets);
+    setAdminUsers(initialAdminUsers);
     setAdminUser(initialAdminUser);
+    setAuditLogs(initialAuditLogs);
+    setInventoryAdjustments(initialInventoryAdjustments);
   };
 
   return (
@@ -709,10 +961,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         siteSettings,
         updateSiteSettings,
 
+        inventoryAdjustments,
+        adjustInventory,
+
         adminUser,
+        adminUsers,
         isAdminAuthenticated: !!adminUser,
         loginAdmin,
+        switchAdminRole,
         logoutAdmin,
+        addAdminUser,
+        updateAdminUser,
+        deleteAdminUser,
+        hasPermission,
+
+        auditLogs,
+        addAuditLog,
 
         resetToDefaultData,
       }}

@@ -6,23 +6,27 @@ import {
   AlertTriangle,
   TrendingUp,
   Plus,
-  Bell,
   ArrowRight,
+  Warehouse,
+  ShieldCheck,
 } from "lucide-react";
 
 export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }> = ({
   onNavigate,
 }) => {
-  const { products, orders, notificationBar } = useData();
+  const { products, orders, reviews, notificationBar, adminUser } = useData();
 
   // Metrics calculations
   const totalProducts = products.length;
   const publishedProducts = products.filter((p) => p.status === "published").length;
   const draftProducts = products.filter((p) => p.status === "draft").length;
-  const lowStockProducts = products.filter((p) => p.inventoryCount <= 3 && p.status === "published");
+  const lowStockProducts = products.filter(
+    (p) => (p.inventoryCount ?? p.inventory ?? 0) <= 3 && p.status === "published"
+  );
   const totalOrders = orders.length;
   const pendingOrders = orders.filter((o) => o.status === "Pending" || o.status === "Confirmed").length;
   const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
+  const pendingReviews = reviews.filter((r) => r.status === "pending").length;
 
   const formatINR = (amt: number) =>
     new Intl.NumberFormat("en-IN", {
@@ -31,298 +35,264 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
       maximumFractionDigits: 0,
     }).format(amt);
 
+  // Sales Trend Mock Points (Mon-Sun)
+  const weeklyTrends = [
+    { day: "Mon", sales: 48500, orders: 4 },
+    { day: "Tue", sales: 62000, orders: 6 },
+    { day: "Wed", sales: 89000, orders: 8 },
+    { day: "Thu", sales: 54000, orders: 5 },
+    { day: "Fri", sales: 112000, orders: 11 },
+    { day: "Sat", sales: 145000, orders: 14 },
+    { day: "Sun", sales: 168000, orders: 16 },
+  ];
+  const maxSales = Math.max(...weeklyTrends.map((t) => t.sales));
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-      {/* Top Banner */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "1rem",
-        }}
-      >
+    <div className="space-y-6">
+      {/* Top Welcome Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span
-            style={{
-              fontSize: "0.7rem",
-              fontWeight: 700,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "#7C2430",
-              display: "block",
-              marginBottom: "0.2rem",
-            }}
-          >
+          <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-brand block mb-1">
             ATELIER OVERVIEW
           </span>
-          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: 0 }}>
-            Executive Dashboard
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-neutral-900 m-0">
+            Executive Commerce Dashboard
           </h1>
+          <p className="text-xs text-neutral-500 mt-1">
+            Welcome back, <strong>{adminUser?.name}</strong>. Here is the operational summary for Surat Atelier.
+          </p>
         </div>
 
-        <div style={{ display: "flex", gap: "0.75rem" }}>
+        <div className="flex items-center gap-2.5 self-start sm:self-auto flex-wrap">
           <button
             onClick={() => onNavigate("/admin/products/new")}
-            className="btn-wine"
-            style={{ padding: "0.65rem 1.25rem", fontSize: "0.8rem" }}
+            className="flex items-center gap-2 px-3.5 py-2 bg-brand text-brand-foreground hover:bg-brand-hover text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs"
           >
-            <Plus size={15} /> Add New Saree
+            <Plus className="w-4 h-4" /> Add Product
           </button>
           <button
-            onClick={() => onNavigate("/admin/content/homepage")}
-            className="btn-secondary"
-            style={{ padding: "0.65rem 1.25rem", fontSize: "0.8rem" }}
+            onClick={() => onNavigate("/admin/inventory")}
+            className="flex items-center gap-2 px-3.5 py-2 bg-white border border-neutral-300 text-neutral-700 hover:border-brand hover:text-brand text-xs font-semibold rounded-sm transition-colors shadow-2xs"
           >
-            Homepage CMS
+            <Warehouse className="w-4 h-4 text-brand" /> Stock Audit
           </button>
         </div>
       </div>
 
+      {/* Demo Mode Notice */}
+      <div className="bg-amber-50/80 border border-amber-200 p-3.5 rounded-sm flex items-center justify-between gap-3 text-xs text-amber-900">
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="w-4 h-4 text-amber-700 shrink-0" />
+          <span>
+            <strong>Atelier Demo Mode:</strong> Database seeded with authentic Surat sarees, live order records, and real-time state persistence.
+          </span>
+        </div>
+        <span className="text-[10px] font-mono text-amber-700 uppercase bg-amber-100 px-2 py-0.5 rounded-xs font-bold shrink-0">
+          Sandboxed
+        </span>
+      </div>
+
       {/* KPI Cards Grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "1.25rem",
-        }}
-      >
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Revenue */}
-        <div
-          style={{
-            backgroundColor: "var(--admin-surface)",
-            padding: "1.5rem",
-            border: "1px solid var(--admin-border)",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
-            <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)" }}>
-              Total Demo Revenue
+        <div className="bg-white p-4 sm:p-5 border border-neutral-200 rounded-sm shadow-xs">
+          <div className="flex justify-between items-start mb-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+              Total Sales Volume
             </span>
-            <TrendingUp size={16} style={{ color: "#234E3E" }} />
+            <TrendingUp className="w-4 h-4 text-emerald-700" />
           </div>
-          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "var(--admin-text)" }}>
+          <div className="text-xl sm:text-2xl font-bold text-neutral-900 font-serif">
             {formatINR(totalRevenue)}
           </div>
-          <span style={{ fontSize: "0.72rem", color: "#234E3E", fontWeight: 600, display: "block", marginTop: "0.25rem" }}>
-            Calculated from {totalOrders} order records
+          <span className="text-[11px] text-emerald-700 font-semibold block mt-1">
+            +18.4% vs last period
           </span>
         </div>
 
         {/* Orders */}
-        <div
-          style={{
-            backgroundColor: "var(--admin-surface)",
-            padding: "1.5rem",
-            border: "1px solid var(--admin-border)",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
-            <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)" }}>
+        <div className="bg-white p-4 sm:p-5 border border-neutral-200 rounded-sm shadow-xs">
+          <div className="flex justify-between items-start mb-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
               Total Orders
             </span>
-            <ShoppingBag size={16} style={{ color: "#7C2430" }} />
+            <ShoppingBag className="w-4 h-4 text-brand" />
           </div>
-          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "var(--admin-text)" }}>
+          <div className="text-xl sm:text-2xl font-bold text-neutral-900 font-serif">
             {totalOrders}
           </div>
-          <span style={{ fontSize: "0.72rem", color: pendingOrders > 0 ? "#7C2430" : "#6F6257", fontWeight: 600, display: "block", marginTop: "0.25rem" }}>
-            {pendingOrders} awaiting fulfillment
+          <span className="text-[11px] text-neutral-500 block mt-1">
+            <strong className="text-brand">{pendingOrders}</strong> awaiting dispatch
           </span>
         </div>
 
-        {/* Published Products */}
-        <div
-          style={{
-            backgroundColor: "var(--admin-surface)",
-            padding: "1.5rem",
-            border: "1px solid var(--admin-border)",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
-            <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)" }}>
-              Catalog Sarees
+        {/* Catalog Products */}
+        <div className="bg-white p-4 sm:p-5 border border-neutral-200 rounded-sm shadow-xs">
+          <div className="flex justify-between items-start mb-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+              Catalog Items
             </span>
-            <Package size={16} style={{ color: "#B18A52" }} />
+            <Package className="w-4 h-4 text-neutral-600" />
           </div>
-          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "var(--admin-text)" }}>
+          <div className="text-xl sm:text-2xl font-bold text-neutral-900 font-serif">
             {publishedProducts}
           </div>
-          <span style={{ fontSize: "0.72rem", color: "var(--admin-text-secondary)", display: "block", marginTop: "0.25rem" }}>
-            {draftProducts} draft / {totalProducts} total
+          <span className="text-[11px] text-neutral-500 block mt-1">
+            {draftProducts} drafts • {totalProducts} total SKUs
           </span>
         </div>
 
         {/* Low Stock Alerts */}
-        <div
-          style={{
-            backgroundColor: "var(--admin-surface)",
-            padding: "1.5rem",
-            border: lowStockProducts.length > 0 ? "1px solid #E8C8C8" : "1px solid #E5DFD5",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
-            <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)" }}>
+        <div className={`p-4 sm:p-5 border rounded-sm shadow-xs bg-white ${
+          lowStockProducts.length > 0 ? "border-amber-300" : "border-neutral-200"
+        }`}>
+          <div className="flex justify-between items-start mb-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
               Low Stock Alert
             </span>
-            <AlertTriangle size={16} style={{ color: lowStockProducts.length > 0 ? "#7C2430" : "#234E3E" }} />
+            <AlertTriangle className={`w-4 h-4 ${lowStockProducts.length > 0 ? "text-amber-700" : "text-neutral-400"}`} />
           </div>
-          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: lowStockProducts.length > 0 ? "#7C2430" : "#171513" }}>
+          <div className={`text-xl sm:text-2xl font-bold font-serif ${
+            lowStockProducts.length > 0 ? "text-amber-700" : "text-neutral-900"
+          }`}>
             {lowStockProducts.length}
           </div>
-          <span style={{ fontSize: "0.72rem", color: "var(--admin-text-secondary)", display: "block", marginTop: "0.25rem" }}>
-            Sarees with ≤ 3 units remaining
+          <span className="text-[11px] text-neutral-500 block mt-1">
+            SKUs with ≤ 3 units remaining
           </span>
         </div>
       </div>
 
-      {/* Live Storefront Status Banner */}
-      <div
-        style={{
-          backgroundColor: "var(--admin-surface)",
-          padding: "1.25rem 1.5rem",
-          border: "1px solid var(--admin-border)",
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "1rem",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <div
-            style={{
-              width: "36px",
-              height: "36px",
-              borderRadius: "50%",
-              backgroundColor: notificationBar.isEnabled ? "rgba(124, 36, 48, 0.1)" : "#EFECE6",
-              color: notificationBar.isEnabled ? "#7C2430" : "#8E8276",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Bell size={18} />
+      {/* Sales Trend Visual & Announcement Bar Card */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Weekly Revenue Visualizer (2 Cols) */}
+        <div className="lg:col-span-2 bg-white p-5 border border-neutral-200 rounded-sm shadow-xs">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-sm font-bold text-neutral-900 m-0">
+                Weekly Revenue Velocity
+              </h3>
+              <p className="text-xs text-neutral-500 m-0 mt-0.5">
+                Daily GMV sales trend across online prepaid & COD orders.
+              </p>
+            </div>
+            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-sm border border-emerald-200">
+              ₹6,78,500 7-Day Total
+            </span>
           </div>
-          <div>
-            <strong style={{ fontSize: "0.85rem", color: "var(--admin-text)", display: "block" }}>
-              Website Announcement Bar: {notificationBar.isEnabled ? "ACTIVE ON STOREFRONT" : "DISABLED"}
-            </strong>
-            <p style={{ fontSize: "0.75rem", color: "var(--admin-text-secondary)", margin: 0 }}>
-              "{notificationBar.message}"
-            </p>
+
+          <div className="grid grid-cols-7 gap-2 items-end h-40 pt-6 border-b border-neutral-100">
+            {weeklyTrends.map((item, i) => {
+              const heightPercent = Math.round((item.sales / maxSales) * 100);
+              return (
+                <div key={i} className="flex flex-col items-center gap-1.5 h-full justify-end group">
+                  <span className="text-[10px] font-mono text-neutral-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                    ₹{(item.sales / 1000).toFixed(0)}k
+                  </span>
+                  <div
+                    className="w-full max-w-[32px] bg-brand/85 hover:bg-brand rounded-t-xs transition-all"
+                    style={{ height: `${heightPercent}%` }}
+                  />
+                  <span className="text-[10px] font-bold text-neutral-600">
+                    {item.day}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        <button
-          onClick={() => onNavigate("/admin/content/notification-bar")}
-          className="btn-secondary"
-          style={{ fontSize: "0.75rem", padding: "0.45rem 0.9rem" }}
-        >
-          Edit Announcement
-        </button>
+        {/* Live Announcement Bar Status (1 Col) */}
+        <div className="bg-white p-5 border border-neutral-200 rounded-sm shadow-xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-brand">
+                STOREFRONT NOTIFICATION
+              </span>
+              <span className={`text-[10px] px-2 py-0.5 rounded-sm font-bold uppercase ${
+                notificationBar.isEnabled
+                  ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                  : "bg-neutral-100 text-neutral-600"
+              }`}>
+                {notificationBar.isEnabled ? "Broadcasting" : "Disabled"}
+              </span>
+            </div>
+            <p className="text-xs font-semibold text-neutral-900 leading-relaxed bg-neutral-50 p-3 rounded-sm border border-neutral-200">
+              "{notificationBar.message}"
+            </p>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between">
+            <span className="text-[11px] text-neutral-500">
+              Link: {notificationBar.link || "None"}
+            </span>
+            <button
+              onClick={() => onNavigate("/admin/notifications")}
+              className="text-xs text-brand hover:underline font-bold"
+            >
+              Configure →
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Main 2-Column Section: Recent Orders & Quick Management */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1.4fr 0.8fr",
-          gap: "2rem",
-        }}
-        className="admin-dashboard-grid"
-      >
-        {/* Left: Recent Orders Table */}
-        <div
-          style={{
-            backgroundColor: "var(--admin-surface)",
-            border: "1px solid var(--admin-border)",
-            padding: "1.5rem",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "1.25rem",
-              borderBottom: "1px solid #F0EAE1",
-              paddingBottom: "0.75rem",
-            }}
-          >
-            <h3 className="font-serif" style={{ fontSize: "1.3rem", margin: 0 }}>
-              Recent Orders
+      {/* Main 2-Column Section: Recent Orders & Low Stock Watch */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left 2-Cols: Recent Orders Table */}
+        <div className="lg:col-span-2 bg-white border border-neutral-200 rounded-sm shadow-xs">
+          <div className="p-4 border-b border-neutral-200 flex justify-between items-center">
+            <h3 className="text-sm font-bold text-neutral-900 m-0">
+              Recent Orders Awaiting Action
             </h3>
             <button
               onClick={() => onNavigate("/admin/orders")}
-              style={{ fontSize: "0.75rem", color: "#7C2430", fontWeight: 600, background: "none", border: "none", cursor: "pointer" }}
+              className="text-xs font-bold text-brand hover:underline flex items-center gap-1"
             >
-              View All Orders →
+              View All Orders <ArrowRight className="w-3 h-3" />
             </button>
           </div>
 
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem", textAlign: "left" }}>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[500px]">
               <thead>
-                <tr style={{ color: "#8E8276", borderBottom: "1px solid var(--admin-border)" }}>
-                  <th style={{ padding: "0.6rem 0.5rem" }}>ORDER</th>
-                  <th style={{ padding: "0.6rem 0.5rem" }}>CUSTOMER</th>
-                  <th style={{ padding: "0.6rem 0.5rem" }}>TOTAL</th>
-                  <th style={{ padding: "0.6rem 0.5rem" }}>STATUS</th>
-                  <th style={{ padding: "0.6rem 0.5rem", textAlign: "right" }}>ACTION</th>
+                <tr className="bg-neutral-50 text-[11px] font-bold text-neutral-500 uppercase tracking-wider border-b border-neutral-200">
+                  <th className="py-2.5 px-4">Order #</th>
+                  <th className="py-2.5 px-4">Customer</th>
+                  <th className="py-2.5 px-4">Total</th>
+                  <th className="py-2.5 px-4">Status</th>
+                  <th className="py-2.5 px-4 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-neutral-100 text-xs">
                 {orders.slice(0, 5).map((order) => (
-                  <tr key={order.id} style={{ borderBottom: "1px solid #F4F0E8" }}>
-                    <td style={{ padding: "0.75rem 0.5rem", fontWeight: 600 }}>
+                  <tr key={order.id} className="hover:bg-neutral-50/80 transition-colors">
+                    <td className="py-3 px-4 font-mono font-semibold text-neutral-900">
                       {order.orderNumber}
                     </td>
-                    <td style={{ padding: "0.75rem 0.5rem" }}>
-                      <span style={{ display: "block", color: "var(--admin-text)" }}>{order.customerName}</span>
-                      <span style={{ fontSize: "0.7rem", color: "#8E8276" }}>{order.city}</span>
+                    <td className="py-3 px-4">
+                      <span className="font-semibold text-neutral-900 block">{order.customerName}</span>
+                      <span className="text-[11px] text-neutral-500">{order.city}</span>
                     </td>
-                    <td style={{ padding: "0.75rem 0.5rem", fontWeight: 600 }}>
+                    <td className="py-3 px-4 font-semibold text-neutral-900 font-mono">
                       {formatINR(order.total)}
                     </td>
-                    <td style={{ padding: "0.75rem 0.5rem" }}>
+                    <td className="py-3 px-4">
                       <span
-                        style={{
-                          fontSize: "0.7rem",
-                          fontWeight: 700,
-                          padding: "0.2rem 0.5rem",
-                          backgroundColor:
-                            order.status === "Delivered"
-                              ? "rgba(35,78,62,0.1)"
-                              : order.status === "Shipped"
-                              ? "rgba(177,138,82,0.15)"
-                              : "rgba(124,36,48,0.1)",
-                          color:
-                            order.status === "Delivered"
-                              ? "#234E3E"
-                              : order.status === "Shipped"
-                              ? "#8C6836"
-                              : "#7C2430",
-                        }}
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider border ${
+                          order.status === "Delivered"
+                            ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                            : order.status === "Shipped"
+                            ? "bg-blue-50 text-blue-800 border-blue-200"
+                            : "bg-amber-50 text-amber-800 border-amber-200"
+                        }`}
                       >
                         {order.status}
                       </span>
                     </td>
-                    <td style={{ padding: "0.75rem 0.5rem", textAlign: "right" }}>
+                    <td className="py-3 px-4 text-right">
                       <button
                         onClick={() => onNavigate(`/admin/orders/${order.id}`)}
-                        style={{
-                          padding: "0.3rem 0.6rem",
-                          fontSize: "0.72rem",
-                          border: "1px solid #D9D2C7",
-                          backgroundColor: "var(--admin-surface-subtle)",
-                          cursor: "pointer",
-                        }}
+                        className="px-2.5 py-1 text-[11px] font-semibold border border-neutral-300 hover:border-brand hover:text-brand bg-white rounded-sm transition-colors"
                       >
                         Manage
                       </button>
@@ -334,40 +304,41 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
           </div>
         </div>
 
-        {/* Right: Low Stock & Featured Collection Info */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          {/* Low Stock Watch */}
-          <div style={{ backgroundColor: "var(--admin-surface)", border: "1px solid var(--admin-border)", padding: "1.5rem" }}>
-            <h3 className="font-serif" style={{ fontSize: "1.2rem", margin: "0 0 1rem 0" }}>
-              Low Inventory Watch
-            </h3>
+        {/* Right 1-Col: Low Stock Alert & Quick Shortcuts */}
+        <div className="space-y-4">
+          {/* Low Stock Watch Panel */}
+          <div className="bg-white p-4 border border-neutral-200 rounded-sm shadow-xs">
+            <div className="flex items-center justify-between mb-3 border-b border-neutral-100 pb-2">
+              <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider m-0">
+                Low Inventory Watch
+              </h3>
+              <button
+                onClick={() => onNavigate("/admin/inventory")}
+                className="text-[11px] font-bold text-brand hover:underline"
+              >
+                Stock Room →
+              </button>
+            </div>
 
             {lowStockProducts.length === 0 ? (
-              <p style={{ fontSize: "0.8rem", color: "#234E3E" }}>
-                ✓ All published catalog items have healthy stock levels.
+              <p className="text-xs text-emerald-700 m-0 py-2">
+                ✓ All published catalog sarees have healthy stock levels.
               </p>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                {lowStockProducts.map((p) => (
+              <div className="space-y-2">
+                {lowStockProducts.slice(0, 4).map((p) => (
                   <div
                     key={p.id}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      padding: "0.6rem 0.75rem",
-                      backgroundColor: "var(--admin-surface-subtle)",
-                      border: "1px solid #EBE5DB",
-                    }}
+                    className="flex items-center justify-between p-2 bg-neutral-50 border border-neutral-200 rounded-xs text-xs"
                   >
-                    <div>
-                      <strong style={{ fontSize: "0.8rem", color: "var(--admin-text)", display: "block" }}>
+                    <div className="min-w-0 pr-2">
+                      <span className="font-semibold text-neutral-900 block truncate" title={p.title}>
                         {p.title}
-                      </strong>
-                      <span style={{ fontSize: "0.7rem", color: "#8E8276" }}>{p.code}</span>
+                      </span>
+                      <span className="text-[10px] text-neutral-500 font-mono">{p.sku}</span>
                     </div>
-                    <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#7C2430" }}>
-                      {p.inventoryCount} left
+                    <span className="text-xs font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-sm shrink-0">
+                      {p.inventoryCount ?? p.inventory} left
                     </span>
                   </div>
                 ))}
@@ -375,78 +346,51 @@ export const AdminDashboardPage: React.FC<{ onNavigate: (href: string) => void }
             )}
           </div>
 
-          {/* Quick Shortcuts */}
-          <div style={{ backgroundColor: "var(--admin-surface)", border: "1px solid var(--admin-border)", padding: "1.5rem" }}>
-            <h3 className="font-serif" style={{ fontSize: "1.2rem", margin: "0 0 1rem 0" }}>
-              Quick Management
+          {/* Quick Hub Navigation */}
+          <div className="bg-white p-4 border border-neutral-200 rounded-sm shadow-xs">
+            <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider mb-2 border-b border-neutral-100 pb-2">
+              Management Modules
             </h3>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+            <div className="flex flex-col gap-1 text-xs">
               <button
                 onClick={() => onNavigate("/admin/products")}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "0.7rem 0.85rem",
-                  backgroundColor: "var(--admin-surface-subtle)",
-                  border: "1px solid #EBE5DB",
-                  fontSize: "0.8rem",
-                  textAlign: "left",
-                  cursor: "pointer",
-                }}
+                className="flex items-center justify-between p-2 text-neutral-700 hover:bg-neutral-50 hover:text-brand rounded-xs transition-colors text-left"
               >
-                <span>Product Catalog & Pricing</span>
-                <ArrowRight size={14} style={{ color: "#7C2430" }} />
+                <span>Product Catalog & Variants</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
-
-              <button
-                onClick={() => onNavigate("/admin/content/homepage")}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "0.7rem 0.85rem",
-                  backgroundColor: "var(--admin-surface-subtle)",
-                  border: "1px solid #EBE5DB",
-                  fontSize: "0.8rem",
-                  textAlign: "left",
-                  cursor: "pointer",
-                }}
-              >
-                <span>Homepage Hero & Featured Sections</span>
-                <ArrowRight size={14} style={{ color: "#7C2430" }} />
-              </button>
-
               <button
                 onClick={() => onNavigate("/admin/coupons")}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "0.7rem 0.85rem",
-                  backgroundColor: "var(--admin-surface-subtle)",
-                  border: "1px solid #EBE5DB",
-                  fontSize: "0.8rem",
-                  textAlign: "left",
-                  cursor: "pointer",
-                }}
+                className="flex items-center justify-between p-2 text-neutral-700 hover:bg-neutral-50 hover:text-brand rounded-xs transition-colors text-left"
               >
                 <span>Privilege Coupons & Discounts</span>
-                <ArrowRight size={14} style={{ color: "#7C2430" }} />
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => onNavigate("/admin/reviews")}
+                className="flex items-center justify-between p-2 text-neutral-700 hover:bg-neutral-50 hover:text-brand rounded-xs transition-colors text-left"
+              >
+                <span>Buyer Reviews Moderation ({pendingReviews} pending)</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => onNavigate("/admin/users")}
+                className="flex items-center justify-between p-2 text-neutral-700 hover:bg-neutral-50 hover:text-brand rounded-xs transition-colors text-left"
+              >
+                <span>Admin Users & Role Permissions</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => onNavigate("/admin/audit-logs")}
+                className="flex items-center justify-between p-2 text-neutral-700 hover:bg-neutral-50 hover:text-brand rounded-xs transition-colors text-left"
+              >
+                <span>System Mutation Audit Trail</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
         </div>
       </div>
-
-      <style>{`
-        @media (max-width: 900px) {
-          .admin-dashboard-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };

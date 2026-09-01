@@ -126,11 +126,11 @@ export const BrandStorySection: React.FC<{ onNavigate: (href: string) => void }>
 
             <div style={{ paddingTop: "0.75rem" }}>
               <button
-                onClick={() => onNavigate("/about")}
+                onClick={() => onNavigate("/craftsmanship")}
                 className="btn-wine"
                 style={{ padding: "0.9rem 1.75rem", fontSize: "0.825rem" }}
               >
-                Read The Atelier Story <ArrowRight size={15} />
+                Discover Our Craftsmanship <ArrowRight size={15} />
               </button>
             </div>
           </div>

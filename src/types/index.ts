@@ -381,10 +381,60 @@ export interface MediaAsset {
   createdAt: string;
 }
 
+export type AdminRole = "superadmin" | "admin" | "content_manager" | "order_manager";
+
 export interface AdminUser {
   id: string;
   email: string;
   name: string;
-  role: "superadmin" | "manager" | "editor";
+  role: AdminRole;
   avatar?: string;
+  phone?: string;
+  isActive: boolean;
+  lastLogin?: string;
+  createdAt: string;
+}
+
+export type AuditLogSeverity = "info" | "warning" | "critical";
+
+export interface AuditLog {
+  id: string;
+  actorId: string;
+  actorName: string;
+  actorEmail: string;
+  actorRole: AdminRole;
+  action: string;
+  entity: "product" | "inventory" | "order" | "coupon" | "review" | "cms" | "notification" | "user" | "settings" | "category" | "collection" | "auth";
+  entityId?: string;
+  entityName?: string;
+  details: string;
+  previousState?: any;
+  newState?: any;
+  timestamp: string;
+  severity: AuditLogSeverity;
+}
+
+export type InventoryAdjustmentReason =
+  | "restock"
+  | "sale"
+  | "correction"
+  | "return"
+  | "damaged"
+  | "manual";
+
+export interface InventoryAdjustment {
+  id: string;
+  productId: string;
+  productTitle: string;
+  productSku: string;
+  variantId?: string;
+  variantTitle?: string;
+  previousInventory: number;
+  newInventory: number;
+  changeAmount: number;
+  reason: InventoryAdjustmentReason;
+  note?: string;
+  actorName: string;
+  actorEmail: string;
+  timestamp: string;
 }

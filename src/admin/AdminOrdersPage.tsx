@@ -1,12 +1,18 @@
 import React, { useState, useMemo } from "react";
 import { useData } from "../context/DataContext";
 import { Order, OrderStatus } from "../types";
-import { Search, Trash2 } from "lucide-react";
+import { Breadcrumbs } from "../components/common/Breadcrumbs";
+import {
+  Search,
+  ShoppingBag,
+  Edit2,
+  X,
+} from "lucide-react";
 
-export const AdminOrdersPage: React.FC<{ onNavigate: (href: string) => void }> = ({
+export const AdminOrdersPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
   onNavigate,
 }) => {
-  const { orders, updateOrderStatus, deleteOrder } = useData();
+  const { orders, updateOrderStatus } = useData();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
@@ -53,251 +59,226 @@ export const AdminOrdersPage: React.FC<{ onNavigate: (href: string) => void }> =
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+    <div className="space-y-6">
       {/* Header */}
-      <div>
-        <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7C2430", display: "block" }}>
-          FULFILLMENT & TRANSACTIONS
-        </span>
-        <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: "0.2rem 0 0 0" }}>
-          Order Management ({orders.length})
-        </h1>
-      </div>
-
-      {/* Filter Bar */}
-      <div
-        style={{
-          backgroundColor: "var(--admin-surface)",
-          padding: "1rem 1.25rem",
-          border: "1px solid var(--admin-border)",
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "1rem",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flex: 1, minWidth: "240px" }}>
-          <Search size={16} style={{ color: "#9A8F83" }} />
-          <input
-            type="text"
-            placeholder="Search by order #, customer, email, city..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ width: "100%", border: "none", outline: "none", fontSize: "0.85rem", backgroundColor: "transparent" }}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <Breadcrumbs
+            items={[{ label: "Admin", href: "/admin" }, { label: "Order Management" }]}
+            onNavigate={onNavigate}
           />
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--admin-text-secondary)", textTransform: "uppercase" }}>
-            Status:
-          </span>
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            style={{ padding: "0.45rem 0.75rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface-subtle)", fontSize: "0.8rem", outline: "none" }}
-          >
-            <option value="all">All Statuses ({orders.length})</option>
-            <option value="Pending">Pending</option>
-            <option value="Confirmed">Confirmed</option>
-            <option value="Processing">Processing</option>
-            <option value="Shipped">Shipped</option>
-            <option value="Delivered">Delivered</option>
-            <option value="Cancelled">Cancelled</option>
-            <option value="Returned">Returned</option>
-          </select>
+          <h1 className="text-xl sm:text-2xl font-serif font-bold text-neutral-900 mt-1.5 m-0">
+            Order Fulfillment & Transactions ({orders.length})
+          </h1>
         </div>
       </div>
 
-      {/* Orders Table */}
-      <div style={{ backgroundColor: "var(--admin-surface)", border: "1px solid var(--admin-border)", overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.825rem", textAlign: "left" }}>
-          <thead>
-            <tr style={{ backgroundColor: "var(--admin-surface-subtle)", color: "var(--admin-text-secondary)", borderBottom: "1px solid var(--admin-border)" }}>
-              <th style={{ padding: "0.85rem 1rem" }}>ORDER #</th>
-              <th style={{ padding: "0.85rem 1rem" }}>DATE</th>
-              <th style={{ padding: "0.85rem 1rem" }}>CUSTOMER</th>
-              <th style={{ padding: "0.85rem 1rem" }}>ITEMS</th>
-              <th style={{ padding: "0.85rem 1rem" }}>TOTAL</th>
-              <th style={{ padding: "0.85rem 1rem" }}>PAYMENT</th>
-              <th style={{ padding: "0.85rem 1rem" }}>STATUS</th>
-              <th style={{ padding: "0.85rem 1rem", textAlign: "right" }}>ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredOrders.length === 0 ? (
-              <tr>
-                <td colSpan={8} style={{ padding: "3rem", textAlign: "center", color: "#8E8276" }}>
-                  No order records match the selected filter.
-                </td>
+      {/* Orders Table Container */}
+      <div className="bg-white border border-neutral-200 rounded-sm shadow-xs overflow-hidden">
+        {/* Search & Filter Bar */}
+        <div className="p-4 border-b border-neutral-200 flex flex-col md:flex-row gap-3 justify-between items-stretch md:items-center">
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by order #, customer, email, city..."
+              className="w-full pl-9 pr-3 py-2 text-xs bg-neutral-50 border border-neutral-300 rounded-sm focus:bg-white focus:border-brand focus:ring-1 focus:ring-brand outline-none"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs text-neutral-500 font-medium">Status:</span>
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="px-2.5 py-1.5 text-xs bg-white border border-neutral-300 rounded-sm text-neutral-700 outline-none cursor-pointer"
+            >
+              <option value="all">All Statuses ({orders.length})</option>
+              <option value="Pending">Pending</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Processing">Processing</option>
+              <option value="Shipped">Shipped</option>
+              <option value="Delivered">Delivered</option>
+              <option value="Cancelled">Cancelled</option>
+              <option value="Returned">Returned</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[760px]">
+            <thead>
+              <tr className="bg-neutral-50 text-[11px] font-bold text-neutral-500 uppercase tracking-wider border-b border-neutral-200">
+                <th className="py-3 px-4">Order # & Date</th>
+                <th className="py-3 px-4">Customer & City</th>
+                <th className="py-3 px-4">Items / Qty</th>
+                <th className="py-3 px-4">Total & Payment</th>
+                <th className="py-3 px-4 text-center">Fulfillment Status</th>
+                <th className="py-3 px-4 text-right">Actions</th>
               </tr>
-            ) : (
-              filteredOrders.map((order) => (
-                <tr key={order.id} style={{ borderBottom: "1px solid #F2EEE6" }}>
-                  <td style={{ padding: "0.85rem 1rem", fontWeight: 700, color: "var(--admin-text)" }}>
-                    {order.orderNumber}
-                  </td>
-                  <td style={{ padding: "0.85rem 1rem", color: "var(--admin-text-secondary)" }}>
-                    {order.date}
-                  </td>
-                  <td style={{ padding: "0.85rem 1rem" }}>
-                    <strong style={{ display: "block", color: "var(--admin-text)" }}>{order.customerName}</strong>
-                    <span style={{ fontSize: "0.72rem", color: "#8E8276" }}>{order.city}</span>
-                  </td>
-                  <td style={{ padding: "0.85rem 1rem", color: "var(--admin-text-secondary)" }}>
-                    {order.items.reduce((s, i) => s + i.quantity, 0)} saree(s)
-                  </td>
-                  <td style={{ padding: "0.85rem 1rem", fontWeight: 700, color: "var(--admin-text)" }}>
-                    {formatINR(order.total)}
-                  </td>
-                  <td style={{ padding: "0.85rem 1rem" }}>
-                    <span
-                      style={{
-                        fontSize: "0.7rem",
-                        fontWeight: 600,
-                        color: order.paymentStatus === "Paid" ? "#234E3E" : "#7C2430",
-                      }}
-                    >
-                      ● {order.paymentStatus}
-                    </span>
-                    <span style={{ fontSize: "0.68rem", color: "#8E8276", display: "block" }}>
-                      {order.paymentMethod.split("(")[0]}
-                    </span>
-                  </td>
-                  <td style={{ padding: "0.85rem 1rem" }}>
-                    <button
-                      onClick={() => handleOpenStatusModal(order)}
-                      style={{
-                        fontSize: "0.7rem",
-                        fontWeight: 700,
-                        padding: "0.25rem 0.55rem",
-                        border: "none",
-                        cursor: "pointer",
-                        backgroundColor:
-                          order.status === "Delivered"
-                            ? "rgba(35,78,62,0.12)"
-                            : order.status === "Shipped"
-                            ? "rgba(177,138,82,0.15)"
-                            : "rgba(124,36,48,0.1)",
-                        color:
-                          order.status === "Delivered"
-                            ? "#234E3E"
-                            : order.status === "Shipped"
-                            ? "#8C6836"
-                            : "#7C2430",
-                      }}
-                    >
-                      {order.status} ▾
-                    </button>
-                  </td>
-                  <td style={{ padding: "0.85rem 1rem", textAlign: "right" }}>
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+            </thead>
+            <tbody className="divide-y divide-neutral-100 text-xs">
+              {filteredOrders.map((order) => {
+                const totalQty = order.items.reduce((s, i) => s + i.quantity, 0);
+
+                return (
+                  <tr key={order.id} className="hover:bg-neutral-50/80 transition-colors">
+                    <td className="py-3 px-4">
+                      <span className="font-mono font-bold text-neutral-900 block">
+                        {order.orderNumber}
+                      </span>
+                      <span className="text-[11px] text-neutral-500 font-mono">
+                        {order.date}
+                      </span>
+                    </td>
+
+                    <td className="py-3 px-4">
+                      <span className="font-semibold text-neutral-900 block">{order.customerName}</span>
+                      <span className="text-[11px] text-neutral-500">{order.city}, {order.state}</span>
+                    </td>
+
+                    <td className="py-3 px-4">
+                      <span className="font-semibold text-neutral-800 block">
+                        {totalQty} item{totalQty > 1 ? "s" : ""}
+                      </span>
+                      <span className="text-[11px] text-neutral-500 truncate block max-w-xs" title={order.items.map(i => i.title).join(", ")}>
+                        {order.items[0]?.title} {order.items.length > 1 ? `+${order.items.length - 1} more` : ""}
+                      </span>
+                    </td>
+
+                    <td className="py-3 px-4 font-mono">
+                      <span className="font-bold text-neutral-900 block">
+                        {formatINR(order.total)}
+                      </span>
+                      <span className="text-[10px] text-neutral-500 block">
+                        {order.paymentMethod} • {order.paymentStatus}
+                      </span>
+                    </td>
+
+                    <td className="py-3 px-4 text-center">
                       <button
-                        onClick={() => onNavigate(`/admin/orders/${order.id}`)}
-                        title="View Full Order Detail"
-                        style={{
-                          padding: "0.4rem 0.65rem",
-                          fontSize: "0.75rem",
-                          border: "1px solid #D9D2C7",
-                          backgroundColor: "var(--admin-surface-subtle)",
-                          cursor: "pointer",
-                        }}
+                        onClick={() => handleOpenStatusModal(order)}
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider border cursor-pointer ${
+                          order.status === "Delivered"
+                            ? "bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100"
+                            : order.status === "Shipped"
+                            ? "bg-blue-50 text-blue-800 border-blue-200 hover:bg-blue-100"
+                            : order.status === "Cancelled" || order.status === "Returned"
+                            ? "bg-red-50 text-red-800 border-red-200 hover:bg-red-100"
+                            : "bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100"
+                        }`}
+                        title="Click to shift order status"
                       >
-                        Details
+                        {order.status}
                       </button>
-                      <button
-                        onClick={() => deleteOrder(order.id)}
-                        title="Delete Order Record"
-                        style={{
-                          padding: "0.4rem",
-                          color: "#7C2430",
-                          border: "1px solid #E8C8C8",
-                          backgroundColor: "var(--admin-surface-subtle)",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
+                    </td>
+
+                    <td className="py-3 px-4 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        {onNavigate && (
+                          <button
+                            onClick={() => onNavigate(`/admin/orders/${order.id}`)}
+                            className="px-2.5 py-1 text-xs font-semibold border border-neutral-300 hover:border-brand hover:text-brand bg-white rounded-sm transition-colors"
+                          >
+                            Details
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleOpenStatusModal(order)}
+                          className="p-1.5 text-neutral-600 hover:text-brand hover:bg-neutral-100 rounded-sm transition-colors"
+                          title="Update Status"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+
+              {filteredOrders.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-neutral-500">
+                    No orders match the filter criteria.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Status Update Modal */}
+      {/* Status Shift Modal */}
       {statusModalOrder && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(0,0,0,0.6)",
-            zIndex: 99999,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "1rem",
-          }}
-          onClick={() => setStatusModalOrder(null)}
-        >
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
           <div
-            style={{
-              backgroundColor: "var(--admin-surface)",
-              padding: "2rem",
-              maxWidth: "460px",
-              width: "100%",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-            }}
+            className="bg-white border border-neutral-200 rounded-sm max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-serif" style={{ fontSize: "1.4rem", margin: "0 0 0.5rem 0" }}>
-              Update Status: {statusModalOrder.orderNumber}
-            </h3>
-            <p style={{ fontSize: "0.8rem", color: "var(--admin-text-secondary)", marginBottom: "1.25rem" }}>
-              Customer: <strong>{statusModalOrder.customerName}</strong> ({statusModalOrder.customerEmail})
-            </p>
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
+              <div className="flex items-center gap-2">
+                <ShoppingBag className="w-5 h-5 text-brand" />
+                <h3 className="font-bold text-neutral-900 text-base m-0">
+                  Update Order Status: {statusModalOrder.orderNumber}
+                </h3>
+              </div>
+              <button
+                onClick={() => setStatusModalOrder(null)}
+                className="text-neutral-400 hover:text-neutral-700 p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-            <form onSubmit={handleUpdateStatus} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <form onSubmit={handleUpdateStatus} className="space-y-4 text-xs">
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  New Order Status *
+                <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                  Target Status Transition
                 </label>
                 <select
                   value={newStatus}
-                  onChange={(e) => setNewStatus(e.target.value as any)}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface)" }}
+                  onChange={(e) => setNewStatus(e.target.value as OrderStatus)}
+                  className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 text-neutral-900 text-xs rounded-sm focus:bg-white focus:border-brand outline-none font-semibold cursor-pointer"
                 >
-                  <option value="Pending">Pending</option>
-                  <option value="Confirmed">Confirmed</option>
-                  <option value="Processing">Processing / Craft Inspection</option>
-                  <option value="Shipped">Shipped</option>
-                  <option value="Delivered">Delivered</option>
-                  <option value="Cancelled">Cancelled</option>
-                  <option value="Returned">Returned</option>
+                  <option value="Pending">Pending (Awaiting Confirmation)</option>
+                  <option value="Confirmed">Confirmed (Prepaid / COD Verified)</option>
+                  <option value="Processing">Processing (Atelier Packing)</option>
+                  <option value="Shipped">Shipped (Handed to Courier)</option>
+                  <option value="Delivered">Delivered (Customer Handover Complete)</option>
+                  <option value="Cancelled">Cancelled (Order Voided)</option>
+                  <option value="Returned">Returned (Reverse Logistic Received)</option>
                 </select>
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  Status Timeline Note (Optional)
+                <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                  Timeline Event Note / Waybill #
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Dispatched with Blue Dart express airway bill 88291..."
                   value={statusNote}
                   onChange={(e) => setStatusNote(e.target.value)}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", outline: "none" }}
+                  placeholder="e.g. Dispatched via BlueDart AWB #99882201"
+                  className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 text-neutral-900 text-xs rounded-sm focus:bg-white focus:border-brand outline-none"
                 />
               </div>
 
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1rem" }}>
-                <button type="button" onClick={() => setStatusModalOrder(null)} className="btn-secondary" style={{ padding: "0.6rem 1rem" }}>
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-200">
+                <button
+                  type="button"
+                  onClick={() => setStatusModalOrder(null)}
+                  className="px-4 py-2 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-sm hover:bg-neutral-50 transition-colors"
+                >
                   Cancel
                 </button>
-                <button type="submit" className="btn-wine" style={{ padding: "0.6rem 1.25rem" }}>
-                  Save Status
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-brand text-brand-foreground text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-brand-hover transition-colors"
+                >
+                  Confirm Status Change
                 </button>
               </div>
             </form>

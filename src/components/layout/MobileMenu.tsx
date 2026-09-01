@@ -233,17 +233,17 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
             </button>
 
             <button
-              onClick={() => handleLink("/about")}
+              onClick={() => handleLink("/craftsmanship")}
               className="w-full text-left px-3 py-2.5 min-h-[44px] flex items-center text-sm font-medium text-foreground hover:text-brand hover:bg-secondary/50 rounded-sm transition-colors"
             >
-              Our Atelier Heritage
+              Atelier Craftsmanship
             </button>
 
             <button
               onClick={() => handleLink("/contact")}
               className="w-full text-left px-3 py-2.5 min-h-[44px] flex items-center text-sm font-medium text-foreground hover:text-brand hover:bg-secondary/50 rounded-sm transition-colors"
             >
-              Concierge & Contact
+              Contact Us
             </button>
           </div>
         </div>

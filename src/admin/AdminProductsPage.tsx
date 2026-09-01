@@ -1,18 +1,17 @@
 import React, { useState, useMemo } from "react";
 import { useData } from "../context/DataContext";
 import { Product } from "../types";
+import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import {
   Plus,
   Search,
   Edit2,
   Trash2,
   Copy,
-  CheckCircle,
-  Clock,
-  ExternalLink,
+  Warehouse,
 } from "lucide-react";
 
-export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }> = ({
+export const AdminProductsPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
   onNavigate,
 }) => {
   const { products, deleteProduct, duplicateProduct, updateProduct, categories } = useData();
@@ -57,7 +56,7 @@ export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }>
 
   const handleDuplicate = (id: string) => {
     const dup = duplicateProduct(id);
-    if (dup) {
+    if (dup && onNavigate) {
       onNavigate(`/admin/products/edit/${dup.id}`);
     }
   };
@@ -68,350 +67,230 @@ export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }>
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+    <div className="space-y-6">
       {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "1rem",
-        }}
-      >
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span
-            style={{
-              fontSize: "0.7rem",
-              fontWeight: 700,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "#7C2430",
-              display: "block",
-              marginBottom: "0.2rem",
-            }}
-          >
-            INVENTORY & CATALOG
-          </span>
-          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: 0 }}>
-            Saree Catalog ({products.length})
+          <Breadcrumbs
+            items={[{ label: "Admin", href: "/admin" }, { label: "Product Catalog" }]}
+            onNavigate={onNavigate}
+          />
+          <h1 className="text-xl sm:text-2xl font-serif font-bold text-neutral-900 mt-1.5 m-0">
+            Catalog Management ({products.length} Items)
           </h1>
         </div>
 
-        <button
-          onClick={() => onNavigate("/admin/products/new")}
-          className="btn-wine"
-          style={{ padding: "0.75rem 1.35rem", fontSize: "0.825rem" }}
-        >
-          <Plus size={16} /> Create New Saree
-        </button>
+        {onNavigate && (
+          <div className="flex items-center gap-2.5 self-start sm:self-auto">
+            <button
+              onClick={() => onNavigate("/admin/inventory")}
+              className="flex items-center gap-2 px-3.5 py-2 bg-white border border-neutral-300 text-neutral-700 hover:border-brand hover:text-brand text-xs font-semibold rounded-sm transition-colors shadow-2xs"
+            >
+              <Warehouse className="w-4 h-4 text-brand" /> Inventory Room
+            </button>
+            <button
+              onClick={() => onNavigate("/admin/products/new")}
+              className="flex items-center gap-2 px-4 py-2 bg-brand text-brand-foreground hover:bg-brand-hover text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs"
+            >
+              <Plus className="w-4 h-4" /> Add New Saree
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Filter & Search Bar */}
-      <div
-        style={{
-          backgroundColor: "var(--admin-surface)",
-          padding: "1rem 1.25rem",
-          border: "1px solid var(--admin-border)",
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "1rem",
-        }}
-      >
-        {/* Search */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flex: 1, minWidth: "240px" }}>
-          <Search size={16} style={{ color: "#9A8F83" }} />
-          <input
-            type="text"
-            placeholder="Search by title, SKU, fabric..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              width: "100%",
-              border: "none",
-              outline: "none",
-              fontSize: "0.85rem",
-              backgroundColor: "transparent",
-            }}
-          />
+      {/* Main Table Card */}
+      <div className="bg-white border border-neutral-200 rounded-sm shadow-xs overflow-hidden">
+        {/* Search & Filter Bar */}
+        <div className="p-4 border-b border-neutral-200 flex flex-col md:flex-row gap-3 justify-between items-stretch md:items-center">
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search products by title, SKU, or fabric..."
+              className="w-full pl-9 pr-3 py-2 text-xs bg-neutral-50 border border-neutral-300 rounded-sm focus:bg-white focus:border-brand focus:ring-1 focus:ring-brand outline-none"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="px-2.5 py-1.5 text-xs bg-white border border-neutral-300 rounded-sm text-neutral-700 outline-none cursor-pointer"
+            >
+              <option value="all">All Categories</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.slug}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="px-2.5 py-1.5 text-xs bg-white border border-neutral-300 rounded-sm text-neutral-700 outline-none cursor-pointer"
+            >
+              <option value="all">All Statuses</option>
+              <option value="published">Published</option>
+              <option value="draft">Drafts</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
         </div>
 
-        {/* Selectors */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            style={{
-              padding: "0.45rem 0.75rem",
-              border: "1px solid #D9D2C7",
-              backgroundColor: "var(--admin-surface-subtle)",
-              fontSize: "0.8rem",
-              outline: "none",
-            }}
-          >
-            <option value="all">All Categories</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.slug}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            style={{
-              padding: "0.45rem 0.75rem",
-              border: "1px solid #D9D2C7",
-              backgroundColor: "var(--admin-surface-subtle)",
-              fontSize: "0.8rem",
-              outline: "none",
-            }}
-          >
-            <option value="all">All Statuses</option>
-            <option value="published">Published Only</option>
-            <option value="draft">Draft Only</option>
-            <option value="archived">Archived Only</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Products Table */}
-      <div
-        style={{
-          backgroundColor: "var(--admin-surface)",
-          border: "1px solid var(--admin-border)",
-          overflowX: "auto",
-        }}
-      >
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.825rem", textAlign: "left" }}>
-          <thead>
-            <tr style={{ backgroundColor: "var(--admin-surface-subtle)", color: "var(--admin-text-secondary)", borderBottom: "1px solid var(--admin-border)" }}>
-              <th style={{ padding: "0.85rem 1rem" }}>PRODUCT</th>
-              <th style={{ padding: "0.85rem 1rem" }}>SKU</th>
-              <th style={{ padding: "0.85rem 1rem" }}>CATEGORY</th>
-              <th style={{ padding: "0.85rem 1rem" }}>PRICE</th>
-              <th style={{ padding: "0.85rem 1rem" }}>INVENTORY</th>
-              <th style={{ padding: "0.85rem 1rem" }}>STATUS</th>
-              <th style={{ padding: "0.85rem 1rem", textAlign: "right" }}>ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredProducts.length === 0 ? (
-              <tr>
-                <td colSpan={7} style={{ padding: "3rem", textAlign: "center", color: "#8E8276" }}>
-                  No sarees match your filter criteria.
-                </td>
+        {/* Table Container */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[760px]">
+            <thead>
+              <tr className="bg-neutral-50 text-[11px] font-bold text-neutral-500 uppercase tracking-wider border-b border-neutral-200">
+                <th className="py-3 px-4">Saree & Craft</th>
+                <th className="py-3 px-4">SKU / Code</th>
+                <th className="py-3 px-4">Price</th>
+                <th className="py-3 px-4 text-center">Stock</th>
+                <th className="py-3 px-4 text-center">Status</th>
+                <th className="py-3 px-4 text-right">Actions</th>
               </tr>
-            ) : (
-              filteredProducts.map((p) => (
-                <tr
-                  key={p.id}
-                  style={{
-                    borderBottom: "1px solid #F2EEE6",
-                    transition: "background-color 0.15s ease",
-                  }}
-                >
-                  {/* Thumbnail & Title */}
-                  <td style={{ padding: "0.85rem 1rem" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
-                      <img
-                        src={p.images[0]}
-                        alt={p.title}
-                        style={{
-                          width: "44px",
-                          height: "58px",
-                          objectFit: "cover",
-                          backgroundColor: "#EDE7DD",
-                          border: "1px solid var(--admin-border)",
-                        }}
-                      />
-                      <div>
-                        <strong
-                          onClick={() => onNavigate(`/admin/products/edit/${p.id}`)}
-                          style={{
-                            color: "var(--admin-text)",
-                            display: "block",
-                            cursor: "pointer",
-                            fontSize: "0.85rem",
-                          }}
-                        >
-                          {p.title}
-                        </strong>
-                        <span style={{ fontSize: "0.72rem", color: "#8E8276" }}>{p.fabric}</span>
+            </thead>
+            <tbody className="divide-y divide-neutral-100 text-xs">
+              {filteredProducts.map((p) => {
+                const qty = p.inventoryCount ?? p.inventory ?? 0;
+                const isLow = qty <= 3 && qty > 0;
+                const isOut = qty <= 0 || !p.inStock;
+
+                return (
+                  <tr key={p.id} className="hover:bg-neutral-50/80 transition-colors">
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={p.images[0]}
+                          alt={p.title}
+                          className="w-10 h-13 object-cover rounded-xs border border-neutral-200 shrink-0 bg-neutral-100"
+                        />
+                        <div className="min-w-0">
+                          <span className="font-semibold text-neutral-900 block truncate max-w-xs" title={p.title}>
+                            {p.title}
+                          </span>
+                          <span className="text-[11px] text-neutral-500 block">
+                            {p.fabric} • {p.color}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  {/* SKU */}
-                  <td style={{ padding: "0.85rem 1rem", color: "var(--admin-text-secondary)", fontFamily: "monospace" }}>
-                    {p.code || p.sku}
-                  </td>
+                    <td className="py-3 px-4 font-mono text-[11px] text-neutral-600">
+                      {p.sku || p.code}
+                    </td>
 
-                  {/* Category */}
-                  <td style={{ padding: "0.85rem 1rem", textTransform: "capitalize", color: "var(--admin-text-secondary)" }}>
-                    {p.category}
-                  </td>
-
-                  {/* Price */}
-                  <td style={{ padding: "0.85rem 1rem", fontWeight: 600 }}>
-                    {formatINR(p.price)}
-                    {p.compareAtPrice && (
-                      <span style={{ fontSize: "0.7rem", color: "#9A8F83", textDecoration: "line-through", display: "block" }}>
-                        {formatINR(p.compareAtPrice)}
-                      </span>
-                    )}
-                  </td>
-
-                  {/* Inventory Stock */}
-                  <td style={{ padding: "0.85rem 1rem" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                      <span
-                        style={{
-                          width: "8px",
-                          height: "8px",
-                          borderRadius: "50%",
-                          backgroundColor: p.inventoryCount > 3 ? "#234E3E" : p.inventoryCount > 0 ? "#B18A52" : "#7C2430",
-                        }}
-                      />
-                      <span style={{ fontWeight: 600, color: p.inventoryCount <= 3 ? "#7C2430" : "#171513" }}>
-                        {p.inventoryCount} units
-                      </span>
-                    </div>
-                  </td>
-
-                  {/* Status Toggle */}
-                  <td style={{ padding: "0.85rem 1rem" }}>
-                    <button
-                      onClick={() => handleTogglePublish(p)}
-                      style={{
-                        fontSize: "0.7rem",
-                        fontWeight: 700,
-                        padding: "0.25rem 0.55rem",
-                        border: "none",
-                        cursor: "pointer",
-                        backgroundColor: p.status === "published" ? "rgba(35,78,62,0.12)" : "#EFECE6",
-                        color: p.status === "published" ? "#234E3E" : "#6F6257",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "0.3rem",
-                      }}
-                    >
-                      {p.status === "published" ? (
-                        <>
-                          <CheckCircle size={12} /> PUBLISHED
-                        </>
-                      ) : (
-                        <>
-                          <Clock size={12} /> DRAFT
-                        </>
+                    <td className="py-3 px-4 font-semibold text-neutral-900">
+                      {formatINR(p.price)}
+                      {p.compareAtPrice && (
+                        <span className="text-[10px] text-neutral-400 line-through block font-normal">
+                          {formatINR(p.compareAtPrice)}
+                        </span>
                       )}
-                    </button>
-                  </td>
+                    </td>
 
-                  {/* Actions */}
-                  <td style={{ padding: "0.85rem 1rem", textAlign: "right" }}>
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+                    <td className="py-3 px-4 text-center">
+                      <span className={`px-2 py-0.5 rounded-sm font-bold text-[11px] ${
+                        isOut
+                          ? "bg-red-100 text-red-800"
+                          : isLow
+                          ? "bg-amber-100 text-amber-900"
+                          : "bg-neutral-100 text-neutral-800"
+                      }`}>
+                        {qty} units
+                      </span>
+                    </td>
+
+                    <td className="py-3 px-4 text-center">
                       <button
-                        onClick={() => onNavigate(`/products/${p.slug}`)}
-                        title="Preview on Storefront"
-                        style={{
-                          padding: "0.4rem",
-                          color: "var(--admin-text-secondary)",
-                          background: "none",
-                          border: "1px solid #D9D2C7",
-                          cursor: "pointer",
-                        }}
+                        onClick={() => handleTogglePublish(p)}
+                        className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm border cursor-pointer ${
+                          p.status === "published"
+                            ? "bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100"
+                            : "bg-neutral-100 text-neutral-600 border-neutral-200 hover:bg-neutral-200"
+                        }`}
+                        title="Click to toggle publish status"
                       >
-                        <ExternalLink size={13} />
+                        {p.status}
                       </button>
-                      <button
-                        onClick={() => onNavigate(`/admin/products/edit/${p.id}`)}
-                        title="Edit Product"
-                        style={{
-                          padding: "0.4rem",
-                          color: "var(--admin-text)",
-                          background: "none",
-                          border: "1px solid #D9D2C7",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <Edit2 size={13} />
-                      </button>
-                      <button
-                        onClick={() => handleDuplicate(p.id)}
-                        title="Duplicate Saree"
-                        style={{
-                          padding: "0.4rem",
-                          color: "var(--admin-text-secondary)",
-                          background: "none",
-                          border: "1px solid #D9D2C7",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <Copy size={13} />
-                      </button>
-                      <button
-                        onClick={() => setDeleteConfirmId(p.id)}
-                        title="Delete Saree"
-                        style={{
-                          padding: "0.4rem",
-                          color: "#7C2430",
-                          background: "none",
-                          border: "1px solid #E8C8C8",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
+                    </td>
+
+                    <td className="py-3 px-4 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        {onNavigate && (
+                          <button
+                            onClick={() => onNavigate(`/admin/products/edit/${p.id}`)}
+                            className="p-1.5 text-neutral-600 hover:text-brand hover:bg-neutral-100 rounded-sm transition-colors"
+                            title="Edit Product"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDuplicate(p.id)}
+                          className="p-1.5 text-neutral-600 hover:text-brand hover:bg-neutral-100 rounded-sm transition-colors"
+                          title="Duplicate Saree"
+                        >
+                          <Copy className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirmId(p.id)}
+                          className="p-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-sm transition-colors"
+                          title="Delete Saree"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+
+              {filteredProducts.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-neutral-500">
+                    No products match the filter criteria.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Delete Confirmation Modal */}
       {deleteConfirmId && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(0,0,0,0.6)",
-            zIndex: 99999,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "1rem",
-          }}
-          onClick={() => setDeleteConfirmId(null)}
-        >
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
           <div
-            style={{
-              backgroundColor: "var(--admin-surface)",
-              padding: "2rem",
-              maxWidth: "420px",
-              width: "100%",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-            }}
+            className="bg-white border border-red-200 rounded-sm max-w-sm w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-serif" style={{ fontSize: "1.4rem", margin: "0 0 0.5rem 0", color: "#7C2430" }}>
-              Delete Saree from Catalog?
-            </h3>
-            <p style={{ fontSize: "0.85rem", color: "var(--admin-text-secondary)", lineHeight: 1.5, marginBottom: "1.5rem" }}>
-              This will permanently remove this piece from the database and the customer storefront.
-            </p>
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem" }}>
-              <button onClick={() => setDeleteConfirmId(null)} className="btn-secondary" style={{ padding: "0.6rem 1rem" }}>
+            <div className="w-12 h-12 bg-red-50 text-red-700 rounded-full flex items-center justify-center mx-auto border border-red-200">
+              <Trash2 className="w-6 h-6" />
+            </div>
+            <div className="text-center">
+              <h3 className="text-base font-bold text-neutral-900 mb-1">
+                Delete Product?
+              </h3>
+              <p className="text-xs text-neutral-600 leading-relaxed">
+                Are you sure you want to permanently remove this saree from the database? This action cannot be undone.
+              </p>
+            </div>
+            <div className="flex items-center justify-center gap-2 pt-2">
+              <button
+                onClick={() => setDeleteConfirmId(null)}
+                className="px-4 py-2 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-sm hover:bg-neutral-50 transition-colors flex-1"
+              >
                 Cancel
               </button>
-              <button onClick={() => handleDelete(deleteConfirmId)} className="btn-wine" style={{ padding: "0.6rem 1rem" }}>
-                Confirm Delete
+              <button
+                onClick={() => handleDelete(deleteConfirmId)}
+                className="px-4 py-2 bg-red-700 text-white text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-red-800 transition-colors flex-1"
+              >
+                Delete Saree
               </button>
             </div>
           </div>

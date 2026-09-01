@@ -145,13 +145,13 @@ export const Footer: React.FC<{ onNavigate?: (href: string) => void }> = ({ onNa
           </div>
           <div className="flex gap-6">
             <button onClick={() => handleNav("/privacy-policy")} className="hover:text-brand transition-colors">
-              Privacy
+              Privacy Policy
             </button>
             <button onClick={() => handleNav("/terms-of-service")} className="hover:text-brand transition-colors">
-              Terms
+              Terms of Service
             </button>
-            <button onClick={() => handleNav("/admin")} className="font-semibold text-primary hover:text-brand transition-colors">
-              Admin Portal
+            <button onClick={() => handleNav("/shipping-policy")} className="hover:text-brand transition-colors">
+              Shipping & Delivery
             </button>
           </div>
         </div>
