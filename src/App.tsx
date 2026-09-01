@@ -428,7 +428,7 @@ const AppContent: React.FC = () => {
       {isAdminRoute ? (
         renderAdminRoute()
       ) : (
-        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+        <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column" }}>
           <CustomCursor />
           <GrainOverlay />
           <NotificationBar onNavigate={navigate} />

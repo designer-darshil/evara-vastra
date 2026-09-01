@@ -212,7 +212,7 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
   };
 
   return (
-    <div className="bg-background min-h-[85vh] py-8 sm:py-12">
+    <div className="bg-background min-h-[85dvh] py-8 sm:py-12">
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Breadcrumbs
           items={[{ label: "Cart", href: "/cart" }, { label: "Checkout & Payment" }]}
@@ -649,7 +649,7 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
       {/* Fastrr Checkout Popup Modal */}
       {isFastrrModalOpen && activeIntent && (
         <div
-          className="fixed inset-0 bg-black/75 z-[99999] flex items-center justify-center p-4"
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/75 z-[99999] flex items-center justify-center p-4"
           onClick={() => {
             if (!isProcessingPayment) setIsFastrrModalOpen(false);
           }}

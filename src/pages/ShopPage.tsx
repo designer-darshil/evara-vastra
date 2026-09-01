@@ -463,11 +463,11 @@ export const ShopPage: React.FC<ShopPageProps> = ({
       {/* Mobile Filter Drawer */}
       {isMobileFilterOpen && (
         <div
-          className="fixed inset-0 bg-black/60 z-[99999] flex justify-end"
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-[99999] flex justify-end"
           onClick={() => setIsMobileFilterOpen(false)}
         >
           <div
-            className="bg-background w-[85%] max-w-[340px] h-full overflow-y-auto p-8 flex flex-col gap-8 shadow-xl animate-in slide-in-from-right duration-300"
+            className="bg-background w-[85%] max-w-[340px] h-[100dvh] max-h-[100dvh] overflow-y-auto p-8 flex flex-col gap-8 shadow-xl animate-in slide-in-from-right duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center pb-4 border-b border-border">

@@ -61,7 +61,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   // Authentication guard
   if (!isAdminAuthenticated || !adminUser) {
     return (
-      <div className="min-h-screen bg-neutral-900 flex items-center justify-center p-4">
+      <div className="min-h-[100dvh] bg-neutral-900 flex items-center justify-center p-4">
         <div className="bg-white p-8 sm:p-10 max-w-md w-full text-center shadow-2xl border border-neutral-200 rounded-sm">
           <div className="w-14 h-14 bg-red-50 text-red-700 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-200">
             <Lock className="w-7 h-7" />
@@ -179,9 +179,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   };
 
   return (
-    <div className="flex min-h-screen bg-[#FBFBFA] text-neutral-900 font-sans antialiased">
+    <div className="flex min-h-[100dvh] bg-[#FBFBFA] text-neutral-900 font-sans antialiased">
       {/* Sidebar Desktop */}
-      <aside className="hidden lg:flex w-64 bg-[#141210] text-neutral-200 flex-col sticky top-0 h-screen z-30 border-r border-neutral-800 shrink-0">
+      <aside className="hidden lg:flex w-64 bg-[#141210] text-neutral-200 flex-col sticky top-0 h-[100dvh] z-30 border-r border-neutral-800 shrink-0">
         {/* Brand Header */}
         <div className="p-5 border-b border-neutral-800">
           <div className="flex items-center justify-between">
@@ -362,11 +362,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       {/* Mobile Drawer Navigation */}
       {isMobileNavOpen && (
         <div
-          className="fixed inset-0 bg-black/60 z-50 lg:hidden flex"
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-50 lg:hidden flex"
           onClick={() => setIsMobileNavOpen(false)}
         >
           <div
-            className="w-72 max-w-[85vw] h-full bg-[#141210] text-neutral-200 flex flex-col p-4 shadow-2xl"
+            className="w-72 max-w-[85vw] h-[100dvh] max-h-[100dvh] bg-[#141210] text-neutral-200 flex flex-col p-4 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-4 mb-2 border-b border-neutral-800">

@@ -61,6 +61,8 @@ export const QuickViewModal: React.FC<{ onNavigate: (href: string) => void }> = 
       style={{
         position: "fixed",
         inset: 0,
+        minHeight: "100dvh",
+        height: "100dvh",
         backgroundColor: "rgba(0, 0, 0, 0.65)",
         zIndex: 99999,
         display: "flex",
@@ -77,7 +79,7 @@ export const QuickViewModal: React.FC<{ onNavigate: (href: string) => void }> = 
           color: "var(--text-primary)",
           width: "100%",
           maxWidth: "880px",
-          maxHeight: "90vh",
+          maxHeight: "90dvh",
           overflowY: "auto",
           boxShadow: "var(--shadow-elevated)",
           position: "relative",

@@ -66,7 +66,7 @@ export const SearchModal: React.FC<{ onNavigate: (href: string) => void }> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/65 z-[99999] flex flex-col items-center justify-start pt-12 sm:pt-20 px-3 sm:px-6 animate-in fade-in duration-200"
+      className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/65 z-[99999] flex flex-col items-center justify-start pt-12 sm:pt-20 px-3 sm:px-6 animate-in fade-in duration-200"
       onClick={closeSearch}
       role="dialog"
       aria-modal="true"
@@ -122,7 +122,7 @@ export const SearchModal: React.FC<{ onNavigate: (href: string) => void }> = ({
 
         {/* Live Search Results */}
         {query && (
-          <div className="bg-white text-foreground p-4 sm:p-5 mt-2 max-h-[60vh] overflow-y-auto rounded-sm border border-border shadow-xl">
+          <div className="bg-white text-foreground p-4 sm:p-5 mt-2 max-h-[60dvh] overflow-y-auto rounded-sm border border-border shadow-xl">
             <div className="flex justify-between items-center mb-3 pb-2 border-b border-border text-xs">
               <span className="text-muted-foreground">
                 Found {filteredProducts.length} matching product(s)

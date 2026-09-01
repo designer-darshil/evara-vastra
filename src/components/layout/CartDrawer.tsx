@@ -66,11 +66,11 @@ export const CartDrawer: React.FC<{ onNavigate?: (href: string) => void }> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/60 z-[99999] flex justify-end animate-in fade-in duration-200"
+      className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-[99999] flex justify-end animate-in fade-in duration-200"
       onClick={closeCartDrawer}
     >
       <div
-        className="bg-background text-foreground w-full max-w-[460px] h-full flex flex-col shadow-2xl animate-in slide-in-from-right duration-300"
+        className="bg-background text-foreground w-full max-w-[460px] h-[100dvh] max-h-[100dvh] flex flex-col shadow-2xl animate-in slide-in-from-right duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

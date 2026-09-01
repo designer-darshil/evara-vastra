@@ -64,7 +64,7 @@ export const CollectionDetailPage: React.FC<{
       <div
         style={{
           position: "relative",
-          minHeight: "55vh",
+          minHeight: "55dvh",
           backgroundColor: "var(--bg-dark)",
           color: "var(--text-inverse)",
           display: "flex",

@@ -564,7 +564,7 @@ export const AdminShipmentsPage: React.FC<{ onNavigate?: (href: string) => void 
 
       {/* TRACKING TIMELINE MODAL */}
       {trackingModalShipment && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white max-w-lg w-full rounded-sm border border-neutral-200 shadow-xl overflow-hidden animate-in fade-in zoom-in-95">
             <div className="p-4 border-b border-neutral-200 flex items-center justify-between bg-neutral-50">
               <div>
@@ -584,7 +584,7 @@ export const AdminShipmentsPage: React.FC<{ onNavigate?: (href: string) => void 
               </button>
             </div>
 
-            <div className="p-6 max-h-[60vh] overflow-y-auto space-y-6">
+            <div className="p-6 max-h-[60dvh] overflow-y-auto space-y-6">
               <div className="flex items-center justify-between p-3 bg-neutral-50 border border-neutral-200 rounded-sm">
                 <div>
                   <span className="text-[10px] uppercase font-bold text-neutral-400 block">Current Status</span>
@@ -656,7 +656,7 @@ export const AdminShipmentsPage: React.FC<{ onNavigate?: (href: string) => void 
 
       {/* CANCEL SHIPMENT MODAL */}
       {cancelModalShipment && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white max-w-md w-full rounded-sm border border-neutral-200 shadow-xl overflow-hidden p-6 animate-in fade-in">
             <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4">
               <AlertCircle className="w-6 h-6" />

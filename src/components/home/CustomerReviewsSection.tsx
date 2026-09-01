@@ -122,7 +122,7 @@ export const CustomerReviewsSection: React.FC<{ onNavigate?: (href: string) => v
       {/* Review Submission Modal */}
       {showModal && (
         <div
-          className="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-[9999] flex items-center justify-center p-4 animate-in fade-in duration-200"
           onClick={() => setShowModal(false)}
         >
           <div

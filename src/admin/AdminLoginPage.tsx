@@ -78,7 +78,7 @@ export const AdminLoginPage: React.FC<{ onNavigate: (href: string) => void }> = 
   };
 
   return (
-    <div className="min-h-screen bg-neutral-100 flex items-center justify-center p-4 sm:p-6">
+    <div className="min-h-[100dvh] bg-neutral-100 flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-md bg-white border border-neutral-200 shadow-xl p-6 sm:p-10 rounded-sm">
         {/* Brand Wordmark & Security Header */}
         <div className="text-center mb-8">

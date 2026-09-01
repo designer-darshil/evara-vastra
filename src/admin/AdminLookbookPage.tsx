@@ -180,6 +180,8 @@ export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }>
           style={{
             position: "fixed",
             inset: 0,
+            minHeight: "100dvh",
+            height: "100dvh",
             backgroundColor: "rgba(0,0,0,0.6)",
             zIndex: 99999,
             display: "flex",
@@ -196,7 +198,7 @@ export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }>
               maxWidth: "520px",
               width: "100%",
               boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-              maxHeight: "90vh",
+              maxHeight: "90dvh",
               overflowY: "auto",
             }}
             onClick={(e) => e.stopPropagation()}

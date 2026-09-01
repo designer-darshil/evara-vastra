@@ -168,7 +168,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       {/* Lightbox Focused Image Viewer Modal */}
       {isLightboxOpen && (
         <div
-          className="fixed inset-0 bg-black/95 z-[999999] flex items-center justify-center p-4 sm:p-8"
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/95 z-[999999] flex items-center justify-center p-4 sm:p-8"
           onClick={() => setIsLightboxOpen(false)}
         >
           <button
@@ -219,7 +219,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           <img
             src={product.images[activeImageIndex]}
             alt={product.title}
-            className="max-h-[85vh] max-w-[90vw] object-contain transition-transform duration-200"
+            className="max-h-[85dvh] max-w-[90vw] object-contain transition-transform duration-200"
             onClick={(e) => e.stopPropagation()}
           />
         </div>

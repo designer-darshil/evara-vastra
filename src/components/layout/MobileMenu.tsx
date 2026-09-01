@@ -57,14 +57,14 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-[99999] flex justify-start bg-black/60 transition-opacity duration-300"
+      className="fixed inset-0 min-h-[100dvh] h-[100dvh] z-[99999] flex justify-start bg-black/60 transition-opacity duration-300"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Navigation Menu"
     >
       <div
-        className="relative w-[85%] max-w-[340px] h-full bg-white text-neutral-900 shadow-2xl flex flex-col justify-between overflow-y-auto animate-in slide-in-from-left duration-300 border-r border-neutral-200"
+        className="relative w-[85%] max-w-[340px] h-[100dvh] max-h-[100dvh] bg-white text-neutral-900 shadow-2xl flex flex-col justify-between overflow-y-auto animate-in slide-in-from-left duration-300 border-r border-neutral-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header */}
