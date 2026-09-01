@@ -294,9 +294,32 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>(() =>
     loadStored(STORAGE_KEYS.MEDIA, initialMediaAssets)
   );
-  const [adminUsers, setAdminUsers] = useState<AdminUser[]>(() =>
-    loadStored(STORAGE_KEYS.ADMIN_USERS, initialAdminUsers)
-  );
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>(() => {
+    const stored = loadStored<AdminUser[]>(STORAGE_KEYS.ADMIN_USERS, initialAdminUsers);
+    if (!stored || !Array.isArray(stored) || stored.length === 0) {
+      return initialAdminUsers;
+    }
+    const merged = [...stored];
+    for (const initUser of initialAdminUsers) {
+      const idx = merged.findIndex(
+        (u) => u.email.trim().toLowerCase() === initUser.email.trim().toLowerCase()
+      );
+      if (idx === -1) {
+        merged.unshift(initUser);
+      } else {
+        // If the stored user has no custom password change recorded, sync with initialData
+        if (!merged[idx].passwordChangedAt && initUser.passwordHash) {
+          merged[idx] = {
+            ...merged[idx],
+            passwordHash: initUser.passwordHash,
+            isActive: initUser.isActive,
+            role: initUser.role,
+          };
+        }
+      }
+    }
+    return merged;
+  });
   const [adminUser, setAdminUser] = useState<AdminUser | null>(() =>
     loadStored<AdminUser | null>(STORAGE_KEYS.AUTH, null)
   );
@@ -882,17 +905,21 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     const foundUser = adminUsers.find(
-      (u) => u.email.toLowerCase() === cleanEmail && u.isActive
+      (u) => u.email.trim().toLowerCase() === cleanEmail
     );
 
-    if (!foundUser || !foundUser.passwordHash) {
+    if (!foundUser || !foundUser.isActive || !foundUser.passwordHash) {
       AdminAuthRateLimiter.recordFailedAttempt(cleanEmail);
       addAuditLog(
         "FAILED_LOGIN_ATTEMPT",
         "auth",
-        `Failed login attempt for email '${cleanEmail}'`,
-        undefined,
-        undefined,
+        !foundUser
+          ? `Login failed: user '${cleanEmail}' not found (ADMIN_NOT_FOUND)`
+          : !foundUser.isActive
+          ? `Login failed: account '${cleanEmail}' is deactivated (ADMIN_DISABLED)`
+          : `Login failed: account '${cleanEmail}' missing password hash (AUTH_CONFIGURATION_ERROR)`,
+        foundUser?.id,
+        foundUser?.name,
         "warning"
       );
       return { success: false, error: "Invalid email or password." };
@@ -937,7 +964,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     addAuditLog(
       "FAILED_LOGIN_ATTEMPT",
       "auth",
-      `Failed password attempt for admin email '${cleanEmail}'`,
+      `Failed password attempt for admin '${cleanEmail}' (INVALID_PASSWORD)`,
       foundUser.id,
       foundUser.name,
       "warning"
