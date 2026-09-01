@@ -74,7 +74,8 @@ export const QuickViewModal: React.FC<{ onNavigate: (href: string) => void }> = 
     >
       <div
         style={{
-          backgroundColor: "#FFFFFF",
+          backgroundColor: "var(--bg-surface)",
+          color: "var(--text-primary)",
           width: "100%",
           maxWidth: "880px",
           maxHeight: "90vh",
@@ -83,6 +84,8 @@ export const QuickViewModal: React.FC<{ onNavigate: (href: string) => void }> = 
           position: "relative",
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          borderRadius: "4px",
+          border: "1px solid var(--border-subtle)",
         }}
         onClick={(e) => e.stopPropagation()}
       >

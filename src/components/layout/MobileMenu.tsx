@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useData } from "../../context/DataContext";
-import { X, Shield, Phone, MapPin } from "lucide-react";
+import { useShop } from "../../context/ShopContext";
+import { X, Shield, Phone, MapPin, Sun, Moon } from "lucide-react";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
   onNavigate,
 }) => {
   const { activeCategories, siteSettings, isAdminAuthenticated } = useData();
+  const { theme, toggleTheme } = useShop();
 
   // Close on Escape key
   useEffect(() => {
@@ -38,8 +40,9 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
       style={{
         position: "fixed",
         inset: 0,
-        backgroundColor: "rgba(23, 21, 19, 0.65)",
+        backgroundColor: "rgba(0, 0, 0, 0.65)",
         backdropFilter: "blur(4px)",
+        WebkitBackdropFilter: "blur(4px)",
         zIndex: 99999,
         display: "flex",
         justifyContent: "flex-start",
@@ -51,7 +54,8 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
     >
       <div
         style={{
-          backgroundColor: "#FFFFFF",
+          backgroundColor: "var(--bg-surface)",
+          color: "var(--text-primary)",
           width: "88%",
           maxWidth: "380px",
           height: "100%",
@@ -61,6 +65,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
           flexDirection: "column",
           justifyContent: "space-between",
           boxShadow: "var(--shadow-elevated)",
+          transition: "background-color 0.3s ease, color 0.3s ease",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -246,8 +251,34 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
           </div>
         </div>
 
-        {/* Bottom Support & Admin Link */}
-        <div style={{ borderTop: "1px solid var(--border-subtle)", paddingTop: "1.25rem", marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+        {/* Bottom Support, Theme Toggle & Admin Link */}
+        <div style={{ borderTop: "1px solid var(--border-subtle)", paddingTop: "1.25rem", marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+          {/* Theme Switcher Button */}
+          <button
+            onClick={toggleTheme}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "0.6rem 0.75rem",
+              backgroundColor: "var(--bg-surface-subtle)",
+              borderRadius: "4px",
+              border: "1px solid var(--border-subtle)",
+              color: "var(--text-primary)",
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              {theme === "light" ? <Moon size={16} /> : <Sun size={16} style={{ color: "var(--accent-gold)" }} />}
+              <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
+            </span>
+            <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", textTransform: "uppercase" }}>
+              {theme === "light" ? "Switch" : "Active"}
+            </span>
+          </button>
+
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8rem", color: "var(--text-secondary)" }}>
             <Phone size={14} style={{ color: "var(--accent-wine)" }} />
             <span>Care: +91-92743 44037</span>
@@ -258,7 +289,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
             <span>Surat, Gujarat, India</span>
           </div>
 
-          <div style={{ display: "flex", gap: "1rem", marginTop: "0.5rem", fontSize: "0.75rem", color: "var(--text-muted)" }}>
+          <div style={{ display: "flex", gap: "1rem", marginTop: "0.25rem", fontSize: "0.75rem", color: "var(--text-muted)" }}>
             <button onClick={() => handleLink("/shipping")} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 0 }}>
               Shipping
             </button>
@@ -282,7 +313,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
               display: "flex",
               alignItems: "center",
               gap: "0.4rem",
-              marginTop: "0.5rem",
+              marginTop: "0.25rem",
               padding: "0.6rem 0",
               minHeight: "44px",
               borderTop: "1px dashed var(--border-subtle)",

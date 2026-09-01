@@ -74,7 +74,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           position: "relative",
           aspectRatio: "3/4",
           overflow: "hidden",
-          backgroundColor: "#EDE7DD",
+          backgroundColor: "var(--bg-surface-subtle)",
           marginBottom: "0.85rem",
           borderRadius: "2px",
         }}
@@ -211,7 +211,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               title="Quick Preview"
               style={{
                 padding: "0.55rem 0.65rem",
-                backgroundColor: "#FFFFFF",
+                backgroundColor: "var(--bg-surface)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",

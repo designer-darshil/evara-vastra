@@ -24,6 +24,9 @@ interface ShopContextType {
   quickViewProduct: Product | null;
   toasts: ToastItem[];
   cursorLabel: string | null;
+  theme: "light" | "dark";
+  toggleTheme: () => void;
+  setTheme: (theme: "light" | "dark") => void;
 
   // Cart operations
   addToCart: (
@@ -60,6 +63,40 @@ interface ShopContextType {
 const ShopContext = createContext<ShopContextType | undefined>(undefined);
 
 export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Theme state persisted in localStorage
+  const [theme, setThemeState] = useState<"light" | "dark">(() => {
+    try {
+      const saved = localStorage.getItem("evara_theme");
+      if (saved === "dark" || saved === "light") return saved;
+      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        return "light"; // default to elegant light palette for luxury handlooms
+      }
+      return "light";
+    } catch {
+      return "light";
+    }
+  });
+
+  const setTheme = (newTheme: "light" | "dark") => {
+    setThemeState(newTheme);
+    try {
+      localStorage.setItem("evara_theme", newTheme);
+      document.documentElement.setAttribute("data-theme", newTheme);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const toggleTheme = () => {
+    const next = theme === "light" ? "dark" : "light";
+    setTheme(next);
+  };
+
+  // Sync data-theme attribute on mount & change
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
   // Cart state persisted in localStorage
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
@@ -229,6 +266,9 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
         quickViewProduct,
         toasts,
         cursorLabel,
+        theme,
+        toggleTheme,
+        setTheme,
 
         addToCart,
         removeFromCart,

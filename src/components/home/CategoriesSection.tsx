@@ -79,7 +79,7 @@ export const CategoriesSection: React.FC<{ onNavigate: (href: string) => void }>
               data-cursor="EXPLORE"
               style={{
                 cursor: "pointer",
-                backgroundColor: "#FFFFFF",
+                backgroundColor: "var(--bg-surface)",
                 border: "1px solid var(--border-subtle)",
                 overflow: "hidden",
                 boxShadow: "var(--shadow-subtle)",
@@ -93,7 +93,7 @@ export const CategoriesSection: React.FC<{ onNavigate: (href: string) => void }>
                 style={{
                   aspectRatio: idx % 3 === 0 ? "4/5" : "1/1",
                   overflow: "hidden",
-                  backgroundColor: "#EDE7DD",
+                  backgroundColor: "var(--bg-surface-subtle)",
                   position: "relative",
                 }}
               >

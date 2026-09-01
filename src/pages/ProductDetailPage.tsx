@@ -488,7 +488,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                         fontWeight: 600,
                         borderRadius: "3px",
                         border: selectedSize === sz ? "2px solid var(--accent-wine)" : "1px solid var(--border-subtle)",
-                        backgroundColor: selectedSize === sz ? "var(--accent-wine-subtle)" : "#FFFFFF",
+                        backgroundColor: selectedSize === sz ? "var(--accent-wine-subtle)" : "var(--bg-surface)",
                         color: selectedSize === sz ? "var(--accent-wine)" : "var(--text-primary)",
                         cursor: "pointer",
                         transition: "all 0.15s ease",
@@ -517,7 +517,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                         fontSize: "0.8rem",
                         borderRadius: "3px",
                         border: selectedColor === col ? "2px solid var(--accent-wine)" : "1px solid var(--border-subtle)",
-                        backgroundColor: selectedColor === col ? "var(--accent-wine-subtle)" : "#FFFFFF",
+                        backgroundColor: selectedColor === col ? "var(--accent-wine-subtle)" : "var(--bg-surface)",
                         color: selectedColor === col ? "var(--accent-wine)" : "var(--text-primary)",
                         cursor: "pointer",
                         fontWeight: 600,
@@ -539,7 +539,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                     display: "flex",
                     alignItems: "center",
                     border: "1px solid var(--border-subtle)",
-                    backgroundColor: "#FFFFFF",
+                    backgroundColor: "var(--bg-surface)",
                     borderRadius: "3px",
                   }}
                 >
@@ -551,11 +551,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                       border: "none",
                       fontSize: "1.1rem",
                       cursor: "pointer",
+                      color: "var(--text-primary)",
                     }}
                   >
                     -
                   </button>
-                  <span style={{ padding: "0 0.5rem", fontWeight: 600, fontSize: "0.95rem" }}>{quantity}</span>
+                  <span style={{ padding: "0 0.5rem", fontWeight: 600, fontSize: "0.95rem", color: "var(--text-primary)" }}>{quantity}</span>
                   <button
                     onClick={() => setQuantity((q) => q + 1)}
                     style={{
@@ -564,6 +565,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                       border: "none",
                       fontSize: "1.1rem",
                       cursor: "pointer",
+                      color: "var(--text-primary)",
                     }}
                   >
                     +
@@ -594,7 +596,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                     width: "48px",
                     height: "48px",
                     border: "1px solid var(--border-subtle)",
-                    backgroundColor: isSaved ? "var(--accent-wine-subtle)" : "#FFFFFF",
+                    backgroundColor: isSaved ? "var(--accent-wine-subtle)" : "var(--bg-surface)",
                     color: isSaved ? "var(--accent-wine)" : "var(--text-primary)",
                     borderRadius: "3px",
                     display: "flex",

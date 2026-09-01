@@ -72,7 +72,8 @@ export const CartDrawer: React.FC<{ onNavigate: (href: string) => void }> = ({
     >
       <div
         style={{
-          backgroundColor: "#FFFFFF",
+          backgroundColor: "var(--bg-surface)",
+          color: "var(--text-primary)",
           width: "100%",
           maxWidth: "460px",
           height: "100%",

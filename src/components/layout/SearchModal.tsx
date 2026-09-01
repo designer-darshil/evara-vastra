@@ -92,13 +92,14 @@ export const SearchModal: React.FC<{ onNavigate: (href: string) => void }> = ({
         {/* Search Bar Input Container */}
         <div
           style={{
-            backgroundColor: "#FFFFFF",
+            backgroundColor: "var(--bg-surface)",
             boxShadow: "var(--shadow-elevated)",
             padding: "1rem 1.5rem",
             display: "flex",
             alignItems: "center",
             gap: "1rem",
             border: "1px solid var(--border-medium)",
+            borderRadius: "4px",
           }}
         >
           <Search size={22} style={{ color: "var(--accent-wine)" }} />
@@ -106,7 +107,7 @@ export const SearchModal: React.FC<{ onNavigate: (href: string) => void }> = ({
             <input
               ref={inputRef}
               type="text"
-              placeholder="Search by weave, fabric, color, or occasion (e.g. Katan Silk, Banarasi, Wine, Wedding)..."
+              placeholder="Search by weave, fabric, color, or ensemble..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               style={{
@@ -126,6 +127,9 @@ export const SearchModal: React.FC<{ onNavigate: (href: string) => void }> = ({
             style={{
               padding: "0.4rem",
               color: "var(--text-muted)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
               transition: "color 0.2s ease",
             }}
           >
@@ -137,9 +141,12 @@ export const SearchModal: React.FC<{ onNavigate: (href: string) => void }> = ({
         {!query && (
           <div
             style={{
-              backgroundColor: "rgba(255, 255, 255, 0.98)",
+              backgroundColor: "var(--bg-surface)",
+              color: "var(--text-primary)",
               padding: "1.5rem",
               marginTop: "0.5rem",
+              borderRadius: "4px",
+              border: "1px solid var(--border-subtle)",
               boxShadow: "var(--shadow-medium)",
             }}
           >
@@ -157,7 +164,7 @@ export const SearchModal: React.FC<{ onNavigate: (href: string) => void }> = ({
               Curator Suggestions
             </span>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-              {["Katan Silk", "Banarasi Kadwa", "Mulmul Cotton", "Wine", "Wedding", "Organza", "Linen"].map(
+              {["Sarees", "Co-ord Sets", "Kurta Sets", "Anarkali", "Fendy Satin", "Chinon Silk", "Wedding", "Wine"].map(
                 (tag) => (
                   <button
                     key={tag}
@@ -165,10 +172,11 @@ export const SearchModal: React.FC<{ onNavigate: (href: string) => void }> = ({
                     style={{
                       padding: "0.4rem 0.85rem",
                       fontSize: "0.8rem",
-                      backgroundColor: "var(--bg-primary)",
+                      backgroundColor: "var(--bg-surface-subtle)",
                       border: "1px solid var(--border-medium)",
                       color: "var(--text-primary)",
                       cursor: "pointer",
+                      borderRadius: "2px",
                       transition: "all 0.2s ease",
                     }}
                   >
@@ -184,11 +192,14 @@ export const SearchModal: React.FC<{ onNavigate: (href: string) => void }> = ({
         {query && (
           <div
             style={{
-              backgroundColor: "rgba(255, 255, 255, 0.98)",
+              backgroundColor: "var(--bg-surface)",
+              color: "var(--text-primary)",
               padding: "1.5rem",
               marginTop: "0.5rem",
               maxHeight: "60vh",
               overflowY: "auto",
+              borderRadius: "4px",
+              border: "1px solid var(--border-subtle)",
               boxShadow: "var(--shadow-medium)",
             }}
           >

@@ -28,7 +28,7 @@ export const ShoppableVideosSection: React.FC<{ onNavigate: (href: string) => vo
   if (publishedVideos.length === 0) return null;
 
   return (
-    <section style={{ padding: "5rem 0", backgroundColor: "#FAF7F5", borderTop: "1px solid var(--border-subtle)", borderBottom: "1px solid var(--border-subtle)" }}>
+    <section style={{ padding: "4.5rem 0", backgroundColor: "var(--bg-surface-subtle)", borderTop: "1px solid var(--border-subtle)", borderBottom: "1px solid var(--border-subtle)" }}>
       <div className="container">
         {/* Header */}
         <div style={{ textAlign: "center", maxWidth: "600px", margin: "0 auto 3rem auto" }}>

@@ -586,8 +586,9 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                 style={{
                   padding: "5rem 2rem",
                   textAlign: "center",
-                  backgroundColor: "#FFFFFF",
+                  backgroundColor: "var(--bg-surface)",
                   border: "1px solid var(--border-subtle)",
+                  borderRadius: "4px",
                 }}
               >
                 <h3 className="font-serif" style={{ fontSize: "1.85rem", color: "var(--text-primary)" }}>
@@ -617,6 +618,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                       : "repeat(auto-fill, minmax(280px, 1fr))",
                   gap: "2.5rem 1.75rem",
                 }}
+                className="mobile-product-grid"
               >
                 {sortedProducts.map((product: Product, idx: number) => (
                   <ProductCard
@@ -647,7 +649,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         >
           <div
             style={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--bg-surface)",
+              color: "var(--text-primary)",
               width: "85%",
               maxWidth: "340px",
               height: "100%",
@@ -656,12 +659,13 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               display: "flex",
               flexDirection: "column",
               gap: "1.5rem",
+              boxShadow: "var(--shadow-elevated)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 className="font-serif" style={{ fontSize: "1.4rem", margin: 0 }}>Filters</h3>
-              <button onClick={() => setIsMobileFilterOpen(false)} style={{ border: "none", background: "none", cursor: "pointer" }}>
+              <h3 className="font-serif" style={{ fontSize: "1.4rem", margin: 0, color: "var(--text-primary)" }}>Filters</h3>
+              <button onClick={() => setIsMobileFilterOpen(false)} style={{ border: "none", background: "none", cursor: "pointer", color: "var(--text-primary)" }}>
                 <X size={20} />
               </button>
             </div>

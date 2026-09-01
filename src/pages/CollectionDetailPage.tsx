@@ -167,6 +167,7 @@ export const CollectionDetailPage: React.FC<{
               gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
               gap: "2.5rem 1.75rem",
             }}
+            className="mobile-product-grid"
           >
             {collectionProducts.map((p, idx) => (
               <ProductCard key={p.id} product={p} index={idx} onNavigate={onNavigate} />
@@ -209,12 +210,13 @@ export const CollectionDetailPage: React.FC<{
                   onClick={() => onNavigate(`/collections/${col.slug}`)}
                   style={{
                     cursor: "pointer",
-                    backgroundColor: "#FFFFFF",
+                    backgroundColor: "var(--bg-surface)",
                     border: "1px solid var(--border-subtle)",
                     overflow: "hidden",
+                    borderRadius: "3px",
                   }}
                 >
-                  <div style={{ aspectRatio: "16/9", overflow: "hidden", backgroundColor: "#EDE7DD" }}>
+                  <div style={{ aspectRatio: "16/9", overflow: "hidden", backgroundColor: "var(--bg-surface-subtle)" }}>
                     <img
                       src={col.heroImage}
                       alt={col.title}

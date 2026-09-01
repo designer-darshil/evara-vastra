@@ -1,7 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useShop } from "../../context/ShopContext";
 import { useData } from "../../context/DataContext";
-import { Search, Heart, ShoppingBag, Menu, User, Shield, ChevronDown, Sparkles, ArrowRight } from "lucide-react";
+import {
+  Search,
+  Heart,
+  ShoppingBag,
+  Menu,
+  User,
+  Shield,
+  ChevronDown,
+  Sparkles,
+  ArrowRight,
+  Sun,
+  Moon,
+} from "lucide-react";
 
 interface NavbarProps {
   onNavigate: (href: string) => void;
@@ -9,7 +21,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) => {
-  const { cartCount, wishlistCount, openSearch, openCartDrawer } = useShop();
+  const { cartCount, wishlistCount, openSearch, openCartDrawer, theme, toggleTheme } = useShop();
   const { activeCategories, activeCollections, isAdminAuthenticated } = useData();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
@@ -17,9 +29,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 15);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -31,7 +43,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
   const handleMouseLeave = () => {
     megaMenuTimeoutRef.current = setTimeout(() => {
       setIsMegaMenuOpen(false);
-    }, 200);
+    }, 180);
   };
 
   return (
@@ -40,35 +52,35 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
         position: "sticky",
         top: 0,
         zIndex: 999,
-        backgroundColor: isScrolled ? "rgba(255, 255, 255, 0.98)" : "var(--bg-primary)",
-        backdropFilter: isScrolled ? "blur(12px)" : "none",
+        backgroundColor: isScrolled ? "var(--bg-header-scrolled)" : "var(--bg-header)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
         borderBottom: "1px solid var(--border-subtle)",
-        transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+        transition: "background-color 0.3s ease, border-color 0.3s ease",
       }}
     >
       <div className="container">
         <div
           style={{
-            height: "74px",
+            height: "var(--header-height)",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
           }}
+          className="header-inner"
         >
           {/* Left: Mobile Menu & Primary Links */}
-          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", flex: 1 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", flex: 1 }}>
             <button
               onClick={onOpenMobileMenu}
-              aria-label="Open mobile menu"
-              className="mobile-only"
+              aria-label="Open mobile navigation menu"
+              className="mobile-only btn-icon"
               style={{
                 color: "var(--text-primary)",
-                display: "flex",
-                alignItems: "center",
                 background: "none",
                 border: "none",
                 cursor: "pointer",
-                padding: "0.4rem",
+                padding: "0.5rem",
               }}
             >
               <Menu size={22} />
@@ -92,7 +104,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
                 <button
                   onClick={() => onNavigate("/shop")}
                   style={{
-                    fontSize: "0.78rem",
+                    fontSize: "0.8rem",
                     fontWeight: 600,
                     letterSpacing: "0.14em",
                     textTransform: "uppercase",
@@ -104,6 +116,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
                     border: "none",
                     cursor: "pointer",
                     padding: "0.5rem 0",
+                    transition: "color 0.2s ease",
                   }}
                 >
                   Shop <ChevronDown size={14} style={{ transform: isMegaMenuOpen ? "rotate(180deg)" : "rotate(0)", transition: "transform 0.2s ease" }} />
@@ -117,8 +130,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
                       top: "100%",
                       left: "-2rem",
                       width: "860px",
-                      backgroundColor: "#FFFFFF",
-                      boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
+                      backgroundColor: "var(--bg-surface)",
+                      boxShadow: "var(--shadow-elevated)",
                       border: "1px solid var(--border-subtle)",
                       borderRadius: "0 0 6px 6px",
                       padding: "2rem",
@@ -154,16 +167,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
                               style={{
                                 background: "none",
                                 border: "none",
-                                fontSize: "0.88rem",
-                                color: "var(--text-primary)",
-                                textAlign: "left",
+                                color: "var(--text-secondary)",
+                                fontSize: "0.85rem",
                                 cursor: "pointer",
                                 padding: 0,
-                                fontWeight: 500,
-                                transition: "color 0.2s ease",
+                                textAlign: "left",
+                                transition: "color 0.15s ease",
                               }}
                               onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent-wine)")}
-                              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-primary)")}
+                              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
                             >
                               {cat.name}
                             </button>
@@ -172,7 +184,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
                       </ul>
                     </div>
 
-                    {/* Col 2: Shop By Collection */}
+                    {/* Col 2: Curated Collections */}
                     <div>
                       <span
                         style={{
@@ -188,7 +200,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
                         COLLECTIONS
                       </span>
                       <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-                        {activeCollections.slice(0, 5).map((col) => (
+                        {activeCollections.map((col) => (
                           <li key={col.id}>
                             <button
                               onClick={() => {
@@ -198,25 +210,46 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
                               style={{
                                 background: "none",
                                 border: "none",
-                                fontSize: "0.88rem",
-                                color: "var(--text-primary)",
-                                textAlign: "left",
+                                color: "var(--text-secondary)",
+                                fontSize: "0.85rem",
                                 cursor: "pointer",
                                 padding: 0,
-                                fontWeight: 500,
-                                transition: "color 0.2s ease",
+                                textAlign: "left",
+                                transition: "color 0.15s ease",
                               }}
                               onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent-wine)")}
-                              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-primary)")}
+                              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
                             >
                               {col.title}
                             </button>
                           </li>
                         ))}
+                        <li>
+                          <button
+                            onClick={() => {
+                              setIsMegaMenuOpen(false);
+                              onNavigate("/collections");
+                            }}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: "var(--accent-gold)",
+                              fontSize: "0.82rem",
+                              fontWeight: 600,
+                              cursor: "pointer",
+                              padding: "0.2rem 0 0 0",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "0.3rem",
+                            }}
+                          >
+                            All Collections <ArrowRight size={13} />
+                          </button>
+                        </li>
                       </ul>
                     </div>
 
-                    {/* Col 3: Shop By Occasion */}
+                    {/* Col 3: Occasions & Edits */}
                     <div>
                       <span
                         style={{
@@ -229,46 +262,75 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
                           marginBottom: "0.85rem",
                         }}
                       >
-                        OCCASIONS
+                        DISCOVERY
                       </span>
                       <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-                        {[
-                          { label: "Festive Wear", query: "Festive Wear" },
-                          { label: "Wedding Party", query: "Wedding Party" },
-                          { label: "Everyday Luxury", query: "Everyday Luxury" },
-                          { label: "Casual Elegance", query: "Casual Elegance" },
-                        ].map((occ) => (
-                          <li key={occ.label}>
-                            <button
-                              onClick={() => {
-                                setIsMegaMenuOpen(false);
-                                onNavigate(`/shop?occasion=${encodeURIComponent(occ.query)}`);
-                              }}
-                              style={{
-                                background: "none",
-                                border: "none",
-                                fontSize: "0.88rem",
-                                color: "var(--text-primary)",
-                                textAlign: "left",
-                                cursor: "pointer",
-                                padding: 0,
-                                fontWeight: 500,
-                              }}
-                              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent-wine)")}
-                              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-primary)")}
-                            >
-                              {occ.label}
-                            </button>
-                          </li>
-                        ))}
+                        <li>
+                          <button
+                            onClick={() => {
+                              setIsMegaMenuOpen(false);
+                              onNavigate("/shop?filter=newArrival");
+                            }}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: "var(--accent-wine)",
+                              fontSize: "0.85rem",
+                              fontWeight: 600,
+                              cursor: "pointer",
+                              padding: 0,
+                              textAlign: "left",
+                            }}
+                          >
+                            ★ New Season Drops
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            onClick={() => {
+                              setIsMegaMenuOpen(false);
+                              onNavigate("/shop?filter=bestseller");
+                            }}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: "var(--text-secondary)",
+                              fontSize: "0.85rem",
+                              cursor: "pointer",
+                              padding: 0,
+                              textAlign: "left",
+                            }}
+                          >
+                            Bestselling Sets
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            onClick={() => {
+                              setIsMegaMenuOpen(false);
+                              onNavigate("/about");
+                            }}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: "var(--text-secondary)",
+                              fontSize: "0.85rem",
+                              cursor: "pointer",
+                              padding: 0,
+                              textAlign: "left",
+                            }}
+                          >
+                            Our Heritage Story
+                          </button>
+                        </li>
                       </ul>
                     </div>
 
-                    {/* Col 4: Featured Showcase Card */}
+                    {/* Col 4: Visual Spotlight Card */}
                     <div
                       style={{
                         backgroundColor: "var(--bg-surface-subtle)",
-                        padding: "1rem",
+                        padding: "1.25rem",
                         borderRadius: "4px",
                         border: "1px solid var(--border-subtle)",
                         display: "flex",
@@ -277,50 +339,38 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
                       }}
                     >
                       <div>
-                        <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--accent-wine)", textTransform: "uppercase", letterSpacing: "0.1em", display: "flex", alignItems: "center", gap: "0.25rem" }}>
-                          <Sparkles size={12} /> PREMIUM EDIT
-                        </span>
-                        <h4 className="font-serif" style={{ fontSize: "1.1rem", margin: "0.3rem 0 0.5rem 0" }}>
-                          Aurelia Fendy Satin Sarees
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", color: "var(--accent-wine)", marginBottom: "0.4rem" }}>
+                          <Sparkles size={14} />
+                          <span style={{ fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase" }}>
+                            ATELIER SPOTLIGHT
+                          </span>
+                        </div>
+                        <h4 className="font-serif" style={{ fontSize: "1.15rem", margin: "0 0 0.4rem 0", color: "var(--text-primary)" }}>
+                          Aurelia Fendy Satin Saree
                         </h4>
-                        <img
-                          src="https://cdn.shopify.com/s/files/1/0719/5974/0506/files/6073220371323753379.jpg?v=1788176378"
-                          alt="Aurelia Saree"
-                          style={{ width: "100%", height: "130px", objectFit: "cover", borderRadius: "3px", marginBottom: "0.75rem" }}
-                        />
+                        <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.4, margin: "0 0 1rem 0" }}>
+                          Heavy Resham & Zari Cutwork embroidery in vibrant festive shades.
+                        </p>
                       </div>
                       <button
                         onClick={() => {
                           setIsMegaMenuOpen(false);
-                          onNavigate("/collections/premium-collection-saree");
+                          onNavigate("/product/aurelia-saree-floral-embroidery-fendy-satin-saree-collection");
                         }}
-                        style={{
-                          background: "var(--accent-wine)",
-                          color: "#FFFFFF",
-                          border: "none",
-                          padding: "0.45rem 0.8rem",
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                          borderRadius: "2px",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: "0.3rem",
-                        }}
+                        className="btn btn-primary"
+                        style={{ padding: "0.5rem 1rem", fontSize: "0.75rem", width: "100%" }}
                       >
-                        Explore Edit <ArrowRight size={12} />
+                        Shop Spotlight Drape
                       </button>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Direct Category Links */}
               <button
                 onClick={() => onNavigate("/shop/sarees")}
                 style={{
-                  fontSize: "0.78rem",
+                  fontSize: "0.8rem",
                   fontWeight: 600,
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
@@ -336,7 +386,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
               <button
                 onClick={() => onNavigate("/shop/coord-sets")}
                 style={{
-                  fontSize: "0.78rem",
+                  fontSize: "0.8rem",
                   fontWeight: 600,
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
@@ -352,7 +402,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
               <button
                 onClick={() => onNavigate("/shop/kurta-sets")}
                 style={{
-                  fontSize: "0.78rem",
+                  fontSize: "0.8rem",
                   fontWeight: 600,
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
@@ -368,7 +418,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
               <button
                 onClick={() => onNavigate("/shop?filter=newArrival")}
                 style={{
-                  fontSize: "0.78rem",
+                  fontSize: "0.8rem",
                   fontWeight: 600,
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
@@ -384,9 +434,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
           </div>
 
           {/* Center Brand Identity */}
-          <div style={{ textAlign: "center" }}>
+          <div style={{ textAlign: "center", flexShrink: 0 }}>
             <button
               onClick={() => onNavigate("/")}
+              aria-label="Evara Vastra Home"
               style={{
                 background: "none",
                 border: "none",
@@ -397,9 +448,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
               <span
                 className="font-serif"
                 style={{
-                  fontSize: "clamp(1.4rem, 2.8vw, 1.85rem)",
+                  fontSize: "clamp(1.25rem, 2.5vw, 1.85rem)",
                   fontWeight: 600,
-                  letterSpacing: "0.22em",
+                  letterSpacing: "0.2em",
                   color: "var(--text-primary)",
                   display: "block",
                   lineHeight: 1.1,
@@ -409,7 +460,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
               </span>
               <span
                 style={{
-                  fontSize: "0.58rem",
+                  fontSize: "0.55rem",
                   letterSpacing: "0.32em",
                   textTransform: "uppercase",
                   color: "var(--accent-wine)",
@@ -429,55 +480,63 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
               display: "flex",
               alignItems: "center",
               justifyContent: "flex-end",
-              gap: "1.25rem",
+              gap: "0.6rem",
               flex: 1,
             }}
           >
+            {/* Theme Switcher Toggle */}
+            <button
+              onClick={toggleTheme}
+              aria-label={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+              title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+              className="btn-icon"
+              style={{
+                color: "var(--text-primary)",
+                cursor: "pointer",
+              }}
+            >
+              {theme === "light" ? <Moon size={18} /> : <Sun size={18} style={{ color: "var(--accent-gold)" }} />}
+            </button>
+
             {/* Search */}
             <button
               onClick={openSearch}
               aria-label="Search catalog"
+              title="Search"
+              className="btn-icon"
               style={{
                 color: "var(--text-primary)",
-                display: "flex",
-                alignItems: "center",
-                background: "none",
-                border: "none",
                 cursor: "pointer",
-                padding: "0.4rem",
               }}
             >
-              <Search size={19} />
+              <Search size={18} />
             </button>
 
             {/* Wishlist */}
             <button
               onClick={() => onNavigate("/wishlist")}
-              aria-label="View wishlist"
+              aria-label={`View wishlist (${wishlistCount} saved)`}
+              title="Wishlist"
+              className="btn-icon"
               style={{
-                color: "var(--text-primary)",
-                display: "flex",
-                alignItems: "center",
                 position: "relative",
-                background: "none",
-                border: "none",
+                color: "var(--text-primary)",
                 cursor: "pointer",
-                padding: "0.4rem",
               }}
             >
-              <Heart size={19} />
+              <Heart size={18} />
               {wishlistCount > 0 && (
                 <span
                   style={{
                     position: "absolute",
-                    top: "0px",
-                    right: "0px",
+                    top: "-2px",
+                    right: "-2px",
                     backgroundColor: "var(--accent-wine)",
                     color: "#FFFFFF",
-                    fontSize: "0.62rem",
+                    fontSize: "0.6rem",
                     fontWeight: 700,
-                    width: "16px",
-                    height: "16px",
+                    width: "17px",
+                    height: "17px",
                     borderRadius: "50%",
                     display: "flex",
                     alignItems: "center",
@@ -489,52 +548,45 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
               )}
             </button>
 
-            {/* Account / Track Order */}
+            {/* Account / Track Order (Desktop) */}
             <button
               onClick={() => onNavigate("/account")}
-              aria-label="Account and orders"
-              className="desktop-only"
+              aria-label="Client Account"
+              title="Account & Orders"
+              className="desktop-only btn-icon"
               style={{
                 color: "var(--text-primary)",
-                display: "flex",
-                alignItems: "center",
-                background: "none",
-                border: "none",
                 cursor: "pointer",
-                padding: "0.4rem",
               }}
             >
-              <User size={19} />
+              <User size={18} />
             </button>
 
             {/* Cart Drawer Trigger */}
             <button
               onClick={openCartDrawer}
-              aria-label="View shopping bag"
+              aria-label={`View shopping bag (${cartCount} items)`}
+              title="Shopping Bag"
+              className="btn-icon"
               style={{
-                color: "var(--text-primary)",
-                display: "flex",
-                alignItems: "center",
                 position: "relative",
-                background: "none",
-                border: "none",
+                color: "var(--text-primary)",
                 cursor: "pointer",
-                padding: "0.4rem",
               }}
             >
-              <ShoppingBag size={19} />
+              <ShoppingBag size={18} />
               {cartCount > 0 && (
                 <span
                   style={{
                     position: "absolute",
-                    top: "0px",
-                    right: "0px",
+                    top: "-2px",
+                    right: "-2px",
                     backgroundColor: "var(--accent-wine)",
                     color: "#FFFFFF",
-                    fontSize: "0.62rem",
+                    fontSize: "0.6rem",
                     fontWeight: 700,
-                    width: "16px",
-                    height: "16px",
+                    width: "17px",
+                    height: "17px",
                     borderRadius: "50%",
                     display: "flex",
                     alignItems: "center",
@@ -550,12 +602,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
             <button
               onClick={() => onNavigate("/admin")}
               title="Atelier Admin Portal"
+              aria-label="Atelier Admin Suite"
               style={{
                 backgroundColor: isAdminAuthenticated ? "var(--accent-wine)" : "var(--bg-surface-subtle)",
                 color: isAdminAuthenticated ? "#FFFFFF" : "var(--text-secondary)",
                 border: "1px solid var(--border-subtle)",
                 borderRadius: "3px",
-                padding: "0.3rem 0.55rem",
+                padding: "0.35rem 0.6rem",
                 display: "flex",
                 alignItems: "center",
                 gap: "0.3rem",
@@ -563,9 +616,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
                 fontWeight: 700,
                 letterSpacing: "0.08em",
                 cursor: "pointer",
+                height: "36px",
               }}
             >
-              <Shield size={12} />
+              <Shield size={13} />
               <span className="desktop-only">ADMIN</span>
             </button>
           </div>

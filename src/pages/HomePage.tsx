@@ -32,7 +32,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
       {/* 4. New Season Arrivals Grid */}
       {vis.newArrivals && (
-        <section style={{ padding: "5rem 0", backgroundColor: "#FFFFFF" }}>
+        <section style={{ padding: "4.5rem 0", backgroundColor: "var(--bg-surface)" }}>
           <div className="container">
             <div
               style={{
@@ -59,7 +59,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 >
                   FRESH ATELIER DROPS
                 </span>
-                <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 3.5vw, 2.8rem)", color: "var(--text-primary)", margin: 0 }}>
+                <h2 className="font-serif" style={{ fontSize: "clamp(1.85rem, 3.5vw, 2.8rem)", color: "var(--text-primary)", margin: 0 }}>
                   New Season Arrivals
                 </h2>
               </div>
@@ -77,8 +77,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-                gap: "2rem",
+                gap: "2rem 1.5rem",
               }}
+              className="mobile-product-grid"
             >
               {newArrivals.map((product) => (
                 <ProductCard key={product.id} product={product} onNavigate={onNavigate} />
@@ -138,8 +139,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-                gap: "2rem",
+                gap: "2rem 1.5rem",
               }}
+              className="mobile-product-grid"
             >
               {bestsellers.map((product) => (
                 <ProductCard key={product.id} product={product} onNavigate={onNavigate} />
@@ -151,7 +153,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
       {/* 7. Why Choose Us / Trust Signals */}
       {vis.whyChooseUs && (
-        <section style={{ padding: "4.5rem 0", backgroundColor: "#FFFFFF", borderTop: "1px solid var(--border-subtle)", borderBottom: "1px solid var(--border-subtle)" }}>
+        <section style={{ padding: "4.5rem 0", backgroundColor: "var(--bg-surface)", borderTop: "1px solid var(--border-subtle)", borderBottom: "1px solid var(--border-subtle)" }}>
           <div className="container">
             <div style={{ textAlign: "center", maxWidth: "600px", margin: "0 auto 3rem auto" }}>
               <span
