@@ -106,7 +106,7 @@ export const ShippingPolicyPage: React.FC<{ onNavigate: (href: string) => void }
               4. Tracking Your Consignment
             </h3>
             <p>
-              You can track your package live using our dedicated <a href="/orders" onClick={(e) => { e.preventDefault(); onNavigate("/orders"); }} style={{ color: "var(--accent-wine)", fontWeight: 600 }}>Order Tracking Page</a> or by clicking the link in your dispatch SMS/email.
+              You can track your package live using our dedicated <a href="/account/orders" onClick={(e) => { e.preventDefault(); onNavigate("/account/orders"); }} style={{ color: "var(--accent-wine)", fontWeight: 600 }}>Order Tracking Page</a> or by clicking the link in your dispatch SMS/email.
             </p>
           </div>
 

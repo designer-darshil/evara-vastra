@@ -1,83 +1,51 @@
 import React from "react";
 import { useData } from "../../context/DataContext";
+import { useNavigate } from "react-router-dom";
 import { ShieldCheck, Truck, RefreshCw, Mail, Phone, MapPin } from "lucide-react";
 
-export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNavigate }) => {
+export const Footer: React.FC<{ onNavigate?: (href: string) => void }> = ({ onNavigate }) => {
   const { siteSettings, activeCategories } = useData();
+  const navigate = useNavigate();
+
+  const handleNav = (href: string) => {
+    if (onNavigate) {
+      onNavigate(href);
+    } else {
+      navigate(href);
+    }
+  };
 
   return (
-    <footer
-      style={{
-        backgroundColor: "var(--footer-bg)",
-        color: "var(--footer-text)",
-        paddingTop: "5.5rem",
-        paddingBottom: "3rem",
-        borderTop: "1px solid var(--footer-border)",
-      }}
-    >
+    <footer className="bg-secondary text-secondary-foreground pt-24 pb-12 border-t border-border">
       <div className="container">
         {/* Main 4-Column Grid */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-            gap: "3rem 2.5rem",
-            paddingBottom: "4rem",
-            borderBottom: "1px solid var(--footer-border)",
-          }}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-10 pb-16 border-b border-border">
           {/* Col 1: Brand & Atelier Contact */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          <div className="flex flex-col gap-5">
             <div>
-              <span
-                style={{
-                  fontSize: "0.68rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.26em",
-                  textTransform: "uppercase",
-                  color: "var(--accent-gold)",
-                  display: "block",
-                  marginBottom: "0.4rem",
-                }}
-              >
+              <span className="text-[11px] font-bold tracking-[0.26em] uppercase text-primary block mb-1.5">
                 CONTEMPORARY INDIAN WOMENSWEAR
               </span>
-              <h3
-                className="font-serif"
-                style={{
-                  fontSize: "1.85rem",
-                  letterSpacing: "0.12em",
-                  color: "var(--footer-heading)",
-                  lineHeight: 1.1,
-                  margin: 0,
-                }}
-              >
+              <h3 className="font-serif text-3xl tracking-widest text-foreground leading-none m-0">
                 {siteSettings.name}
               </h3>
             </div>
 
-            <p
-              style={{
-                fontSize: "0.85rem",
-                lineHeight: 1.65,
-                color: "var(--footer-text-muted)",
-                margin: 0,
-              }}
-            >
+            <p className="text-sm leading-relaxed text-muted-foreground m-0">
               Surat-crafted Sarees, Designer Co-Ord Sets, Chinon Kurti Palazzo Ensembles, and Festive Anarkali Gowns designed for modern living.
             </p>
 
-            <div style={{ fontSize: "0.82rem", color: "var(--footer-text-secondary)", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <MapPin size={15} style={{ color: "var(--accent-gold)", flexShrink: 0 }} />
+            <div className="text-[13px] text-muted-foreground flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-primary shrink-0" />
                 <span>{siteSettings.atelierAddress}</span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <Phone size={15} style={{ color: "var(--accent-gold)", flexShrink: 0 }} />
+              <div className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-primary shrink-0" />
                 <span>Customer Care: {siteSettings.phone}</span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <Mail size={15} style={{ color: "var(--accent-gold)", flexShrink: 0 }} />
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-primary shrink-0" />
                 <span>Email: {siteSettings.email}</span>
               </div>
             </div>
@@ -85,44 +53,15 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
 
           {/* Col 2: Categories */}
           <div>
-            <h4
-              style={{
-                fontSize: "0.75rem",
-                fontWeight: 700,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: "var(--accent-gold)",
-                marginBottom: "1.25rem",
-              }}
-            >
+            <h4 className="text-xs font-bold tracking-[0.18em] uppercase text-primary mb-5">
               Shop By Category
             </h4>
-            <ul
-              style={{
-                listStyle: "none",
-                padding: 0,
-                margin: 0,
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.75rem",
-              }}
-            >
+            <ul className="flex flex-col gap-3">
               {activeCategories.map((cat) => (
                 <li key={cat.id}>
                   <button
-                    onClick={() => onNavigate(`/shop/${cat.slug}`)}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      color: "var(--footer-text-muted)",
-                      fontSize: "0.85rem",
-                      cursor: "pointer",
-                      padding: 0,
-                      textAlign: "left",
-                      transition: "color 0.2s ease",
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "var(--footer-heading)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "var(--footer-text-muted)")}
+                    onClick={() => handleNav(`/shop/${cat.slug}`)}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {cat.name}
                   </button>
@@ -130,17 +69,8 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
               ))}
               <li>
                 <button
-                  onClick={() => onNavigate("/shop?filter=newArrival")}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "var(--accent-gold)",
-                    fontSize: "0.85rem",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    padding: 0,
-                    textAlign: "left",
-                  }}
+                  onClick={() => handleNav("/shop?filter=newArrival")}
+                  className="text-sm font-semibold text-primary hover:text-accent transition-colors mt-1"
                 >
                   ★ New Season Drops
                 </button>
@@ -150,52 +80,23 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
 
           {/* Col 3: Customer Care & Policies */}
           <div>
-            <h4
-              style={{
-                fontSize: "0.75rem",
-                fontWeight: 700,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: "var(--accent-gold)",
-                marginBottom: "1.25rem",
-              }}
-            >
+            <h4 className="text-xs font-bold tracking-[0.18em] uppercase text-primary mb-5">
               Customer Care & Policies
             </h4>
-            <ul
-              style={{
-                listStyle: "none",
-                padding: 0,
-                margin: 0,
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.75rem",
-              }}
-            >
+            <ul className="flex flex-col gap-3">
               {[
-                { label: "Track Your Order", href: "/orders" },
-                { label: "Shipping Policy", href: "/shipping" },
-                { label: "Replacement & Exchange", href: "/returns" },
-                { label: "Privacy Policy", href: "/privacy" },
-                { label: "Terms of Service", href: "/terms" },
+                { label: "Track Your Order", href: "/account/orders" },
+                { label: "Shipping Policy", href: "/shipping-policy" },
+                { label: "Replacement & Exchange", href: "/replacement-exchange-policy" },
+                { label: "Privacy Policy", href: "/privacy-policy" },
+                { label: "Terms of Service", href: "/terms-of-service" },
                 { label: "Contact Us", href: "/contact" },
                 { label: "FAQs & Help Center", href: "/faq" },
               ].map((item) => (
                 <li key={item.label}>
                   <button
-                    onClick={() => onNavigate(item.href)}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      color: "var(--footer-text-muted)",
-                      fontSize: "0.85rem",
-                      cursor: "pointer",
-                      padding: 0,
-                      textAlign: "left",
-                      transition: "color 0.2s ease",
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "var(--footer-heading)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "var(--footer-text-muted)")}
+                    onClick={() => handleNav(item.href)}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {item.label}
                   </button>
@@ -206,40 +107,31 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
 
           {/* Col 4: Assurance Badges */}
           <div>
-            <h4
-              style={{
-                fontSize: "0.75rem",
-                fontWeight: 700,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: "var(--accent-gold)",
-                marginBottom: "1.25rem",
-              }}
-            >
+            <h4 className="text-xs font-bold tracking-[0.18em] uppercase text-primary mb-5">
               The Evara Promise
             </h4>
-            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
-                <Truck size={18} style={{ color: "var(--accent-gold)", flexShrink: 0, marginTop: "2px" }} />
+            <div className="flex flex-col gap-4">
+              <div className="flex items-start gap-3">
+                <Truck className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                 <div>
-                  <strong style={{ fontSize: "0.82rem", color: "var(--footer-heading)", display: "block" }}>Free Pan-India Delivery</strong>
-                  <span style={{ fontSize: "0.75rem", color: "var(--footer-text-muted)" }}>Insured delivery to 28,000+ pin codes.</span>
+                  <strong className="text-[13px] text-foreground block font-semibold">Free Pan-India Delivery</strong>
+                  <span className="text-[12px] text-muted-foreground">Insured delivery to 28,000+ pin codes.</span>
                 </div>
               </div>
 
-              <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
-                <ShieldCheck size={18} style={{ color: "var(--accent-gold)", flexShrink: 0, marginTop: "2px" }} />
+              <div className="flex items-start gap-3">
+                <ShieldCheck className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                 <div>
-                  <strong style={{ fontSize: "0.82rem", color: "var(--footer-heading)", display: "block" }}>COD & 10% Prepaid Off</strong>
-                  <span style={{ fontSize: "0.75rem", color: "var(--footer-text-muted)" }}>Instant savings on UPI and card orders.</span>
+                  <strong className="text-[13px] text-foreground block font-semibold">COD & 10% Prepaid Off</strong>
+                  <span className="text-[12px] text-muted-foreground">Instant savings on UPI and card orders.</span>
                 </div>
               </div>
 
-              <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
-                <RefreshCw size={18} style={{ color: "var(--accent-gold)", flexShrink: 0, marginTop: "2px" }} />
+              <div className="flex items-start gap-3">
+                <RefreshCw className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                 <div>
-                  <strong style={{ fontSize: "0.82rem", color: "var(--footer-heading)", display: "block" }}>7-Day Easy Exchange</strong>
-                  <span style={{ fontSize: "0.75rem", color: "var(--footer-text-muted)" }}>Doorstep reverse pickup assistance.</span>
+                  <strong className="text-[13px] text-foreground block font-semibold">7-Day Easy Exchange</strong>
+                  <span className="text-[12px] text-muted-foreground">Doorstep reverse pickup assistance.</span>
                 </div>
               </div>
             </div>
@@ -247,29 +139,18 @@ export const Footer: React.FC<{ onNavigate: (href: string) => void }> = ({ onNav
         </div>
 
         {/* Bottom Copyright & Disclaimer */}
-        <div
-          style={{
-            paddingTop: "2.5rem",
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: "1rem",
-            fontSize: "0.78rem",
-            color: "var(--footer-copyright)",
-          }}
-        >
+        <div className="pt-10 flex flex-wrap justify-between items-center gap-4 text-xs text-muted-foreground">
           <div>
-            © 2026 EVARA VASTRA. ALL RIGHTS RESERVED. SURAT, GUJARAT, INDIA.
+            © {new Date().getFullYear()} EVARA VASTRA. ALL RIGHTS RESERVED. SURAT, GUJARAT, INDIA.
           </div>
-          <div style={{ display: "flex", gap: "1.5rem" }}>
-            <button onClick={() => onNavigate("/privacy")} style={{ background: "none", border: "none", color: "var(--footer-copyright)", cursor: "pointer", fontSize: "0.78rem" }}>
+          <div className="flex gap-6">
+            <button onClick={() => handleNav("/privacy")} className="hover:text-foreground transition-colors">
               Privacy
             </button>
-            <button onClick={() => onNavigate("/terms")} style={{ background: "none", border: "none", color: "var(--footer-copyright)", cursor: "pointer", fontSize: "0.78rem" }}>
+            <button onClick={() => handleNav("/terms")} className="hover:text-foreground transition-colors">
               Terms
             </button>
-            <button onClick={() => onNavigate("/admin")} style={{ background: "none", border: "none", color: "var(--accent-gold)", cursor: "pointer", fontSize: "0.78rem", fontWeight: 600 }}>
+            <button onClick={() => handleNav("/admin")} className="font-semibold text-primary hover:text-accent transition-colors">
               Admin Portal
             </button>
           </div>

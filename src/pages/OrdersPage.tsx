@@ -143,7 +143,7 @@ export const OrdersPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                       />
                       <div style={{ flex: 1 }}>
                         <h4
-                          onClick={() => onNavigate(`/product/${item.slug}`)}
+                          onClick={() => onNavigate(`/products/${item.slug}`)}
                           style={{
                             fontSize: "0.95rem",
                             color: "var(--text-primary)",

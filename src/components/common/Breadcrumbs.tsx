@@ -1,39 +1,34 @@
 import React from "react";
 import { ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export interface BreadcrumbItem {
   label: string;
   href?: string;
 }
 
-export const Breadcrumbs: React.FC<{ items: BreadcrumbItem[]; onNavigate: (href: string) => void }> = ({
+export const Breadcrumbs: React.FC<{ items: BreadcrumbItem[]; onNavigate?: (href: string) => void }> = ({
   items,
   onNavigate,
 }) => {
+  const navigate = useNavigate();
+
+  const handleNav = (href: string) => {
+    if (onNavigate) {
+      onNavigate(href);
+    } else {
+      navigate(href);
+    }
+  };
+
   return (
     <nav
       aria-label="Breadcrumb"
-      style={{
-        display: "flex",
-        alignItems: "center",
-        flexWrap: "wrap",
-        gap: "0.4rem",
-        fontSize: "0.75rem",
-        textTransform: "uppercase",
-        letterSpacing: "0.1em",
-        color: "var(--text-muted)",
-        marginBottom: "1.5rem",
-      }}
+      className="flex items-center flex-wrap gap-1.5 text-xs uppercase tracking-widest text-muted-foreground mb-6"
     >
       <button
-        onClick={() => onNavigate("/")}
-        style={{
-          color: "var(--text-secondary)",
-          background: "none",
-          border: "none",
-          padding: 0,
-          cursor: "pointer",
-        }}
+        onClick={() => handleNav("/")}
+        className="text-muted-foreground hover:text-foreground transition-colors"
       >
         Home
       </button>
@@ -41,19 +36,13 @@ export const Breadcrumbs: React.FC<{ items: BreadcrumbItem[]; onNavigate: (href:
         const isLast = idx === items.length - 1;
         return (
           <React.Fragment key={idx}>
-            <ChevronRight size={12} style={{ color: "var(--border-medium)" }} />
+            <ChevronRight className="h-3 w-3 text-border" />
             {isLast || !item.href ? (
-              <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>{item.label}</span>
+              <span className="text-foreground font-semibold">{item.label}</span>
             ) : (
               <button
-                onClick={() => item.href && onNavigate(item.href)}
-                style={{
-                  color: "var(--text-secondary)",
-                  background: "none",
-                  border: "none",
-                  padding: 0,
-                  cursor: "pointer",
-                }}
+                onClick={() => item.href && handleNav(item.href)}
+                className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 {item.label}
               </button>

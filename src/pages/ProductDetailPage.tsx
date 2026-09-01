@@ -3,7 +3,8 @@ import { useData } from "../context/DataContext";
 import { Product } from "../types";
 import { useShop } from "../context/ShopContext";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
-import { ProductCard } from "../components/product/ProductCard";
+import { ProductCard } from "../components/common/ProductCard";
+import { useNavigate } from "react-router-dom";
 import {
   Heart,
   ShoppingBag,
@@ -18,10 +19,14 @@ import {
   MessageCircle,
   Sparkles,
 } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
+import { Input } from "../components/ui/input";
+import { cn } from "../lib/utils";
 
 interface ProductDetailPageProps {
   slug: string;
-  onNavigate: (href: string) => void;
+  onNavigate?: (href: string) => void;
 }
 
 export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
@@ -30,6 +35,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 }) => {
   const { publishedProducts } = useData();
   const { addToCart, toggleWishlist, isInWishlist, addRecentlyViewed } = useShop();
+  const navigate = useNavigate();
+
+  const handleNav = (href: string) => {
+    if (onNavigate) onNavigate(href);
+    else navigate(href);
+  };
 
   const product = publishedProducts.find((p) => p.slug === slug) || publishedProducts[0];
 
@@ -38,7 +49,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState<"details" | "craft" | "styling" | "shipping">("details");
+  const [activeTab, setActiveTab] = useState<"details" | "craft" | "shipping">("details");
   const [pincode, setPincode] = useState("");
   const [pincodeStatus, setPincodeStatus] = useState<string | null>(null);
 
@@ -55,14 +66,14 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
   if (!product) {
     return (
-      <div className="container" style={{ padding: "6rem 0", textAlign: "center" }}>
-        <h2 className="font-serif" style={{ fontSize: "2rem" }}>Product Not Found</h2>
-        <p style={{ color: "var(--text-secondary)", marginTop: "0.5rem" }}>
+      <div className="container py-24 text-center">
+        <h2 className="font-serif text-3xl">Product Not Found</h2>
+        <p className="text-muted-foreground mt-2">
           This handcrafted garment may have been archived or is temporarily unlisted.
         </p>
-        <button onClick={() => onNavigate("/shop")} className="btn btn-primary" style={{ marginTop: "1.5rem" }}>
+        <Button onClick={() => handleNav("/shop")} className="mt-6">
           Explore Full Catalog
-        </button>
+        </Button>
       </div>
     );
   }
@@ -89,7 +100,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
   const handleBuyNow = () => {
     addToCart(product, quantity, selectedSize, selectedColor);
-    onNavigate("/checkout");
+    handleNav("/checkout");
   };
 
   const checkDelivery = (e: React.FormEvent) => {
@@ -110,42 +121,19 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   );
 
   return (
-    <div className="animate-fade-in" style={{ paddingBottom: "7rem" }}>
+    <div className="animate-in fade-in duration-500 pb-28">
       {/* Lightbox Modal */}
       {isLightboxOpen && (
         <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(0,0,0,0.92)",
-            zIndex: 999999,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "2rem",
-          }}
+          className="fixed inset-0 bg-black/95 z-[999999] flex items-center justify-center p-8"
           onClick={() => setIsLightboxOpen(false)}
         >
           <button
             onClick={() => setIsLightboxOpen(false)}
             aria-label="Close Lightbox"
-            style={{
-              position: "absolute",
-              top: "1.5rem",
-              right: "1.5rem",
-              color: "#FFFFFF",
-              width: "44px",
-              height: "44px",
-              borderRadius: "50%",
-              backgroundColor: "rgba(255,255,255,0.15)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              border: "none",
-              cursor: "pointer",
-            }}
+            className="absolute top-6 right-6 text-white w-11 h-11 rounded-full bg-white/10 flex items-center justify-center border-none cursor-pointer hover:bg-white/20 transition-colors"
           >
-            <X size={22} />
+            <X className="w-5 h-5" />
           </button>
 
           <button
@@ -154,32 +142,15 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : product.images.length - 1));
             }}
             aria-label="Previous image"
-            style={{
-              position: "absolute",
-              left: "1.5rem",
-              color: "#FFFFFF",
-              width: "44px",
-              height: "44px",
-              borderRadius: "50%",
-              backgroundColor: "rgba(255,255,255,0.15)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              border: "none",
-              cursor: "pointer",
-            }}
+            className="absolute left-6 text-white w-11 h-11 rounded-full bg-white/10 flex items-center justify-center border-none cursor-pointer hover:bg-white/20 transition-colors"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft className="w-6 h-6" />
           </button>
 
           <img
             src={product.images[activeImageIndex]}
             alt={product.title}
-            style={{
-              maxHeight: "90vh",
-              maxWidth: "85vw",
-              objectFit: "contain",
-            }}
+            className="max-h-[90vh] max-w-[85vw] object-contain"
             onClick={(e) => e.stopPropagation()}
           />
 
@@ -189,27 +160,14 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               setActiveImageIndex((prev) => (prev < product.images.length - 1 ? prev + 1 : 0));
             }}
             aria-label="Next image"
-            style={{
-              position: "absolute",
-              right: "1.5rem",
-              color: "#FFFFFF",
-              width: "44px",
-              height: "44px",
-              borderRadius: "50%",
-              backgroundColor: "rgba(255,255,255,0.15)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              border: "none",
-              cursor: "pointer",
-            }}
+            className="absolute right-6 text-white w-11 h-11 rounded-full bg-white/10 flex items-center justify-center border-none cursor-pointer hover:bg-white/20 transition-colors"
           >
-            <ChevronRight size={24} />
+            <ChevronRight className="w-6 h-6" />
           </button>
         </div>
       )}
 
-      <div className="container" style={{ paddingTop: "2rem" }}>
+      <div className="container pt-8">
         <Breadcrumbs
           items={[
             { label: "Shop", href: "/shop" },
@@ -220,279 +178,115 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         />
 
         {/* Product Hero Layout */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1.1fr 0.9fr",
-            gap: "clamp(2rem, 4vw, 4rem)",
-            alignItems: "start",
-            marginTop: "1.5rem",
-          }}
-          className="pdp-layout-grid"
-        >
+        <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 lg:gap-16 items-start mt-6">
           {/* Gallery Column */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "80px 1fr",
-              gap: "1rem",
-              alignItems: "start",
-            }}
-            className="gallery-layout-grid"
-          >
+          <div className="grid grid-cols-[80px_1fr] gap-4 items-start">
             {/* Thumbnails */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.75rem",
-                maxHeight: "680px",
-                overflowY: "auto",
-              }}
-              className="gallery-thumbs"
-            >
+            <div className="flex flex-col gap-3 max-h-[680px] overflow-y-auto no-scrollbar pb-2 pr-1">
               {product.images.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setActiveImageIndex(idx)}
-                  style={{
-                    aspectRatio: "3/4",
-                    width: "100%",
-                    overflow: "hidden",
-                    border:
-                      activeImageIndex === idx
-                        ? "2px solid var(--accent-wine)"
-                        : "1px solid var(--border-subtle)",
-                    opacity: activeImageIndex === idx ? 1 : 0.65,
-                    transition: "all 0.2s ease",
-                    cursor: "pointer",
-                    backgroundColor: "var(--bg-muted)",
-                    padding: 0,
-                    borderRadius: "3px",
-                  }}
+                  className={cn(
+                    "aspect-[3/4] w-full overflow-hidden rounded-sm cursor-pointer transition-all duration-200 border-2",
+                    activeImageIndex === idx ? "border-accent opacity-100" : "border-transparent opacity-60 hover:opacity-100"
+                  )}
                 >
-                  <img src={img} alt="thumbnail" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <img src={img} alt="thumbnail" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
 
             {/* Main Stage View */}
-            <div
-              style={{
-                position: "relative",
-                aspectRatio: "3/4",
-                backgroundColor: "var(--bg-muted)",
-                overflow: "hidden",
-                boxShadow: "var(--shadow-medium)",
-                borderRadius: "4px",
-              }}
-            >
+            <div className="relative aspect-[3/4] bg-secondary overflow-hidden shadow-md rounded-md">
               <img
                 src={product.images[activeImageIndex] || product.images[0]}
                 alt={product.title}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                }}
+                className="w-full h-full object-cover transition-opacity duration-300"
               />
 
               <button
                 onClick={() => setIsLightboxOpen(true)}
                 aria-label="Expand image"
-                style={{
-                  position: "absolute",
-                  bottom: "1rem",
-                  right: "1rem",
-                  width: "38px",
-                  height: "38px",
-                  borderRadius: "50%",
-                  backgroundColor: "rgba(255,255,255,0.9)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "var(--text-primary)",
-                  boxShadow: "var(--shadow-subtle)",
-                  border: "none",
-                  cursor: "pointer",
-                }}
+                className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-background/90 flex items-center justify-center text-foreground shadow-sm hover:scale-105 transition-transform"
               >
-                <Maximize2 size={16} />
+                <Maximize2 className="w-4 h-4" />
               </button>
 
-              <div
-                style={{
-                  position: "absolute",
-                  top: "1rem",
-                  left: "1rem",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.4rem",
-                }}
-              >
+              <div className="absolute top-4 left-4 flex flex-col gap-2">
                 {product.discountPercentage ? (
-                  <span
-                    style={{
-                      backgroundColor: "var(--accent-wine)",
-                      color: "#FFFFFF",
-                      fontSize: "0.72rem",
-                      fontWeight: 700,
-                      padding: "0.25rem 0.6rem",
-                      borderRadius: "2px",
-                      letterSpacing: "0.05em",
-                    }}
-                  >
+                  <Badge variant="secondary" className="bg-accent text-accent-foreground font-bold tracking-widest text-[10px] px-2.5 py-1 rounded-sm">
                     {product.discountPercentage}% OFF
-                  </span>
+                  </Badge>
                 ) : null}
                 {product.details?.blousePiece && (
-                  <span
-                    style={{
-                      backgroundColor: "var(--bg-surface)",
-                      color: "var(--text-primary)",
-                      fontSize: "0.68rem",
-                      fontWeight: 700,
-                      padding: "0.25rem 0.5rem",
-                      borderRadius: "2px",
-                      boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-                    }}
-                  >
+                  <Badge className="bg-background text-foreground font-bold tracking-widest text-[10px] px-2.5 py-1 rounded-sm shadow-md">
                     BLOUSE INCLUDED
-                  </span>
+                  </Badge>
                 )}
               </div>
             </div>
           </div>
 
           {/* Right Product Details Column */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          <div className="flex flex-col gap-5">
             <div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: "0.4rem",
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: "0.72rem",
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
-                    color: "var(--accent-wine)",
-                    fontWeight: 700,
-                  }}
-                >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[11px] tracking-[0.14em] uppercase text-accent font-bold">
                   SKU: {product.sku || "EV-VAS-100"}
                 </span>
-                <span
-                  style={{
-                    fontSize: "0.72rem",
-                    color: "var(--success-text)",
-                    fontWeight: 600,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.25rem",
-                  }}
-                >
-                  <Check size={14} /> In Stock • Ready to Dispatch
+                <span className="text-[11px] text-green-600 dark:text-green-400 font-semibold flex items-center gap-1">
+                  <Check className="w-3.5 h-3.5" /> In Stock • Ready to Dispatch
                 </span>
               </div>
 
-              <h1
-                className="font-serif"
-                style={{
-                  fontSize: "clamp(1.75rem, 2.6vw, 2.35rem)",
-                  lineHeight: 1.2,
-                  color: "var(--text-primary)",
-                  margin: "0 0 0.5rem 0",
-                }}
-              >
+              <h1 className="font-serif text-3xl lg:text-4xl leading-tight text-foreground m-0 mb-2">
                 {product.title}
               </h1>
 
               {/* Price Row */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  gap: "0.75rem",
-                  marginTop: "0.5rem",
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: "1.85rem",
-                    fontWeight: 700,
-                    color: "var(--text-primary)",
-                  }}
-                >
+              <div className="flex items-baseline gap-3 mt-2">
+                <span className="text-3xl font-bold text-foreground">
                   {formattedPrice}
                 </span>
                 {formattedComparePrice && (
-                  <span
-                    style={{
-                      fontSize: "1.1rem",
-                      color: "var(--text-muted)",
-                      textDecoration: "line-through",
-                    }}
-                  >
+                  <span className="text-lg text-muted-foreground line-through">
                     {formattedComparePrice}
                   </span>
                 )}
                 {product.discountPercentage ? (
-                  <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--accent-wine)" }}>
+                  <span className="text-sm font-bold text-accent">
                     ({product.discountPercentage}% OFF)
                   </span>
                 ) : null}
               </div>
 
-              <div
-                style={{
-                  backgroundColor: "var(--accent-wine-subtle)",
-                  border: "1px solid rgba(124, 36, 48, 0.15)",
-                  padding: "0.5rem 0.85rem",
-                  borderRadius: "3px",
-                  marginTop: "0.75rem",
-                  fontSize: "0.8rem",
-                  color: "var(--accent-wine)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.4rem",
-                  fontWeight: 600,
-                }}
-              >
-                <Sparkles size={14} />
+              <div className="bg-accent/5 border border-accent/15 px-3.5 py-2 rounded-sm mt-3 text-xs text-accent flex items-center gap-1.5 font-semibold">
+                <Sparkles className="w-3.5 h-3.5" />
                 <span>Get 10% Instant Discount on Prepaid UPI & Card Orders!</span>
               </div>
             </div>
 
             {/* Size Selector */}
             {product.sizes && product.sizes.length > 0 && (
-              <div style={{ paddingTop: "0.5rem", borderTop: "1px solid var(--border-subtle)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
-                  <label style={{ fontSize: "0.82rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                    Select Size: <span style={{ color: "var(--accent-wine)" }}>{selectedSize}</span>
+              <div className="pt-2 border-t">
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-xs font-bold uppercase tracking-wide">
+                    Select Size: <span className="text-accent ml-1">{selectedSize}</span>
                   </label>
-                  <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Standard Indian Fit</span>
+                  <span className="text-xs text-muted-foreground">Standard Indian Fit</span>
                 </div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                <div className="flex flex-wrap gap-2">
                   {product.sizes.map((sz) => (
                     <button
                       key={sz}
                       onClick={() => setSelectedSize(sz)}
-                      style={{
-                        padding: "0.5rem 1rem",
-                        fontSize: "0.82rem",
-                        fontWeight: 600,
-                        borderRadius: "3px",
-                        border: selectedSize === sz ? "2px solid var(--accent-wine)" : "1px solid var(--border-subtle)",
-                        backgroundColor: selectedSize === sz ? "var(--accent-wine-subtle)" : "var(--bg-surface)",
-                        color: selectedSize === sz ? "var(--accent-wine)" : "var(--text-primary)",
-                        cursor: "pointer",
-                        transition: "all 0.15s ease",
-                      }}
+                      className={cn(
+                        "px-4 py-2 text-[13px] font-semibold rounded-sm border transition-colors",
+                        selectedSize === sz
+                          ? "border-accent bg-accent/5 text-accent"
+                          : "border-border bg-background text-foreground hover:border-accent/50"
+                      )}
                     >
                       {sz}
                     </button>
@@ -504,24 +298,20 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             {/* Color Selector */}
             {product.colors && product.colors.length > 1 && (
               <div>
-                <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.5rem" }}>
-                  Color Shade: <span style={{ color: "var(--accent-wine)" }}>{selectedColor}</span>
+                <label className="block text-xs font-bold uppercase tracking-wide mb-2">
+                  Color Shade: <span className="text-accent ml-1">{selectedColor}</span>
                 </label>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                <div className="flex flex-wrap gap-2">
                   {product.colors.map((col) => (
                     <button
                       key={col}
                       onClick={() => setSelectedColor(col)}
-                      style={{
-                        padding: "0.4rem 0.85rem",
-                        fontSize: "0.8rem",
-                        borderRadius: "3px",
-                        border: selectedColor === col ? "2px solid var(--accent-wine)" : "1px solid var(--border-subtle)",
-                        backgroundColor: selectedColor === col ? "var(--accent-wine-subtle)" : "var(--bg-surface)",
-                        color: selectedColor === col ? "var(--accent-wine)" : "var(--text-primary)",
-                        cursor: "pointer",
-                        fontWeight: 600,
-                      }}
+                      className={cn(
+                        "px-3.5 py-1.5 text-xs rounded-sm border transition-colors font-semibold",
+                        selectedColor === col
+                          ? "border-accent bg-accent/5 text-accent"
+                          : "border-border bg-background text-foreground hover:border-accent/50"
+                      )}
                     >
                       {col}
                     </button>
@@ -531,166 +321,105 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             )}
 
             {/* Quantity and Actions */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "0.5rem" }}>
-              <div style={{ display: "flex", gap: "1rem" }}>
+            <div className="flex flex-col gap-3 mt-2">
+              <div className="flex gap-4 h-12">
                 {/* Quantity */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    border: "1px solid var(--border-subtle)",
-                    backgroundColor: "var(--bg-surface)",
-                    borderRadius: "3px",
-                  }}
-                >
+                <div className="flex items-center border border-border bg-background rounded-sm">
                   <button
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    style={{
-                      padding: "0.75rem 1rem",
-                      background: "none",
-                      border: "none",
-                      fontSize: "1.1rem",
-                      cursor: "pointer",
-                      color: "var(--text-primary)",
-                    }}
+                    className="px-4 text-lg text-foreground hover:bg-secondary/50 h-full transition-colors"
                   >
                     -
                   </button>
-                  <span style={{ padding: "0 0.5rem", fontWeight: 600, fontSize: "0.95rem", color: "var(--text-primary)" }}>{quantity}</span>
+                  <span className="px-2 font-semibold text-[15px] w-8 text-center">{quantity}</span>
                   <button
                     onClick={() => setQuantity((q) => q + 1)}
-                    style={{
-                      padding: "0.75rem 1rem",
-                      background: "none",
-                      border: "none",
-                      fontSize: "1.1rem",
-                      cursor: "pointer",
-                      color: "var(--text-primary)",
-                    }}
+                    className="px-4 text-lg text-foreground hover:bg-secondary/50 h-full transition-colors"
                   >
                     +
                   </button>
                 </div>
 
                 {/* Add to Cart Button */}
-                <button
+                <Button
                   onClick={handleAddToCart}
-                  className="btn btn-secondary"
-                  style={{
-                    flex: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "0.5rem",
-                    fontWeight: 600,
-                  }}
+                  variant="secondary"
+                  className="flex-1 h-full font-semibold rounded-sm gap-2"
                 >
-                  <ShoppingBag size={18} /> Add to Cart
-                </button>
+                  <ShoppingBag className="w-4 h-4" /> Add to Cart
+                </Button>
 
                 {/* Wishlist Button */}
-                <button
+                <Button
                   onClick={() => toggleWishlist(product.id)}
-                  aria-label="Wishlist"
-                  style={{
-                    width: "48px",
-                    height: "48px",
-                    border: "1px solid var(--border-subtle)",
-                    backgroundColor: isSaved ? "var(--accent-wine-subtle)" : "var(--bg-surface)",
-                    color: isSaved ? "var(--accent-wine)" : "var(--text-primary)",
-                    borderRadius: "3px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                  }}
+                  variant="outline"
+                  size="icon"
+                  className={cn("w-12 h-12 rounded-sm shrink-0 border-border", isSaved ? "text-accent" : "text-foreground")}
                 >
-                  <Heart size={20} fill={isSaved ? "var(--accent-wine)" : "none"} />
-                </button>
+                  <Heart className="w-5 h-5" fill={isSaved ? "currentColor" : "none"} />
+                </Button>
               </div>
 
               {/* Buy Now Primary Button */}
-              <button
+              <Button
                 onClick={handleBuyNow}
-                className="btn btn-primary"
-                style={{
-                  width: "100%",
-                  padding: "0.95rem",
-                  fontSize: "0.95rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                }}
+                className="w-full h-12 text-[15px] font-bold tracking-widest uppercase rounded-sm"
               >
                 Buy Now (Free Express Shipping)
-              </button>
+              </Button>
 
               {/* WhatsApp Concierge Inquiry */}
               <a
                 href={`https://wa.me/919274344037?text=${whatsappMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "0.5rem",
-                  padding: "0.75rem",
-                  backgroundColor: "var(--success-bg)",
-                  color: "var(--success-text)",
-                  border: "1px solid var(--success-bg)",
-                  borderRadius: "3px",
-                  fontSize: "0.85rem",
-                  fontWeight: 600,
-                  textDecoration: "none",
-                }}
+                className="flex items-center justify-center gap-2 p-3 bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400 border border-green-100 dark:border-green-900 rounded-sm text-[13px] font-semibold transition-colors hover:bg-green-100 dark:hover:bg-green-900/60"
               >
-                <MessageCircle size={17} /> Ask Questions on WhatsApp (+91-92743 44037)
+                <MessageCircle className="w-4 h-4" /> Ask Questions on WhatsApp (+91-92743 44037)
               </a>
             </div>
 
             {/* Pincode Estimator */}
-            <div style={{ padding: "1.25rem", backgroundColor: "var(--bg-surface-subtle)", borderRadius: "4px", border: "1px solid var(--border-subtle)", marginTop: "0.5rem" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.5rem", fontSize: "0.85rem", fontWeight: 700 }}>
-                <Truck size={16} style={{ color: "var(--accent-wine)" }} /> Check Pincode Delivery
+            <div className="p-5 bg-secondary/50 rounded-sm border border-border mt-2">
+              <div className="flex items-center gap-1.5 mb-2 text-sm font-bold">
+                <Truck className="w-4 h-4 text-accent" /> Check Pincode Delivery
               </div>
-              <form onSubmit={checkDelivery} style={{ display: "flex", gap: "0.5rem" }}>
-                <input
+              <form onSubmit={checkDelivery} className="flex gap-2">
+                <Input
                   type="text"
                   maxLength={6}
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value)}
                   placeholder="Enter 6-digit PIN code..."
-                  className="input-field"
-                  style={{ flex: 1, backgroundColor: "var(--bg-surface)" }}
+                  className="flex-1 h-10 rounded-sm"
                 />
-                <button type="submit" className="btn btn-primary" style={{ padding: "0 1.25rem", fontSize: "0.8rem" }}>
+                <Button type="submit" className="px-5 h-10 rounded-sm">
                   Check
-                </button>
+                </Button>
               </form>
               {pincodeStatus && (
-                <p style={{ margin: "0.6rem 0 0 0", fontSize: "0.8rem", color: pincodeStatus.startsWith("Serviceable") ? "#2E7D32" : "#C62828", fontWeight: 600 }}>
+                <p className={cn("mt-2 text-xs font-semibold", pincodeStatus.startsWith("Serviceable") ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400")}>
                   {pincodeStatus}
                 </p>
               )}
             </div>
 
             {/* Trust Assurances */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginTop: "0.5rem" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8rem", color: "var(--text-secondary)" }}>
-                <Truck size={16} style={{ color: "var(--accent-wine)" }} />
+            <div className="grid grid-cols-2 gap-3 mt-2">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Truck className="w-4 h-4 text-accent shrink-0" />
                 <span>Free Shipping Pan India</span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8rem", color: "var(--text-secondary)" }}>
-                <ShieldCheck size={16} style={{ color: "var(--accent-wine)" }} />
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <ShieldCheck className="w-4 h-4 text-accent shrink-0" />
                 <span>Cash on Delivery Available</span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8rem", color: "var(--text-secondary)" }}>
-                <RotateCcw size={16} style={{ color: "var(--accent-wine)" }} />
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <RotateCcw className="w-4 h-4 text-accent shrink-0" />
                 <span>7-Day Easy Exchange</span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8rem", color: "var(--text-secondary)" }}>
-                <Sparkles size={16} style={{ color: "var(--accent-wine)" }} />
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Sparkles className="w-4 h-4 text-accent shrink-0" />
                 <span>Surat Craft Quality</span>
               </div>
             </div>
@@ -698,90 +427,72 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         </div>
 
         {/* Specifications & Description Tabs */}
-        <div style={{ marginTop: "5rem", borderTop: "1px solid var(--border-subtle)", paddingTop: "2.5rem" }}>
-          <div style={{ display: "flex", gap: "2rem", borderBottom: "1px solid var(--border-subtle)", marginBottom: "2rem" }}>
+        <div className="mt-20 border-t pt-10">
+          <div className="flex gap-8 border-b mb-8">
             <button
               onClick={() => setActiveTab("details")}
-              style={{
-                background: "none",
-                border: "none",
-                fontSize: "0.95rem",
-                fontWeight: 700,
-                color: activeTab === "details" ? "var(--accent-wine)" : "var(--text-secondary)",
-                borderBottom: activeTab === "details" ? "2px solid var(--accent-wine)" : "2px solid transparent",
-                paddingBottom: "0.75rem",
-                cursor: "pointer",
-              }}
+              className={cn(
+                "pb-3 text-[15px] font-bold transition-colors border-b-2",
+                activeTab === "details" ? "border-accent text-accent" : "border-transparent text-muted-foreground hover:text-foreground"
+              )}
             >
               Product Specifications
             </button>
             <button
               onClick={() => setActiveTab("craft")}
-              style={{
-                background: "none",
-                border: "none",
-                fontSize: "0.95rem",
-                fontWeight: 700,
-                color: activeTab === "craft" ? "var(--accent-wine)" : "var(--text-secondary)",
-                borderBottom: activeTab === "craft" ? "2px solid var(--accent-wine)" : "2px solid transparent",
-                paddingBottom: "0.75rem",
-                cursor: "pointer",
-              }}
+              className={cn(
+                "pb-3 text-[15px] font-bold transition-colors border-b-2",
+                activeTab === "craft" ? "border-accent text-accent" : "border-transparent text-muted-foreground hover:text-foreground"
+              )}
             >
               Fabric & Care
             </button>
             <button
               onClick={() => setActiveTab("shipping")}
-              style={{
-                background: "none",
-                border: "none",
-                fontSize: "0.95rem",
-                fontWeight: 700,
-                color: activeTab === "shipping" ? "var(--accent-wine)" : "var(--text-secondary)",
-                borderBottom: activeTab === "shipping" ? "2px solid var(--accent-wine)" : "2px solid transparent",
-                paddingBottom: "0.75rem",
-                cursor: "pointer",
-              }}
+              className={cn(
+                "pb-3 text-[15px] font-bold transition-colors border-b-2",
+                activeTab === "shipping" ? "border-accent text-accent" : "border-transparent text-muted-foreground hover:text-foreground"
+              )}
             >
               Delivery & Returns
             </button>
           </div>
 
           {activeTab === "details" && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2rem", fontSize: "0.9rem", color: "var(--text-secondary)" }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm text-muted-foreground">
               <div>
-                <h4 style={{ color: "var(--text-primary)", marginBottom: "0.75rem" }}>Design & Weave Details</h4>
-                <p style={{ lineHeight: 1.6, marginBottom: "1rem" }}>{product.description}</p>
-                <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                  <li><strong>Category:</strong> {product.category.toUpperCase()}</li>
-                  <li><strong>Fabric:</strong> {product.fabric}</li>
-                  <li><strong>Craft Work:</strong> {product.craft}</li>
-                  <li><strong>Primary Color:</strong> {product.color}</li>
+                <h4 className="text-foreground font-semibold mb-3">Design & Weave Details</h4>
+                <p className="leading-relaxed mb-4">{product.description}</p>
+                <ul className="flex flex-col gap-2">
+                  <li><strong className="font-semibold text-foreground">Category:</strong> {product.category.toUpperCase()}</li>
+                  <li><strong className="font-semibold text-foreground">Fabric:</strong> {product.fabric}</li>
+                  <li><strong className="font-semibold text-foreground">Craft Work:</strong> {product.craft}</li>
+                  <li><strong className="font-semibold text-foreground">Primary Color:</strong> {product.color}</li>
                 </ul>
               </div>
 
               <div>
-                <h4 style={{ color: "var(--text-primary)", marginBottom: "0.75rem" }}>Package & Sizing</h4>
-                <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                  <li><strong>Package Contains:</strong> {product.details?.packageDetails || "1 Complete Garment Set"}</li>
-                  {product.details?.length && <li><strong>Garment Length:</strong> {product.details.length}</li>}
-                  {product.details?.blouseDescription && <li><strong>Blouse Fabric:</strong> {product.details.blouseDescription}</li>}
-                  <li><strong>Origin:</strong> {product.details?.origin || "Surat, Gujarat"}</li>
+                <h4 className="text-foreground font-semibold mb-3">Package & Sizing</h4>
+                <ul className="flex flex-col gap-2">
+                  <li><strong className="font-semibold text-foreground">Package Contains:</strong> {product.details?.packageDetails || "1 Complete Garment Set"}</li>
+                  {product.details?.length && <li><strong className="font-semibold text-foreground">Garment Length:</strong> {product.details.length}</li>}
+                  {product.details?.blouseDescription && <li><strong className="font-semibold text-foreground">Blouse Fabric:</strong> {product.details.blouseDescription}</li>}
+                  <li><strong className="font-semibold text-foreground">Origin:</strong> {product.details?.origin || "Surat, Gujarat"}</li>
                 </ul>
               </div>
             </div>
           )}
 
           {activeTab === "craft" && (
-            <div style={{ maxWidth: "700px", lineHeight: 1.7, color: "var(--text-secondary)", fontSize: "0.9rem" }}>
-              <h4 style={{ color: "var(--text-primary)", marginBottom: "0.5rem" }}>Wash & Garment Care</h4>
+            <div className="max-w-[700px] text-sm text-muted-foreground leading-relaxed">
+              <h4 className="text-foreground font-semibold mb-2">Wash & Garment Care</h4>
               <p>{product.details?.care || "Dry clean recommended for first wash. Gentle hand wash in cold water with mild detergent. Do not bleach or tumble dry. Iron inside out on moderate heat."}</p>
             </div>
           )}
 
           {activeTab === "shipping" && (
-            <div style={{ maxWidth: "700px", lineHeight: 1.7, color: "var(--text-secondary)", fontSize: "0.9rem" }}>
-              <h4 style={{ color: "var(--text-primary)", marginBottom: "0.5rem" }}>Shipping & Exchange Guidelines</h4>
+            <div className="max-w-[700px] text-sm text-muted-foreground leading-relaxed">
+              <h4 className="text-foreground font-semibold mb-2">Shipping & Exchange Guidelines</h4>
               <p>Free Pan-India delivery via insured Blue Dart Express. Orders are dispatched from Surat within 24–48 hours. 7-day hassle-free size exchange window available.</p>
             </div>
           )}
@@ -789,11 +500,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <div style={{ marginTop: "6rem", borderTop: "1px solid var(--border-subtle)", paddingTop: "3rem" }}>
-            <h2 className="font-serif" style={{ fontSize: "2rem", marginBottom: "2rem" }}>
-              You May Also Like
-            </h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "2rem" }}>
+          <div className="mt-24 border-t pt-12">
+            <h2 className="font-serif text-3xl mb-8">You May Also Like</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
               {relatedProducts.map((rel) => (
                 <ProductCard key={rel.id} product={rel} onNavigate={onNavigate} />
               ))}

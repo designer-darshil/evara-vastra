@@ -77,7 +77,7 @@ export const LookbookTeaserSection: React.FC<{
           {previewLooks.map((look) => (
             <div
               key={look.id}
-              onClick={() => onNavigate(`/product/${look.productSlug}`)}
+              onClick={() => onNavigate(`/products/${look.productSlug}`)}
               data-cursor="VIEW LOOK"
               style={{
                 backgroundColor: "var(--bg-surface)",

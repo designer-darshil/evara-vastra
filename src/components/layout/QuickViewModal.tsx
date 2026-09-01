@@ -48,7 +48,7 @@ export const QuickViewModal: React.FC<{ onNavigate: (href: string) => void }> = 
 
   const handleFullView = () => {
     closeQuickView();
-    onNavigate(`/product/${quickViewProduct.slug}`);
+    onNavigate(`/products/${quickViewProduct.slug}`);
   };
 
   const handleAdd = () => {

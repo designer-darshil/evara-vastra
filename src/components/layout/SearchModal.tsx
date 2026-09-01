@@ -50,7 +50,7 @@ export const SearchModal: React.FC<{ onNavigate: (href: string) => void }> = ({
 
   const handleSelectProduct = (slug: string) => {
     closeSearch();
-    onNavigate(`/product/${slug}`);
+    onNavigate(`/products/${slug}`);
   };
 
   const handleQuickTagClick = (tag: string) => {

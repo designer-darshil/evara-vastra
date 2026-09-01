@@ -2,162 +2,82 @@ import React from "react";
 import { useData } from "../../context/DataContext";
 import { ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
 import { MagneticButton } from "../common/MagneticButton";
+import { Button } from "../ui/button";
 
 interface HeroSectionProps {
-  onNavigate: (href: string) => void;
+  onNavigate?: (href: string) => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
   const { homepageCMS } = useData();
 
+  const handleNav = (href: string) => {
+    if (onNavigate) onNavigate(href);
+  };
+
   return (
-    <section
-      style={{
-        position: "relative",
-        minHeight: "clamp(auto, 70vh, calc(90vh - 72px))",
-        display: "flex",
-        alignItems: "center",
-        overflow: "hidden",
-        backgroundColor: "var(--bg-primary)",
-        paddingTop: "2.5rem",
-        paddingBottom: "4.5rem",
-      }}
-    >
+    <section className="relative min-h-[clamp(auto,70vh,calc(90vh-72px))] flex items-center overflow-hidden bg-background pt-10 pb-16">
       <div className="container">
-        <div
-          className="hero-grid"
-        >
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
           {/* Left Narrative Column */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "1.5rem",
-              zIndex: 2,
-            }}
-          >
+          <div className="flex flex-col gap-6 z-10">
             {/* Season Badge */}
-            <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
-              <span
-                style={{
-                  fontSize: "0.72rem",
-                  fontWeight: 600,
-                  letterSpacing: "0.2em",
-                  textTransform: "uppercase",
-                  color: "var(--accent-wine)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.4rem",
-                }}
-              >
-                <Sparkles size={13} /> {homepageCMS.heroBadge || "AUTUMN / WINTER 2026"}
+            <div className="inline-flex items-center gap-2">
+              <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-accent flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" /> {homepageCMS.heroBadge || "AUTUMN / WINTER 2026"}
               </span>
-              <span style={{ color: "var(--border-medium)" }}>•</span>
-              <span
-                style={{
-                  fontSize: "0.72rem",
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  color: "var(--text-secondary)",
-                }}
-              >
+              <span className="text-border/80">•</span>
+              <span className="text-[11px] tracking-[0.14em] uppercase text-muted-foreground">
                 100% PURE SILK MARK
               </span>
             </div>
 
             {/* Main Headline */}
-            <h1
-              className="font-serif"
-              style={{
-                fontSize: "clamp(2.75rem, 5.2vw, 4.75rem)",
-                lineHeight: 1.05,
-                color: "var(--text-primary)",
-                fontWeight: 500,
-                letterSpacing: "-0.01em",
-              }}
-            >
+            <h1 className="font-serif text-[clamp(2.75rem,5.2vw,4.75rem)] leading-[1.05] text-foreground font-medium tracking-tight m-0">
               {homepageCMS.heroHeading}{" "}
-              <span
-                style={{
-                  fontStyle: "italic",
-                  color: "var(--accent-wine)",
-                  fontWeight: 400,
-                }}
-              >
+              <span className="italic text-accent font-normal">
                 {homepageCMS.heroAccentWord}
               </span>
             </h1>
 
             {/* Editorial Lead Paragraph */}
-            <p
-              style={{
-                fontSize: "clamp(0.95rem, 1.2vw, 1.125rem)",
-                lineHeight: 1.65,
-                color: "var(--text-secondary)",
-                maxWidth: "520px",
-                fontWeight: 400,
-              }}
-            >
+            <p className="text-[clamp(0.95rem,1.2vw,1.125rem)] leading-relaxed text-muted-foreground max-w-[520px] font-normal m-0">
               {homepageCMS.heroSubheading}
             </p>
 
             {/* Call To Actions */}
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                gap: "1.25rem",
-                marginTop: "0.5rem",
-              }}
-            >
+            <div className="flex flex-wrap items-center gap-5 mt-2">
               <MagneticButton>
-                <button
-                  onClick={() => onNavigate(homepageCMS.primaryCtaLink || "/shop")}
-                  className="btn-wine"
-                  style={{
-                    padding: "1rem 2rem",
-                    fontSize: "0.85rem",
-                  }}
+                <Button
+                  onClick={() => handleNav(homepageCMS.primaryCtaLink || "/shop")}
+                  className="px-8 py-6 text-sm font-semibold rounded-sm bg-accent text-accent-foreground hover:bg-accent/90"
                 >
-                  <span>{homepageCMS.primaryCtaText || "Shop The Collection"}</span>
-                  <ArrowRight size={16} />
-                </button>
+                  {homepageCMS.primaryCtaText || "Shop The Collection"}
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
               </MagneticButton>
 
-              <button
-                onClick={() => onNavigate(homepageCMS.secondaryCtaLink || "/craftsmanship")}
-                className="btn-link"
-                style={{
-                  fontSize: "0.85rem",
-                  padding: "0.5rem 0",
-                }}
+              <Button
+                variant="link"
+                onClick={() => handleNav(homepageCMS.secondaryCtaLink || "/craftsmanship")}
+                className="text-sm px-0 h-auto font-semibold text-foreground hover:text-accent transition-colors"
               >
-                <span>{homepageCMS.secondaryCtaText || "Explore The Craft"}</span>
-                <ArrowRight size={15} />
-              </button>
+                {homepageCMS.secondaryCtaText || "Explore The Craft"}
+                <ArrowRight className="w-4 h-4 ml-1" />
+              </Button>
             </div>
 
             {/* Trust Assurances */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "1.75rem",
-                marginTop: "1.5rem",
-                paddingTop: "1.5rem",
-                borderTop: "1px solid var(--border-subtle)",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <ShieldCheck size={16} style={{ color: "var(--accent-gold)" }} />
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>
+            <div className="flex flex-wrap items-center gap-7 mt-6 pt-6 border-t border-border">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-primary" />
+                <span className="text-xs text-muted-foreground">
                   Pure Silk Mark Certified
                 </span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <span style={{ color: "var(--accent-gold)", fontSize: "0.9rem" }}>✦</span>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>
+              <div className="flex items-center gap-2">
+                <span className="text-primary text-sm">✦</span>
+                <span className="text-xs text-muted-foreground">
                   Kadwa Pit Loom Weave
                 </span>
               </div>
@@ -165,82 +85,24 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
           </div>
 
           {/* Right Visual Image */}
-          <div
-            style={{
-              position: "relative",
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            <div
-              style={{
-                position: "relative",
-                width: "100%",
-                maxWidth: "460px",
-                aspectRatio: "3/4",
-                boxShadow: "var(--shadow-elevated)",
-                overflow: "hidden",
-                backgroundColor: "var(--bg-surface-subtle)",
-              }}
-            >
+          <div className="relative flex justify-center lg:justify-end">
+            <div className="relative w-full max-w-[460px] aspect-[3/4] shadow-xl overflow-hidden bg-secondary/50 rounded-sm">
               <img
                 src={homepageCMS.heroImage}
                 alt="Evara Vastra Saree"
                 fetchPriority="high"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  transition: "transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)",
-                }}
+                className="w-full h-full object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-105"
               />
 
               {/* Floating Craftsmanship Badge */}
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: "1.5rem",
-                  left: "1.5rem",
-                  right: "1.5rem",
-                  backgroundColor: "var(--hero-badge-bg)",
-                  backdropFilter: "blur(8px)",
-                  padding: "1rem 1.25rem",
-                  border: "1px solid var(--hero-badge-border)",
-                  boxShadow: "var(--shadow-subtle)",
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: "0.65rem",
-                    fontWeight: 700,
-                    letterSpacing: "0.18em",
-                    textTransform: "uppercase",
-                    color: "var(--accent-wine)",
-                    display: "block",
-                    marginBottom: "0.2rem",
-                  }}
-                >
+              <div className="absolute bottom-6 left-6 right-6 bg-background/80 backdrop-blur-md p-5 border border-border shadow-sm rounded-sm">
+                <span className="text-[10px] font-bold tracking-[0.18em] uppercase text-accent block mb-1">
                   FEATURED DRAPE
                 </span>
-                <p
-                  className="font-serif"
-                  style={{
-                    fontSize: "1.05rem",
-                    color: "var(--text-primary)",
-                    margin: 0,
-                    lineHeight: 1.2,
-                  }}
-                >
+                <p className="font-serif text-[17px] text-foreground m-0 leading-snug">
                   Raga Katan Silk in Deep Wine
                 </p>
-                <span
-                  style={{
-                    fontSize: "0.72rem",
-                    color: "var(--text-secondary)",
-                    display: "block",
-                    marginTop: "0.25rem",
-                  }}
-                >
+                <span className="text-[11px] text-muted-foreground block mt-1">
                   18 days on handloom • Antique gold Kadwa zari
                 </span>
               </div>
@@ -248,7 +110,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
           </div>
         </div>
       </div>
-
     </section>
   );
 };

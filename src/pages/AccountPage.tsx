@@ -77,7 +77,7 @@ export const AccountPage: React.FC<{ onNavigate: (href: string) => void }> = ({
           >
             {[
               { id: "profile", label: "Client Profile", icon: User },
-              { id: "orders", label: "My Orders & Tracking", icon: Package, isLink: "/orders" },
+              { id: "orders", label: "My Orders & Tracking", icon: Package, isLink: "/account/orders" },
               { id: "addresses", label: "Saved Addresses", icon: MapPin },
               { id: "measurements", label: "Bespoke Blouse Sizes", icon: Scissors },
               { id: "wishlist", label: `Saved Pieces (${wishlistCount})`, icon: Heart, isLink: "/wishlist" },

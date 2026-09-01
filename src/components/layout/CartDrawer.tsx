@@ -2,8 +2,10 @@ import React, { useEffect } from "react";
 import { useShop } from "../../context/ShopContext";
 import { siteConfig } from "../../data/site";
 import { X, Trash2, Plus, Minus, ArrowRight, ShoppingBag, ShieldCheck } from "lucide-react";
+import { Button } from "../ui/button";
+import { useNavigate } from "react-router-dom";
 
-export const CartDrawer: React.FC<{ onNavigate: (href: string) => void }> = ({
+export const CartDrawer: React.FC<{ onNavigate?: (href: string) => void }> = ({
   onNavigate,
 }) => {
   const {
@@ -14,6 +16,12 @@ export const CartDrawer: React.FC<{ onNavigate: (href: string) => void }> = ({
     removeFromCart,
     cartSubtotal,
   } = useShop();
+
+  const navigate = useNavigate();
+  const handleNav = (href: string) => {
+    if (onNavigate) onNavigate(href);
+    else navigate(href);
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -48,57 +56,28 @@ export const CartDrawer: React.FC<{ onNavigate: (href: string) => void }> = ({
 
   const handleCheckout = () => {
     closeCartDrawer();
-    onNavigate("/checkout");
+    handleNav("/checkout");
   };
 
   const handleViewBag = () => {
     closeCartDrawer();
-    onNavigate("/cart");
+    handleNav("/cart");
   };
 
   return (
     <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        backgroundColor: "rgba(23, 21, 19, 0.6)",
-        backdropFilter: "blur(6px)",
-        zIndex: 99999,
-        display: "flex",
-        justifyContent: "flex-end",
-        animation: "fadeIn 0.2s ease-out forwards",
-      }}
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[99999] flex justify-end animate-in fade-in duration-200"
       onClick={closeCartDrawer}
     >
       <div
-        style={{
-          backgroundColor: "var(--bg-surface)",
-          color: "var(--text-primary)",
-          width: "100%",
-          maxWidth: "460px",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          boxShadow: "var(--shadow-elevated)",
-        }}
+        className="bg-background text-foreground w-full max-w-[460px] h-full flex flex-col shadow-2xl animate-in slide-in-from-right duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div
-          style={{
-            padding: "1.5rem",
-            borderBottom: "1px solid var(--border-subtle)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <ShoppingBag size={20} style={{ color: "var(--accent-wine)" }} />
-            <h3
-              className="font-serif"
-              style={{ fontSize: "1.4rem", color: "var(--text-primary)" }}
-            >
+        <div className="p-6 border-b border-border flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <ShoppingBag className="w-6 h-6 text-accent" />
+            <h3 className="font-serif text-2xl text-foreground m-0">
               Shopping Bag ({cart.reduce((a, b) => a + b.quantity, 0)})
             </h3>
           </div>
@@ -106,45 +85,23 @@ export const CartDrawer: React.FC<{ onNavigate: (href: string) => void }> = ({
           <button
             onClick={closeCartDrawer}
             aria-label="Close shopping bag"
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "50%",
-              backgroundColor: "var(--bg-primary)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "var(--text-primary)",
-            }}
+            className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground hover:bg-secondary/80 transition-colors"
           >
-            <X size={18} />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Free Shipping Progress */}
-        <div
-          style={{
-            padding: "0.85rem 1.5rem",
-            backgroundColor: "var(--bg-surface-subtle)",
-            borderBottom: "1px solid var(--border-subtle)",
-          }}
-        >
-          <p
-            style={{
-              fontSize: "0.75rem",
-              fontWeight: 500,
-              color: "var(--text-primary)",
-              marginBottom: "0.4rem",
-            }}
-          >
+        <div className="px-6 py-4 bg-secondary/30 border-b border-border">
+          <p className="text-xs font-semibold text-foreground mb-2">
             {remainingForFreeShipping === 0 ? (
-              <span style={{ color: "var(--accent-wine)", fontWeight: 600 }}>
+              <span className="text-accent font-bold">
                 ✓ You have unlocked Complimentary Express Shipping!
               </span>
             ) : (
               <>
                 Add{" "}
-                <strong>
+                <strong className="text-foreground">
                   {new Intl.NumberFormat("en-IN", {
                     style: "currency",
                     currency: "INR",
@@ -155,84 +112,34 @@ export const CartDrawer: React.FC<{ onNavigate: (href: string) => void }> = ({
               </>
             )}
           </p>
-          <div
-            style={{
-              width: "100%",
-              height: "4px",
-              backgroundColor: "var(--border-subtle)",
-              overflow: "hidden",
-            }}
-          >
+          <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
             <div
-              style={{
-                width: `${progressPercent}%`,
-                height: "100%",
-                backgroundColor: "var(--accent-wine)",
-                transition: "width 0.4s ease",
-              }}
+              className="h-full bg-accent transition-all duration-500 ease-out"
+              style={{ width: `${progressPercent}%` }}
             />
           </div>
         </div>
 
         {/* Cart Item List */}
-        <div
-          style={{
-            flex: 1,
-            overflowY: "auto",
-            padding: "1.5rem",
-            display: "flex",
-            flexDirection: "column",
-            gap: "1.25rem",
-          }}
-        >
+        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
           {cart.length === 0 ? (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                height: "100%",
-                textAlign: "center",
-                gap: "1rem",
-              }}
-            >
-              <div
-                style={{
-                  width: "64px",
-                  height: "64px",
-                  borderRadius: "50%",
-                  backgroundColor: "var(--bg-primary)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "var(--text-muted)",
-                }}
-              >
-                <ShoppingBag size={28} />
+            <div className="flex flex-col items-center justify-center h-full text-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center text-muted-foreground">
+                <ShoppingBag className="w-7 h-7" />
               </div>
-              <h4 className="font-serif" style={{ fontSize: "1.5rem" }}>
-                Your bag is empty
-              </h4>
-              <p
-                style={{
-                  fontSize: "0.85rem",
-                  color: "var(--text-secondary)",
-                  maxWidth: "280px",
-                }}
-              >
+              <h4 className="font-serif text-2xl m-0">Your bag is empty</h4>
+              <p className="text-sm text-muted-foreground max-w-[280px]">
                 Discover our handwoven silks, pure linens and Banarasi archives.
               </p>
-              <button
+              <Button
                 onClick={() => {
                   closeCartDrawer();
-                  onNavigate("/shop");
+                  handleNav("/shop");
                 }}
-                className="btn-primary"
-                style={{ marginTop: "0.5rem" }}
+                className="mt-2"
               >
                 Explore Sarees
-              </button>
+              </Button>
             </div>
           ) : (
             cart.map((item) => {
@@ -245,149 +152,65 @@ export const CartDrawer: React.FC<{ onNavigate: (href: string) => void }> = ({
               return (
                 <div
                   key={item.product.id}
-                  style={{
-                    display: "flex",
-                    gap: "1rem",
-                    paddingBottom: "1.25rem",
-                    borderBottom: "1px solid var(--border-subtle)",
-                  }}
+                  className="flex gap-4 pb-6 border-b border-border last:border-0 last:pb-0"
                 >
                   <img
                     src={item.product.images[0]}
                     alt={item.product.title}
-                    style={{
-                      width: "84px",
-                      height: "112px",
-                      objectFit: "cover",
-                      flexShrink: 0,
-                      backgroundColor: "var(--bg-primary)",
-                    }}
+                    className="w-[84px] h-[112px] object-cover shrink-0 bg-secondary rounded-sm"
                   />
 
-                  <div
-                    style={{
-                      flex: 1,
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                    }}
-                  >
+                  <div className="flex-1 flex flex-col justify-between">
                     <div>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "flex-start",
-                        }}
-                      >
+                      <div className="flex justify-between items-start gap-2">
                         <h5
                           onClick={() => {
                             closeCartDrawer();
-                            onNavigate(`/product/${item.product.slug}`);
+                            handleNav(`/products/${item.product.slug}`);
                           }}
-                          style={{
-                            fontSize: "0.9rem",
-                            fontWeight: 600,
-                            color: "var(--text-primary)",
-                            cursor: "pointer",
-                            lineHeight: 1.3,
-                          }}
+                          className="text-sm font-semibold text-foreground cursor-pointer leading-snug hover:text-accent transition-colors m-0"
                         >
                           {item.product.title}
                         </h5>
                         <button
                           onClick={() => removeFromCart(item.product.id)}
                           aria-label="Remove item"
-                          style={{
-                            color: "var(--text-muted)",
-                            padding: "2px",
-                            transition: "color 0.2s ease",
-                          }}
-                          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent-wine)")}
-                          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
+                          className="text-muted-foreground hover:text-accent transition-colors p-1"
                         >
-                          <Trash2 size={15} />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
-                      <p
-                        style={{
-                          fontSize: "0.75rem",
-                          color: "var(--text-secondary)",
-                          marginTop: "0.2rem",
-                        }}
-                      >
+                      <p className="text-xs text-muted-foreground mt-1">
                         {item.product.fabric} • {item.product.color}
                       </p>
                       {item.product.details.blousePiece && (
-                        <span
-                          style={{
-                            display: "inline-block",
-                            fontSize: "0.65rem",
-                            color: "var(--accent-gold)",
-                            fontWeight: 600,
-                            textTransform: "uppercase",
-                            marginTop: "0.2rem",
-                          }}
-                        >
+                        <span className="inline-block text-[10px] text-primary font-bold uppercase mt-1">
                           + Unstitched Blouse Piece
                         </span>
                       )}
                     </div>
 
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        marginTop: "0.5rem",
-                      }}
-                    >
+                    <div className="flex items-center justify-between mt-3">
                       {/* Quantity Controller */}
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          border: "1px solid var(--border-medium)",
-                        }}
-                      >
+                      <div className="flex items-center border border-border rounded-sm bg-background">
                         <button
                           onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                          style={{
-                            padding: "0.25rem 0.5rem",
-                            color: "var(--text-secondary)",
-                          }}
+                          className="p-1.5 text-muted-foreground hover:bg-secondary transition-colors"
                         >
-                          <Minus size={12} />
+                          <Minus className="w-3 h-3" />
                         </button>
-                        <span
-                          style={{
-                            fontSize: "0.8rem",
-                            fontWeight: 600,
-                            padding: "0 0.4rem",
-                            minWidth: "20px",
-                            textAlign: "center",
-                          }}
-                        >
+                        <span className="text-xs font-semibold px-2 min-w-[20px] text-center">
                           {item.quantity}
                         </span>
                         <button
                           onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                          style={{
-                            padding: "0.25rem 0.5rem",
-                            color: "var(--text-secondary)",
-                          }}
+                          className="p-1.5 text-muted-foreground hover:bg-secondary transition-colors"
                         >
-                          <Plus size={12} />
+                          <Plus className="w-3 h-3" />
                         </button>
                       </div>
 
-                      <span
-                        style={{
-                          fontSize: "0.95rem",
-                          fontWeight: 600,
-                          color: "var(--text-primary)",
-                        }}
-                      >
+                      <span className="text-[15px] font-bold text-foreground">
                         {formattedItemPrice}
                       </span>
                     </div>
@@ -400,72 +223,35 @@ export const CartDrawer: React.FC<{ onNavigate: (href: string) => void }> = ({
 
         {/* Footer Actions */}
         {cart.length > 0 && (
-          <div
-            style={{
-              padding: "1.5rem",
-              borderTop: "1px solid var(--border-subtle)",
-              backgroundColor: "var(--bg-primary)",
-              display: "flex",
-              flexDirection: "column",
-              gap: "1rem",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <span
-                style={{
-                  fontSize: "0.85rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.1em",
-                  color: "var(--text-secondary)",
-                }}
-              >
+          <div className="p-6 border-t border-border bg-background flex flex-col gap-5 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+            <div className="flex items-center justify-between">
+              <span className="text-sm uppercase tracking-widest text-muted-foreground font-semibold">
                 Subtotal
               </span>
-              <span
-                style={{
-                  fontSize: "1.25rem",
-                  fontWeight: 600,
-                  color: "var(--text-primary)",
-                }}
-              >
+              <span className="text-2xl font-bold text-foreground">
                 {formattedSubtotal}
               </span>
             </div>
 
-            <p
-              style={{
-                fontSize: "0.75rem",
-                color: "var(--text-muted)",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.4rem",
-              }}
-            >
-              <ShieldCheck size={14} style={{ color: "var(--accent-gold)" }} />
+            <p className="text-xs text-muted-foreground flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-primary" />
               Taxes and insured shipping calculated at checkout
             </p>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-              <button
+            <div className="flex flex-col gap-3">
+              <Button
                 onClick={handleCheckout}
-                className="btn-wine"
-                style={{ width: "100%", padding: "1rem" }}
+                className="w-full h-12 text-sm uppercase tracking-widest font-bold"
               >
-                Proceed to Checkout <ArrowRight size={16} />
-              </button>
-              <button
+                Proceed to Checkout <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+              <Button
                 onClick={handleViewBag}
-                className="btn-secondary"
-                style={{ width: "100%", padding: "0.75rem" }}
+                variant="outline"
+                className="w-full h-10"
               >
                 View Bag & Details
-              </button>
+              </Button>
             </div>
           </div>
         )}

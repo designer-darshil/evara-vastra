@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { DataProvider, useData } from "./context/DataContext";
 import { ShopProvider } from "./context/ShopContext";
 
@@ -55,36 +56,40 @@ import { AdminCouponsPage } from "./admin/AdminCouponsPage";
 import { AdminMediaPage } from "./admin/AdminMediaPage";
 import { AdminSettingsPage } from "./admin/AdminSettingsPage";
 import { AdminAnalyticsPage } from "./admin/AdminAnalyticsPage";
+import { AdminUsersPage } from "./admin/AdminUsersPage";
+import { AdminAuditLogsPage } from "./admin/AdminAuditLogsPage";
+import { AdminLayout } from "./admin/AdminLayout";
+
+// New Storefront Pages
+import { SearchPage } from "./pages/SearchPage";
+import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
+import { AccountAddressesPage } from "./pages/AccountAddressesPage";
+import { AccountProfilePage } from "./pages/AccountProfilePage";
+import { OrderConfirmationPage } from "./pages/OrderConfirmationPage";
 
 const AppContent: React.FC = () => {
   const { siteSettings } = useData();
-  const [currentPath, setCurrentPath] = useState<string>(window.location.pathname);
+  const location = useLocation();
+  const navigateRouter = useNavigate();
+  const currentPath = location.pathname;
+  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAppLoading, setIsAppLoading] = useState(true);
 
-  // Sync route and popstate
   useEffect(() => {
-    const handleLocationChange = () => {
-      setCurrentPath(window.location.pathname);
-      window.scrollTo(0, 0);
-    };
+    window.scrollTo(0, 0);
+  }, [currentPath]);
 
-    window.addEventListener("popstate", handleLocationChange);
-
+  useEffect(() => {
     const timer = setTimeout(() => {
       setIsAppLoading(false);
     }, 450);
-
-    return () => {
-      window.removeEventListener("popstate", handleLocationChange);
-      clearTimeout(timer);
-    };
+    return () => clearTimeout(timer);
   }, []);
 
   const navigate = (href: string) => {
-    window.history.pushState({}, "", href);
-    setCurrentPath(href);
-    window.scrollTo(0, 0);
+    navigateRouter(href);
   };
 
   // Dynamic Browser Title
@@ -105,7 +110,7 @@ const AppContent: React.FC = () => {
     } else if (path.startsWith("/occasions/") || path.startsWith("/occasion/")) {
       const occName = path.replace(/^\/(occasions|occasion)\//, "").replace(/[-_]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
       document.title = `${occName} Collection | EVARA VASTRA`;
-    } else if (path.startsWith("/product/")) {
+    } else if (path.startsWith("/products/")) {
       document.title = "Product Details | EVARA VASTRA";
     } else if (path.startsWith("/collections")) {
       document.title = "Curated Collections | EVARA VASTRA";
@@ -113,15 +118,15 @@ const AppContent: React.FC = () => {
       document.title = "Shopping Bag | EVARA VASTRA";
     } else if (path === "/checkout") {
       document.title = "Express Checkout | EVARA VASTRA";
-    } else if (path === "/orders") {
+    } else if (path === "/account/orders") {
       document.title = "Track Orders | EVARA VASTRA";
-    } else if (path === "/shipping") {
+    } else if (path === "/shipping-policy") {
       document.title = "Shipping Policy | EVARA VASTRA";
-    } else if (path === "/returns") {
+    } else if (path === "/replacement-exchange-policy") {
       document.title = "Replacement & Exchange Policy | EVARA VASTRA";
-    } else if (path === "/privacy") {
+    } else if (path === "/privacy-policy") {
       document.title = "Privacy Policy | EVARA VASTRA";
-    } else if (path === "/terms") {
+    } else if (path === "/terms-of-service") {
       document.title = "Terms of Service | EVARA VASTRA";
     } else {
       document.title = "EVARA VASTRA — Contemporary Indian Womenswear";
@@ -137,67 +142,80 @@ const AppContent: React.FC = () => {
       return <AdminLoginPage onNavigate={navigate} />;
     }
 
-    if (currentPath === "/admin" || currentPath === "/admin/") {
+    const renderAdminInnerRoute = () => {
+      if (currentPath === "/admin" || currentPath === "/admin/") {
+        return <AdminDashboardPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/products") {
+        return <AdminProductsPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/products/new") {
+        return <AdminProductEditPage onNavigate={navigate} />;
+      }
+      if (currentPath.startsWith("/admin/products/edit/")) {
+        const prodId = currentPath.replace("/admin/products/edit/", "");
+        return <AdminProductEditPage productId={prodId} onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/categories") {
+        return <AdminCategoriesPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/collections") {
+        return <AdminCollectionsPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/shoppable-videos") {
+        return <AdminShoppableVideosPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/reviews") {
+        return <AdminReviewsPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/navigation") {
+        return <AdminNavigationPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/orders") {
+        return <AdminOrdersPage onNavigate={navigate} />;
+      }
+      if (currentPath.startsWith("/admin/orders/")) {
+        const ordId = currentPath.replace("/admin/orders/", "");
+        return <AdminOrderDetailPage orderId={ordId} onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/customers") {
+        return <AdminCustomersPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/content") {
+        return <AdminContentHubPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/content/homepage") {
+        return <AdminHomepageCMSPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/content/notification-bar" || currentPath === "/admin/notification-bar") {
+        return <AdminNotificationBarPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/coupons") {
+        return <AdminCouponsPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/media") {
+        return <AdminMediaPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/settings") {
+        return <AdminSettingsPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/analytics") {
+        return <AdminAnalyticsPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/users") {
+        return <AdminUsersPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/audit-logs") {
+        return <AdminAuditLogsPage onNavigate={navigate} />;
+      }
       return <AdminDashboardPage onNavigate={navigate} />;
-    }
-    if (currentPath === "/admin/products") {
-      return <AdminProductsPage onNavigate={navigate} />;
-    }
-    if (currentPath === "/admin/products/new") {
-      return <AdminProductEditPage onNavigate={navigate} />;
-    }
-    if (currentPath.startsWith("/admin/products/edit/")) {
-      const prodId = currentPath.replace("/admin/products/edit/", "");
-      return <AdminProductEditPage productId={prodId} onNavigate={navigate} />;
-    }
-    if (currentPath === "/admin/categories") {
-      return <AdminCategoriesPage onNavigate={navigate} />;
-    }
-    if (currentPath === "/admin/collections") {
-      return <AdminCollectionsPage onNavigate={navigate} />;
-    }
-    if (currentPath === "/admin/shoppable-videos") {
-      return <AdminShoppableVideosPage onNavigate={navigate} />;
-    }
-    if (currentPath === "/admin/reviews") {
-      return <AdminReviewsPage onNavigate={navigate} />;
-    }
-    if (currentPath === "/admin/navigation") {
-      return <AdminNavigationPage onNavigate={navigate} />;
-    }
-    if (currentPath === "/admin/orders") {
-      return <AdminOrdersPage onNavigate={navigate} />;
-    }
-    if (currentPath.startsWith("/admin/orders/")) {
-      const ordId = currentPath.replace("/admin/orders/", "");
-      return <AdminOrderDetailPage orderId={ordId} onNavigate={navigate} />;
-    }
-    if (currentPath === "/admin/customers") {
-      return <AdminCustomersPage onNavigate={navigate} />;
-    }
-    if (currentPath === "/admin/content") {
-      return <AdminContentHubPage onNavigate={navigate} />;
-    }
-    if (currentPath === "/admin/content/homepage") {
-      return <AdminHomepageCMSPage onNavigate={navigate} />;
-    }
-    if (currentPath === "/admin/content/notification-bar" || currentPath === "/admin/notification-bar") {
-      return <AdminNotificationBarPage onNavigate={navigate} />;
-    }
-    if (currentPath === "/admin/coupons") {
-      return <AdminCouponsPage onNavigate={navigate} />;
-    }
-    if (currentPath === "/admin/media") {
-      return <AdminMediaPage onNavigate={navigate} />;
-    }
-    if (currentPath === "/admin/settings") {
-      return <AdminSettingsPage onNavigate={navigate} />;
-    }
-    if (currentPath === "/admin/analytics") {
-      return <AdminAnalyticsPage onNavigate={navigate} />;
-    }
+    };
 
-    return <AdminDashboardPage onNavigate={navigate} />;
+    return (
+      <AdminLayout currentPath={currentPath} onNavigate={navigate}>
+        {renderAdminInnerRoute()}
+      </AdminLayout>
+    );
   };
 
   // Storefront Router
@@ -280,8 +298,20 @@ const AppContent: React.FC = () => {
       );
     }
 
-    if (cleanPath.startsWith("/product/")) {
-      const slug = cleanPath.replace("/product/", "");
+    if (cleanPath === "/search") {
+      return <SearchPage onNavigate={navigate} />;
+    }
+    
+    if (cleanPath === "/login") {
+      return <LoginPage onNavigate={navigate} />;
+    }
+    
+    if (cleanPath === "/register") {
+      return <RegisterPage onNavigate={navigate} />;
+    }
+
+    if (cleanPath.startsWith("/products/")) {
+      const slug = cleanPath.replace("/products/", "");
       return <ProductDetailPage slug={slug} onNavigate={navigate} />;
     }
 
@@ -315,8 +345,21 @@ const AppContent: React.FC = () => {
       return <AccountPage onNavigate={navigate} />;
     }
 
-    if (cleanPath === "/orders") {
+    if (cleanPath === "/account/orders") {
       return <OrdersPage onNavigate={navigate} />;
+    }
+    
+    if (cleanPath === "/account/profile") {
+      return <AccountProfilePage onNavigate={navigate} />;
+    }
+    
+    if (cleanPath === "/account/addresses") {
+      return <AccountAddressesPage onNavigate={navigate} />;
+    }
+    
+    if (cleanPath.startsWith("/order-confirmation/")) {
+      const orderId = cleanPath.replace("/order-confirmation/", "");
+      return <OrderConfirmationPage orderId={orderId} onNavigate={navigate} />;
     }
 
     if (cleanPath === "/about") {
@@ -331,19 +374,19 @@ const AppContent: React.FC = () => {
       return <FaqPage onNavigate={navigate} />;
     }
 
-    if (cleanPath === "/shipping") {
+    if (cleanPath === "/shipping-policy") {
       return <ShippingPolicyPage onNavigate={navigate} />;
     }
 
-    if (cleanPath === "/returns") {
+    if (cleanPath === "/replacement-exchange-policy") {
       return <ReturnsPolicyPage onNavigate={navigate} />;
     }
 
-    if (cleanPath === "/privacy") {
+    if (cleanPath === "/privacy-policy") {
       return <PrivacyPolicyPage onNavigate={navigate} />;
     }
 
-    if (cleanPath === "/terms") {
+    if (cleanPath === "/terms-of-service") {
       return <TermsPage onNavigate={navigate} />;
     }
 

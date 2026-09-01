@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useData } from "../../context/DataContext";
 import { X, ArrowRight } from "lucide-react";
+import { cn } from "../../lib/utils";
 
 export const NotificationBar: React.FC<{ onNavigate: (href: string) => void }> = ({
   onNavigate,
@@ -27,81 +28,31 @@ export const NotificationBar: React.FC<{ onNavigate: (href: string) => void }> =
     sessionStorage.setItem(`evara_notif_dismissed_${notificationBar.message}`, "true");
   };
 
-  const getThemeStyles = () => {
-    switch (notificationBar.backgroundStyle) {
-      case "wine":
-        return {
-          backgroundColor: "var(--accent-wine)",
-          color: "#FFFFFF",
-          linkColor: "var(--accent-gold)",
-        };
-      case "gold":
-        return {
-          backgroundColor: "#8C6836",
-          color: "#FFFFFF",
-          linkColor: "#FFFFFF",
-        };
-      case "dark":
-      default:
-        return {
-          backgroundColor: "var(--bg-dark)",
-          color: "var(--text-inverse)",
-          linkColor: "var(--accent-gold)",
-        };
-    }
-  };
-
-  const theme = getThemeStyles();
+  const themeClasses = {
+    wine: "bg-accent text-accent-foreground",
+    gold: "bg-primary text-primary-foreground",
+    dark: "bg-foreground text-background",
+  }[notificationBar.backgroundStyle || "dark"] || "bg-foreground text-background";
 
   return (
     <div
       role="region"
       aria-label="Website announcement"
-      style={{
-        backgroundColor: theme.backgroundColor,
-        color: theme.color,
-        fontSize: "0.75rem",
-        fontWeight: 500,
-        letterSpacing: "0.06em",
-        padding: "0.55rem 1rem",
-        position: "relative",
-        zIndex: 9999,
-        transition: "all 0.3s ease",
-      }}
+      className={cn(
+        "relative z-50 flex items-center justify-center px-4 py-2.5 text-xs font-medium tracking-wider uppercase transition-all duration-300",
+        themeClasses
+      )}
     >
-      <div
-        className="container"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "0.75rem",
-          textAlign: "center",
-          flexWrap: "wrap",
-          paddingRight: notificationBar.isDismissible ? "2.5rem" : "0",
-        }}
-      >
+      <div className={cn("container flex flex-wrap items-center justify-center gap-3 text-center", notificationBar.isDismissible && "pr-10")}>
         <span>{notificationBar.message}</span>
 
         {notificationBar.link && (
           <button
             onClick={() => onNavigate(notificationBar.link)}
-            style={{
-              color: theme.linkColor,
-              fontWeight: 700,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.25rem",
-              textDecoration: "underline",
-              cursor: "pointer",
-              fontSize: "0.75rem",
-              backgroundColor: "transparent",
-              border: "none",
-              padding: 0,
-            }}
+            className="group inline-flex items-center gap-1 font-bold underline underline-offset-2 hover:opacity-80 transition-opacity"
           >
-            <span>{notificationBar.linkText || "EXPLORE NOW →"}</span>
-            <ArrowRight size={12} />
+            <span>{notificationBar.linkText || "EXPLORE NOW"}</span>
+            <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
           </button>
         )}
       </div>
@@ -110,23 +61,9 @@ export const NotificationBar: React.FC<{ onNavigate: (href: string) => void }> =
         <button
           onClick={handleDismiss}
           aria-label="Dismiss announcement"
-          style={{
-            position: "absolute",
-            right: "0.75rem",
-            top: "50%",
-            transform: "translateY(-50%)",
-            color: theme.color,
-            opacity: 0.8,
-            backgroundColor: "transparent",
-            border: "none",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "0.25rem",
-            cursor: "pointer",
-          }}
+          className="absolute right-4 top-1/2 -translate-y-1/2 p-1 opacity-80 hover:opacity-100 transition-opacity"
         >
-          <X size={14} />
+          <X className="h-4 w-4" />
         </button>
       )}
     </div>

@@ -132,7 +132,7 @@ export const LookbookPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                     </div>
 
                     <button
-                      onClick={() => onNavigate(`/product/${look.productSlug}`)}
+                      onClick={() => onNavigate(`/products/${look.productSlug}`)}
                       className="btn-wine"
                       style={{ width: "100%", padding: "0.9rem" }}
                     >

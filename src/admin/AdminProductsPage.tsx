@@ -315,7 +315,7 @@ export const AdminProductsPage: React.FC<{ onNavigate: (href: string) => void }>
                   <td style={{ padding: "0.85rem 1rem", textAlign: "right" }}>
                     <div style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
                       <button
-                        onClick={() => onNavigate(`/product/${p.slug}`)}
+                        onClick={() => onNavigate(`/products/${p.slug}`)}
                         title="Preview on Storefront"
                         style={{
                           padding: "0.4rem",

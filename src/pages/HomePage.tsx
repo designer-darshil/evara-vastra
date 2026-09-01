@@ -5,84 +5,66 @@ import { EditorialMarquee } from "../components/home/EditorialMarquee";
 import { CategoriesSection } from "../components/home/CategoriesSection";
 import { ShoppableVideosSection } from "../components/home/ShoppableVideosSection";
 import { CustomerReviewsSection } from "../components/home/CustomerReviewsSection";
-import { ProductCard } from "../components/product/ProductCard";
+import { ProductCard } from "../components/common/ProductCard";
 import { ArrowRight, Truck, Sparkles, Shield, RefreshCw } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { useNavigate } from "react-router-dom";
 
 interface HomePageProps {
-  onNavigate: (href: string) => void;
+  onNavigate?: (href: string) => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const { homepageCMS, publishedProducts } = useData();
+  const navigate = useNavigate();
   const vis = homepageCMS.sectionVisibility;
 
   const newArrivals = publishedProducts.slice(0, 8);
   const bestsellers = publishedProducts.filter((p) => p.bestseller).slice(0, 8);
 
+  const handleNav = (href: string) => {
+    if (onNavigate) onNavigate(href);
+    else navigate(href);
+  };
+
   return (
-    <div className="animate-fade-in">
+    <div className="animate-in fade-in duration-500">
       {/* 1. Hero Section */}
-      {vis.hero && <HeroSection onNavigate={onNavigate} />}
+      {vis.hero && <HeroSection onNavigate={handleNav} />}
 
       {/* 2. Marquee Ticker */}
       {vis.marquee && <EditorialMarquee />}
 
       {/* 3. Shop by Category Grid */}
-      {vis.categories && <CategoriesSection onNavigate={onNavigate} />}
+      {vis.categories && <CategoriesSection onNavigate={handleNav} />}
 
       {/* 4. New Season Arrivals Grid */}
       {vis.newArrivals && (
-        <section style={{ padding: "4.5rem 0", backgroundColor: "var(--bg-surface)" }}>
+        <section className="py-20 bg-secondary/50">
           <div className="container">
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                justifyContent: "space-between",
-                alignItems: "flex-end",
-                marginBottom: "2.5rem",
-                borderBottom: "1px solid var(--border-subtle)",
-                paddingBottom: "1.25rem",
-              }}
-            >
+            <div className="flex flex-wrap justify-between items-end mb-10 pb-5 border-b border-border gap-4">
               <div>
-                <span
-                  style={{
-                    fontSize: "0.72rem",
-                    fontWeight: 700,
-                    letterSpacing: "0.2em",
-                    textTransform: "uppercase",
-                    color: "var(--accent-wine)",
-                    display: "block",
-                    marginBottom: "0.3rem",
-                  }}
-                >
+                <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-accent block mb-1">
                   FRESH ATELIER DROPS
                 </span>
-                <h2 className="font-serif" style={{ fontSize: "clamp(1.85rem, 3.5vw, 2.8rem)", color: "var(--text-primary)", margin: 0 }}>
+                <h2 className="font-serif text-3xl md:text-4xl text-foreground m-0">
                   New Season Arrivals
                 </h2>
               </div>
 
-              <button
-                onClick={() => onNavigate("/shop?filter=newArrival")}
-                className="btn-link"
-                style={{ fontSize: "0.85rem", fontWeight: 600 }}
+              <Button
+                variant="link"
+                onClick={() => handleNav("/shop?filter=newArrival")}
+                className="text-sm font-semibold p-0 h-auto"
               >
-                View All New In <ArrowRight size={14} />
-              </button>
+                View All New In <ArrowRight className="w-4 h-4 ml-1" />
+              </Button>
             </div>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-                gap: "2rem 1.5rem",
-              }}
-              className="mobile-product-grid"
-            >
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-10">
               {newArrivals.map((product) => (
-                <ProductCard key={product.id} product={product} onNavigate={onNavigate} />
+                <ProductCard key={product.id} product={product} onNavigate={handleNav} />
               ))}
             </div>
           </div>
@@ -90,61 +72,34 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       )}
 
       {/* 5. Shoppable Videos Feature */}
-      {vis.shoppableVideos && <ShoppableVideosSection onNavigate={onNavigate} />}
+      {vis.shoppableVideos && <ShoppableVideosSection onNavigate={handleNav} />}
 
       {/* 6. Bestselling Curation */}
       {vis.featuredProducts && bestsellers.length > 0 && (
-        <section style={{ padding: "5rem 0", backgroundColor: "var(--bg-primary)" }}>
+        <section className="py-24 bg-background">
           <div className="container">
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                justifyContent: "space-between",
-                alignItems: "flex-end",
-                marginBottom: "2.5rem",
-                borderBottom: "1px solid var(--border-subtle)",
-                paddingBottom: "1.25rem",
-              }}
-            >
+            <div className="flex flex-wrap justify-between items-end mb-10 pb-5 border-b border-border gap-4">
               <div>
-                <span
-                  style={{
-                    fontSize: "0.72rem",
-                    fontWeight: 700,
-                    letterSpacing: "0.2em",
-                    textTransform: "uppercase",
-                    color: "var(--accent-wine)",
-                    display: "block",
-                    marginBottom: "0.3rem",
-                  }}
-                >
+                <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-accent block mb-1">
                   PATRON FAVORITES
                 </span>
-                <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 3.5vw, 2.8rem)", color: "var(--text-primary)", margin: 0 }}>
+                <h2 className="font-serif text-3xl md:text-4xl text-foreground m-0">
                   Bestselling Ensembles
                 </h2>
               </div>
 
-              <button
-                onClick={() => onNavigate("/shop?filter=bestseller")}
-                className="btn-link"
-                style={{ fontSize: "0.85rem", fontWeight: 600 }}
+              <Button
+                variant="link"
+                onClick={() => handleNav("/shop?filter=bestseller")}
+                className="text-sm font-semibold p-0 h-auto"
               >
-                Explore Bestsellers <ArrowRight size={14} />
-              </button>
+                Explore Bestsellers <ArrowRight className="w-4 h-4 ml-1" />
+              </Button>
             </div>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-                gap: "2rem 1.5rem",
-              }}
-              className="mobile-product-grid"
-            >
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-10">
               {bestsellers.map((product) => (
-                <ProductCard key={product.id} product={product} onNavigate={onNavigate} />
+                <ProductCard key={product.id} product={product} onNavigate={handleNav} />
               ))}
             </div>
           </div>
@@ -153,73 +108,57 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
       {/* 7. Why Choose Us / Trust Signals */}
       {vis.whyChooseUs && (
-        <section style={{ padding: "4.5rem 0", backgroundColor: "var(--bg-surface)", borderTop: "1px solid var(--border-subtle)", borderBottom: "1px solid var(--border-subtle)" }}>
+        <section className="py-20 bg-secondary border-y border-border">
           <div className="container">
-            <div style={{ textAlign: "center", maxWidth: "600px", margin: "0 auto 3rem auto" }}>
-              <span
-                style={{
-                  fontSize: "0.72rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.2em",
-                  textTransform: "uppercase",
-                  color: "var(--accent-wine)",
-                  display: "block",
-                  marginBottom: "0.4rem",
-                }}
-              >
+            <div className="text-center max-w-2xl mx-auto mb-14">
+              <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-accent block mb-1.5">
                 THE EVARA ASSURANCE
               </span>
-              <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 3.5vw, 2.8rem)", color: "var(--text-primary)", margin: "0 0 0.5rem 0" }}>
+              <h2 className="font-serif text-3xl md:text-4xl text-foreground m-0 mb-2">
                 {homepageCMS.whyChooseUsTitle || "Why Shop With Evara Vastra"}
               </h2>
-              <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", margin: 0 }}>
+              <p className="text-[15px] text-muted-foreground m-0">
                 {homepageCMS.whyChooseUsSubtitle || "Craftsmanship, trust, and exceptional service on every order."}
               </p>
             </div>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-                gap: "2rem",
-              }}
-            >
-              <div style={{ textAlign: "center", padding: "1.5rem 1rem" }}>
-                <div style={{ width: "52px", height: "52px", borderRadius: "50%", backgroundColor: "var(--accent-wine-subtle)", color: "var(--accent-wine)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.25rem auto" }}>
-                  <Truck size={24} />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="text-center px-4">
+                <div className="w-14 h-14 rounded-full bg-accent/10 text-accent flex items-center justify-center mx-auto mb-5">
+                  <Truck className="w-6 h-6" />
                 </div>
-                <h3 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0 0 0.5rem 0" }}>Free Shipping Pan India</h3>
-                <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.5, margin: 0 }}>
+                <h3 className="text-base font-bold mb-2">Free Shipping Pan India</h3>
+                <p className="text-[13px] text-muted-foreground leading-relaxed m-0">
                   Enjoy complimentary express delivery on all orders across India without minimum cart constraints.
                 </p>
               </div>
 
-              <div style={{ textAlign: "center", padding: "1.5rem 1rem" }}>
-                <div style={{ width: "52px", height: "52px", borderRadius: "50%", backgroundColor: "var(--accent-wine-subtle)", color: "var(--accent-wine)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.25rem auto" }}>
-                  <Shield size={24} />
+              <div className="text-center px-4">
+                <div className="w-14 h-14 rounded-full bg-accent/10 text-accent flex items-center justify-center mx-auto mb-5">
+                  <Shield className="w-6 h-6" />
                 </div>
-                <h3 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0 0 0.5rem 0" }}>Extra 10% Off Prepaid + COD</h3>
-                <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.5, margin: 0 }}>
+                <h3 className="text-base font-bold mb-2">Extra 10% Off Prepaid + COD</h3>
+                <p className="text-[13px] text-muted-foreground leading-relaxed m-0">
                   Instant 10% savings on UPI and card payments, plus reliable Cash on Delivery available nationwide.
                 </p>
               </div>
 
-              <div style={{ textAlign: "center", padding: "1.5rem 1rem" }}>
-                <div style={{ width: "52px", height: "52px", borderRadius: "50%", backgroundColor: "var(--accent-wine-subtle)", color: "var(--accent-wine)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.25rem auto" }}>
-                  <Sparkles size={24} />
+              <div className="text-center px-4">
+                <div className="w-14 h-14 rounded-full bg-accent/10 text-accent flex items-center justify-center mx-auto mb-5">
+                  <Sparkles className="w-6 h-6" />
                 </div>
-                <h3 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0 0 0.5rem 0" }}>High Quality Fabrics</h3>
-                <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.5, margin: 0 }}>
+                <h3 className="text-base font-bold mb-2">High Quality Fabrics</h3>
+                <p className="text-[13px] text-muted-foreground leading-relaxed m-0">
                   Hand-inspected Fendy satin, tissue silks, and soft pure cottons direct from our Surat textile atelier.
                 </p>
               </div>
 
-              <div style={{ textAlign: "center", padding: "1.5rem 1rem" }}>
-                <div style={{ width: "52px", height: "52px", borderRadius: "50%", backgroundColor: "var(--accent-wine-subtle)", color: "var(--accent-wine)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.25rem auto" }}>
-                  <RefreshCw size={24} />
+              <div className="text-center px-4">
+                <div className="w-14 h-14 rounded-full bg-accent/10 text-accent flex items-center justify-center mx-auto mb-5">
+                  <RefreshCw className="w-6 h-6" />
                 </div>
-                <h3 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0 0 0.5rem 0" }}>7-Day Easy Exchange</h3>
-                <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.5, margin: 0 }}>
+                <h3 className="text-base font-bold mb-2">7-Day Easy Exchange</h3>
+                <p className="text-[13px] text-muted-foreground leading-relaxed m-0">
                   Need a different size or shade? Request a quick doorstep replacement with our concierge team.
                 </p>
               </div>
@@ -229,52 +168,21 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       )}
 
       {/* 8. Customer Reviews & Testimonials */}
-      {vis.reviews && <CustomerReviewsSection onNavigate={onNavigate} />}
+      {vis.reviews && <CustomerReviewsSection onNavigate={handleNav} />}
 
       {/* 9. Newsletter VIP Invitation */}
       {vis.newsletter && (
-        <section
-          style={{
-            padding: "5rem 0",
-            backgroundColor: "var(--bg-surface-subtle)",
-            borderTop: "1px solid var(--border-subtle)",
-          }}
-        >
-          <div className="container" style={{ maxWidth: "620px", textAlign: "center" }}>
-            <span
-              style={{
-                fontSize: "0.72rem",
-                fontWeight: 700,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "var(--accent-wine)",
-                display: "block",
-                marginBottom: "0.4rem",
-              }}
-            >
+        <section className="py-24 bg-secondary/80 border-t border-border">
+          <div className="container max-w-2xl text-center">
+            <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-accent block mb-1.5">
               EXCLUSIVE ACCESS
             </span>
 
-            <h2
-              className="font-serif"
-              style={{
-                fontSize: "clamp(2rem, 3.5vw, 2.75rem)",
-                color: "var(--text-primary)",
-                lineHeight: 1.15,
-                marginBottom: "0.75rem",
-              }}
-            >
+            <h2 className="font-serif text-3xl md:text-4xl text-foreground leading-tight mb-3">
               {homepageCMS.newsletterTitle || "Join The Evara Vastra Circle"}
             </h2>
 
-            <p
-              style={{
-                fontSize: "0.95rem",
-                color: "var(--text-secondary)",
-                lineHeight: 1.6,
-                marginBottom: "2rem",
-              }}
-            >
+            <p className="text-[15px] text-muted-foreground leading-relaxed mb-8">
               {homepageCMS.newsletterSubtitle || "Be the first to access new collection drops, limited festival edits, and exclusive VIP offers."}
             </p>
 
@@ -283,33 +191,17 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 e.preventDefault();
                 alert("Thank you for joining the Evara Vastra circle!");
               }}
-              style={{
-                display: "flex",
-                gap: "0.5rem",
-                maxWidth: "460px",
-                margin: "0 auto",
-              }}
+              className="flex gap-2 max-w-md mx-auto"
             >
-              <input
+              <Input
                 type="email"
                 required
                 placeholder="Enter your email address..."
-                className="input-field"
-                style={{
-                  flex: 1,
-                  backgroundColor: "var(--bg-surface)",
-                }}
+                className="flex-1 bg-background"
               />
-              <button
-                type="submit"
-                className="btn btn-primary"
-                style={{
-                  whiteSpace: "nowrap",
-                  padding: "0 1.5rem",
-                }}
-              >
+              <Button type="submit" className="whitespace-nowrap px-6">
                 Join Circle
-              </button>
+              </Button>
             </form>
           </div>
         </section>

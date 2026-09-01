@@ -2,13 +2,22 @@ import React, { useState } from "react";
 import { useShop, CartItem } from "../context/ShopContext";
 import { useData } from "../context/DataContext";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
-import { Trash2, Heart, Plus, Minus, ArrowRight, ShieldCheck, Gift, Check } from "lucide-react";
+import { Trash2, Heart, Plus, Minus, ArrowRight, Gift, Check, ShieldCheck } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { useNavigate } from "react-router-dom";
 
-export const CartPage: React.FC<{ onNavigate: (href: string) => void }> = ({
+export const CartPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
   onNavigate,
 }) => {
   const { cart, updateQuantity, removeFromCart, toggleWishlist, cartSubtotal } = useShop();
   const { siteSettings, validateCoupon } = useData();
+  const navigate = useNavigate();
+
+  const handleNav = (href: string) => {
+    if (onNavigate) onNavigate(href);
+    else navigate(href);
+  };
 
   const [couponCode, setCouponCode] = useState("");
   const [discountAmount, setDiscountAmount] = useState<number>(0);
@@ -45,15 +54,15 @@ export const CartPage: React.FC<{ onNavigate: (href: string) => void }> = ({
     }).format(amount);
 
   return (
-    <div className="animate-fade-in" style={{ paddingBottom: "7rem", paddingTop: "2.5rem" }}>
+    <div className="animate-in fade-in duration-500 pt-10 pb-28">
       <div className="container">
         <Breadcrumbs items={[{ label: "Shopping Bag" }]} onNavigate={onNavigate} />
 
-        <div style={{ marginBottom: "2.5rem" }}>
-          <h1 className="font-serif" style={{ fontSize: "clamp(2rem, 3.5vw, 3rem)", color: "var(--text-primary)" }}>
+        <div className="mb-10">
+          <h1 className="font-serif text-4xl md:text-5xl text-foreground m-0">
             Your Shopping Bag
           </h1>
-          <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", marginTop: "0.3rem" }}>
+          <p className="text-[15px] text-muted-foreground mt-2">
             {cart.length > 0
               ? `You have ${cart.reduce((a: number, b: CartItem) => a + b.quantity, 0)} handcrafted saree(s) in your bag.`
               : "Your shopping bag is currently empty."}
@@ -61,149 +70,95 @@ export const CartPage: React.FC<{ onNavigate: (href: string) => void }> = ({
         </div>
 
         {cart.length === 0 ? (
-          <div
-            style={{
-              padding: "5rem 2rem",
-              textAlign: "center",
-              backgroundColor: "var(--bg-surface)",
-              border: "1px solid var(--border-subtle)",
-            }}
-          >
-            <h3 className="font-serif" style={{ fontSize: "1.85rem", color: "var(--text-primary)" }}>
+          <div className="py-20 px-8 text-center bg-secondary/50 border border-border rounded-sm">
+            <h3 className="font-serif text-3xl text-foreground m-0">
               No Sarees in Your Bag
             </h3>
-            <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", maxWidth: "420px", margin: "0.75rem auto 2rem auto" }}>
+            <p className="text-[15px] text-muted-foreground max-w-[420px] mx-auto mt-3 mb-8">
               Explore our latest arrivals in pure katan silks, handspun mulmuls, and heirloom Banarasi brocades.
             </p>
-            <button onClick={() => onNavigate("/shop")} className="btn-wine">
-              Explore The Catalog <ArrowRight size={15} />
-            </button>
+            <Button onClick={() => handleNav("/shop")} size="lg" className="px-8">
+              Explore The Catalog <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
           </div>
         ) : (
-          <div
-            className="cart-grid"
-          >
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-10 items-start">
             {/* Left Items Table */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-              <div
-                style={{
-                  backgroundColor: "var(--bg-surface)",
-                  border: "1px solid var(--border-subtle)",
-                  overflow: "hidden",
-                }}
-              >
+            <div className="flex flex-col gap-6">
+              <div className="bg-background border border-border rounded-sm overflow-hidden">
                 {cart.map((item: CartItem) => (
                   <div
                     key={item.product.id}
-                    style={{
-                      padding: "1.75rem",
-                      borderBottom: "1px solid var(--border-subtle)",
-                    }}
-                    className="cart-item-row"
+                    className="p-6 border-b border-border flex gap-6 sm:gap-8 last:border-b-0"
                   >
                     <img
                       src={item.product.images[0]}
                       alt={item.product.title}
-                      style={{
-                        width: "100px",
-                        aspectRatio: "3/4",
-                        objectFit: "cover",
-                        backgroundColor: "var(--bg-primary)",
-                      }}
+                      className="w-[100px] aspect-[3/4] object-cover bg-secondary rounded-sm shrink-0"
                     />
 
-                    <div>
-                      <span
-                        style={{
-                          fontSize: "0.68rem",
-                          letterSpacing: "0.14em",
-                          textTransform: "uppercase",
-                          color: "var(--accent-gold)",
-                          fontWeight: 600,
-                        }}
-                      >
-                        {item.product.craft}
-                      </span>
-                      <h4
-                        onClick={() => onNavigate(`/product/${item.product.slug}`)}
-                        style={{
-                          fontSize: "1.05rem",
-                          color: "var(--text-primary)",
-                          cursor: "pointer",
-                          margin: "0.2rem 0",
-                        }}
-                      >
-                        {item.product.title}
-                      </h4>
-                      <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>
-                        {item.product.fabric} • {item.product.color}
-                      </p>
-                      {item.product.details.blousePiece && (
-                        <p style={{ fontSize: "0.75rem", color: "#234E3E", fontWeight: 500, marginTop: "0.2rem" }}>
-                          ✓ Includes unstitched matching blouse fabric
-                        </p>
-                      )}
-
-                      <div style={{ display: "flex", gap: "1rem", marginTop: "0.75rem" }}>
-                        <button
-                          onClick={() => {
-                            toggleWishlist(item.product.id);
-                            removeFromCart(item.product.id);
-                          }}
-                          style={{
-                            fontSize: "0.75rem",
-                            color: "var(--text-muted)",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.3rem",
-                          }}
-                        >
-                          <Heart size={13} /> Save to Wishlist
-                        </button>
-                        <button
-                          onClick={() => removeFromCart(item.product.id)}
-                          style={{
-                            fontSize: "0.75rem",
-                            color: "var(--accent-wine)",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.3rem",
-                          }}
-                        >
-                          <Trash2 size={13} /> Remove
-                        </button>
-                      </div>
-                    </div>
-
-                    <div style={{ textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.75rem" }}>
-                      <span style={{ fontSize: "1.15rem", fontWeight: 600, color: "var(--text-primary)" }}>
-                        {formatINR(item.product.price * item.quantity)}
-                      </span>
-
-                      {/* Quantity Controller */}
-                      <div
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          border: "1px solid var(--border-medium)",
-                          backgroundColor: "var(--bg-surface)",
-                        }}
-                      >
-                        <button
-                          onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                          style={{ padding: "0.4rem 0.65rem", color: "var(--text-secondary)" }}
-                        >
-                          <Minus size={12} />
-                        </button>
-                        <span style={{ padding: "0 0.5rem", fontSize: "0.85rem", fontWeight: 600 }}>
-                          {item.quantity}
+                    <div className="flex-1 flex flex-col justify-between">
+                      <div>
+                        <span className="text-[11px] tracking-[0.14em] uppercase text-accent font-bold block mb-1">
+                          {item.product.craft}
                         </span>
-                        <button
-                          onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                          style={{ padding: "0.4rem 0.65rem", color: "var(--text-secondary)" }}
+                        <h4
+                          onClick={() => handleNav(`/products/${item.product.slug}`)}
+                          className="text-lg font-semibold text-foreground cursor-pointer hover:text-accent transition-colors m-0 leading-tight"
                         >
-                          <Plus size={12} />
-                        </button>
+                          {item.product.title}
+                        </h4>
+                        <p className="text-[13px] text-muted-foreground mt-1 mb-0">
+                          {item.product.fabric} • {item.product.color}
+                        </p>
+                        {item.product.details.blousePiece && (
+                          <p className="text-xs text-green-700 dark:text-green-500 font-semibold mt-1.5 mb-0">
+                            ✓ Includes unstitched matching blouse fabric
+                          </p>
+                        )}
+
+                        <div className="flex gap-4 mt-4">
+                          <button
+                            onClick={() => {
+                              toggleWishlist(item.product.id);
+                              removeFromCart(item.product.id);
+                            }}
+                            className="text-[13px] text-muted-foreground flex items-center gap-1.5 hover:text-foreground transition-colors"
+                          >
+                            <Heart className="w-3.5 h-3.5" /> Save to Wishlist
+                          </button>
+                          <button
+                            onClick={() => removeFromCart(item.product.id)}
+                            className="text-[13px] text-accent flex items-center gap-1.5 hover:text-accent/80 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" /> Remove
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="text-right flex flex-col items-end gap-3 mt-4 sm:mt-0 self-start sm:self-auto">
+                        <span className="text-lg font-bold text-foreground">
+                          {formatINR(item.product.price * item.quantity)}
+                        </span>
+
+                        {/* Quantity Controller */}
+                        <div className="inline-flex items-center border border-border bg-background rounded-sm">
+                          <button
+                            onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                            className="p-2 text-muted-foreground hover:bg-secondary transition-colors"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="px-2 text-sm font-semibold min-w-[24px] text-center">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                            className="p-2 text-muted-foreground hover:bg-secondary transition-colors"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -211,23 +166,14 @@ export const CartPage: React.FC<{ onNavigate: (href: string) => void }> = ({
               </div>
 
               {/* Keepsake Packaging Option */}
-              <div
-                style={{
-                  backgroundColor: "var(--bg-surface)",
-                  padding: "1.25rem 1.5rem",
-                  border: "1px solid var(--border-subtle)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
-                  <Gift size={20} style={{ color: "var(--accent-gold)" }} />
+              <div className="bg-background p-6 border border-border rounded-sm flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <Gift className="w-6 h-6 text-accent shrink-0" />
                   <div>
-                    <strong style={{ fontSize: "0.85rem", color: "var(--text-primary)" }}>
+                    <strong className="text-[15px] text-foreground font-semibold block">
                       Artisanal Keepsake Box Packaging (+₹250)
                     </strong>
-                    <p style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>
+                    <p className="text-[13px] text-muted-foreground m-0 mt-0.5">
                       Hardbound cloth keepsake box wrapped with festive handwoven ribbons & handwritten card.
                     </p>
                   </div>
@@ -237,121 +183,92 @@ export const CartPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                   type="checkbox"
                   checked={isGiftWrap}
                   onChange={(e) => setIsGiftWrap(e.target.checked)}
-                  style={{ width: "18px", height: "18px", accentColor: "var(--accent-wine)", cursor: "pointer" }}
+                  className="w-5 h-5 accent-accent cursor-pointer shrink-0"
                 />
               </div>
             </div>
 
             {/* Right Summary Box */}
-            <div
-              style={{
-                backgroundColor: "var(--bg-surface)",
-                padding: "2rem",
-                border: "1px solid var(--border-subtle)",
-                boxShadow: "var(--shadow-subtle)",
-                display: "flex",
-                flexDirection: "column",
-                gap: "1.5rem",
-              }}
-            >
-              <h3 className="font-serif" style={{ fontSize: "1.45rem", borderBottom: "1px solid var(--border-subtle)", paddingBottom: "0.75rem" }}>
+            <div className="bg-background p-8 border border-border shadow-sm rounded-sm flex flex-col gap-6 sticky top-24">
+              <h3 className="font-serif text-2xl border-b border-border pb-4 m-0">
                 Order Summary
               </h3>
 
               {/* Coupon Form */}
-              <form onSubmit={handleApplyCoupon} style={{ display: "flex", gap: "0.5rem" }}>
-                <input
+              <form onSubmit={handleApplyCoupon} className="flex gap-2">
+                <Input
                   type="text"
                   placeholder="Privilege Code (try EVARA10)..."
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value)}
-                  style={{
-                    flex: 1,
-                    padding: "0.65rem 0.85rem",
-                    border: "1px solid var(--border-medium)",
-                    outline: "none",
-                    textTransform: "uppercase",
-                    fontSize: "0.85rem",
-                  }}
+                  className="flex-1 uppercase font-medium placeholder:normal-case placeholder:font-normal"
                 />
-                <button type="submit" className="btn-secondary" style={{ padding: "0.65rem 1rem", fontSize: "0.75rem" }}>
+                <Button type="submit" variant="secondary" className="px-5">
                   Apply
-                </button>
+                </Button>
               </form>
 
               {couponSuccess && (
-                <p style={{ fontSize: "0.75rem", color: "#234E3E", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.3rem" }}>
-                  <Check size={14} /> {couponSuccess}
+                <p className="text-xs text-green-700 dark:text-green-500 font-bold flex items-center gap-1.5 m-0 -mt-3">
+                  <Check className="w-3.5 h-3.5" /> {couponSuccess}
                 </p>
               )}
               {couponError && (
-                <p style={{ fontSize: "0.75rem", color: "var(--accent-wine)", fontWeight: 500 }}>
+                <p className="text-xs text-accent font-semibold m-0 -mt-3">
                   {couponError}
                 </p>
               )}
 
               {/* Cost Rows */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div className="flex flex-col gap-3 text-sm text-muted-foreground">
+                <div className="flex justify-between">
                   <span>Bag Subtotal</span>
-                  <strong style={{ color: "var(--text-primary)" }}>{formatINR(cartSubtotal)}</strong>
+                  <strong className="text-foreground">{formatINR(cartSubtotal)}</strong>
                 </div>
 
                 {discountAmount > 0 && (
-                  <div style={{ display: "flex", justifyContent: "space-between", color: "#234E3E" }}>
+                  <div className="flex justify-between text-green-700 dark:text-green-500 font-medium">
                     <span>Privilege Discount</span>
                     <span>- {formatINR(discountAmount)}</span>
                   </div>
                 )}
 
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div className="flex justify-between">
                   <span>Insured Shipping Across India</span>
                   <span>{shippingFee === 0 ? "Complimentary" : formatINR(shippingFee)}</span>
                 </div>
 
                 {isGiftWrap && (
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div className="flex justify-between">
                     <span>Keepsake Gift Packaging</span>
                     <span>{formatINR(giftWrapFee)}</span>
                   </div>
                 )}
 
-                <div
-                  style={{
-                    borderTop: "1px solid var(--border-medium)",
-                    paddingTop: "1rem",
-                    marginTop: "0.5rem",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    fontSize: "1.2rem",
-                    fontWeight: 600,
-                    color: "var(--text-primary)",
-                  }}
-                >
+                <div className="border-t border-border pt-4 mt-2 flex justify-between text-[19px] font-bold text-foreground">
                   <span>Grand Total</span>
                   <span>{formatINR(finalTotal)}</span>
                 </div>
               </div>
 
               {/* Checkout Button */}
-              <button
-                onClick={() => onNavigate("/checkout")}
-                className="btn-wine"
-                style={{ width: "100%", padding: "1.1rem", fontSize: "0.85rem" }}
-              >
-                Proceed to Secure Checkout <ArrowRight size={16} />
-              </button>
+              <div className="flex flex-col gap-4 mt-2">
+                <Button
+                  onClick={() => handleNav("/checkout")}
+                  className="w-full h-14 text-[15px] tracking-wide uppercase font-bold"
+                >
+                  Proceed to Secure Checkout <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
 
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.4rem", fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                <ShieldCheck size={14} style={{ color: "var(--accent-gold)" }} />
-                <span>256-Bit Encrypted Secure Checkout</span>
+                <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground font-medium">
+                  <ShieldCheck className="w-4 h-4 text-primary" />
+                  <span>256-Bit Encrypted Secure Checkout</span>
+                </div>
               </div>
             </div>
           </div>
         )}
       </div>
-
-
     </div>
   );
 };

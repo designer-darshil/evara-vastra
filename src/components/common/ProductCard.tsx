@@ -2,11 +2,15 @@ import React from "react";
 import { Product } from "../../types";
 import { useShop } from "../../context/ShopContext";
 import { Heart, ShoppingBag, Eye } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
+import { cn } from "../../lib/utils";
 
 interface ProductCardProps {
   product: Product;
   index?: number;
-  onNavigate: (href: string) => void;
+  onNavigate?: (href: string) => void;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
@@ -15,6 +19,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onNavigate,
 }) => {
   const { toggleWishlist, isInWishlist, addToCart, openQuickView } = useShop();
+  const navigate = useNavigate();
 
   const isSaved = isInWishlist(product.id);
 
@@ -33,7 +38,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     : null;
 
   const handleCardClick = () => {
-    onNavigate(`/product/${product.slug}`);
+    const href = `/products/${product.slug}`;
+    if (onNavigate) onNavigate(href);
+    else navigate(href);
   };
 
   const handleQuickAdd = (e: React.MouseEvent) => {
@@ -56,40 +63,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <article
-      className="product-card group"
+      className="group relative flex flex-col cursor-pointer"
       onClick={handleCardClick}
       data-cursor="VIEW"
-      style={{
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        cursor: "pointer",
-        animationDelay: `${(index % 8) * 0.06}s`,
-      }}
+      style={{ animationDelay: `${(index % 8) * 0.06}s` }}
     >
       {/* Visual Image Container */}
-      <div
-        className="product-image-container"
-        style={{
-          position: "relative",
-          aspectRatio: "3/4",
-          overflow: "hidden",
-          backgroundColor: "var(--bg-surface-subtle)",
-          marginBottom: "0.85rem",
-          borderRadius: "2px",
-        }}
-      >
+      <div className="relative aspect-[3/4] overflow-hidden bg-secondary mb-3 rounded-sm">
         <img
           src={product.images[0]}
           alt={product.title}
           loading="lazy"
-          className="product-primary-img"
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            transition: "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease",
-          }}
+          className="w-full h-full object-cover transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
         />
 
         {product.images[1] && (
@@ -97,47 +82,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             src={product.images[1]}
             alt={`${product.title} detail`}
             loading="lazy"
-            className="product-secondary-img"
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              opacity: 0,
-              transition: "opacity 0.5s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
-            }}
+            className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-100 group-hover:scale-105"
           />
         )}
 
         {/* Badges */}
-        <div
-          style={{
-            position: "absolute",
-            top: "0.6rem",
-            left: "0.6rem",
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.3rem",
-            zIndex: 2,
-          }}
-        >
+        <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
           {isOutOfStock ? (
-            <span className="badge-tag" style={{ backgroundColor: "var(--bg-dark)", color: "var(--text-inverse)", fontSize: "0.65rem", padding: "0.2rem 0.45rem" }}>
-              SOLD OUT
-            </span>
+            <Badge variant="destructive" className="text-[10px] py-0 px-2 rounded-sm uppercase tracking-widest font-bold">Sold Out</Badge>
           ) : isLowStock ? (
-            <span className="badge-tag badge-tag-wine" style={{ fontSize: "0.65rem", padding: "0.2rem 0.45rem" }}>
-              ONLY {product.inventoryCount} LEFT
-            </span>
+            <Badge variant="evara" className="text-[10px] py-0 px-2">Only {product.inventoryCount} Left</Badge>
           ) : product.bestseller ? (
-            <span className="badge-tag badge-tag-wine" style={{ fontSize: "0.65rem", padding: "0.2rem 0.45rem" }}>
-              BESTSELLER
-            </span>
+            <Badge variant="evara" className="text-[10px] py-0 px-2">Bestseller</Badge>
           ) : product.newArrival ? (
-            <span className="badge-tag" style={{ fontSize: "0.65rem", padding: "0.2rem 0.45rem" }}>
-              NEW SEASON
-            </span>
+            <Badge variant="secondary" className="text-[10px] py-0 px-2 rounded-sm uppercase tracking-widest font-bold">New Season</Badge>
           ) : null}
         </div>
 
@@ -145,145 +103,63 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <button
           onClick={handleWishlistClick}
           aria-label={isSaved ? `Remove ${product.title} from wishlist` : `Add ${product.title} to wishlist`}
-          className="wishlist-btn"
-          style={{
-            position: "absolute",
-            top: "0.6rem",
-            right: "0.6rem",
-            zIndex: 3,
-            width: "38px",
-            height: "38px",
-            minWidth: "38px",
-            minHeight: "38px",
-            borderRadius: "50%",
-            backgroundColor: "var(--wishlist-btn-bg)",
-            backdropFilter: "blur(4px)",
-            border: `1px solid var(--wishlist-btn-border)`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: isSaved ? "var(--accent-wine)" : "var(--text-primary)",
-            transition: "transform 0.2s ease, background-color 0.2s ease",
-            cursor: "pointer",
-            boxShadow: "var(--wishlist-btn-shadow)",
-          }}
+          className={cn(
+            "absolute top-2 right-2 z-20 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 shadow-sm border",
+            isSaved ? "bg-background border-border text-accent" : "bg-background/80 backdrop-blur-sm border-transparent text-foreground hover:bg-background hover:scale-105"
+          )}
         >
-          <Heart size={16} fill={isSaved ? "var(--accent-wine)" : "none"} strokeWidth={1.75} />
+          <Heart className="h-4 w-4" fill={isSaved ? "currentColor" : "none"} strokeWidth={isSaved ? 0 : 2} />
         </button>
 
         {/* Hover Quick Action Drawer */}
         {!isOutOfStock && (
-          <div
-            className="product-actions-overlay"
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              padding: "0.6rem",
-              display: "flex",
-              gap: "0.4rem",
-              zIndex: 3,
-              transform: "translateY(100%)",
-              transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
-            }}
-          >
-            <button
+          <div className="absolute bottom-0 left-0 right-0 p-2 flex gap-1 z-20 translate-y-full transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-y-0">
+            <Button
               onClick={handleQuickAdd}
-              aria-label={`Add ${product.title} to bag`}
-              className="btn btn-primary"
-              style={{
-                flex: 1,
-                padding: "0.55rem 0.6rem",
-                fontSize: "0.75rem",
-                justifyContent: "center",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.35rem",
-              }}
+              className="flex-1 h-9 text-xs rounded-sm bg-background text-foreground hover:bg-background/90"
+              variant="outline"
             >
-              <ShoppingBag size={14} /> Quick Add
-            </button>
-            <button
+              <ShoppingBag className="h-3 w-3 mr-1.5" /> Quick Add
+            </Button>
+            <Button
               onClick={handleQuickViewClick}
-              aria-label={`Quick view ${product.title}`}
-              className="btn btn-secondary"
+              size="icon"
+              className="h-9 w-9 rounded-sm bg-background text-foreground hover:bg-background/90"
+              variant="outline"
               title="Quick Preview"
-              style={{
-                padding: "0.55rem 0.65rem",
-                backgroundColor: "var(--bg-surface)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
             >
-              <Eye size={15} />
-            </button>
+              <Eye className="h-4 w-4" />
+            </Button>
           </div>
         )}
       </div>
 
       {/* Product Metadata Details */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem" }}>
-        <span
-          style={{
-            fontSize: "0.68rem",
-            fontWeight: 600,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            color: "var(--accent-gold)",
-          }}
-        >
+      <div className="flex flex-col gap-1">
+        <span className="text-[10px] font-bold tracking-widest uppercase text-accent">
           {product.fabric} • {product.color}
         </span>
 
         {/* 2-line clamped title for uniform grid alignment */}
         <h3
-          style={{
-            fontSize: "0.9rem",
-            fontWeight: 500,
-            color: "var(--text-primary)",
-            lineHeight: 1.35,
-            margin: 0,
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-            minHeight: "2.45rem",
-          }}
+          className="text-sm font-medium text-foreground leading-snug m-0 line-clamp-2 min-h-[2.6rem]"
           title={product.title}
         >
           {product.title}
         </h3>
 
         {/* Price & Discount Hierarchy */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.2rem" }}>
-          <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text-primary)" }}>
+        <div className="flex items-center gap-2 flex-wrap mt-0.5">
+          <span className="text-sm font-bold text-foreground">
             {formattedPrice}
           </span>
           {formattedComparePrice && (
-            <span
-              style={{
-                fontSize: "0.8rem",
-                color: "var(--text-muted)",
-                textDecoration: "line-through",
-              }}
-            >
+            <span className="text-xs text-muted-foreground line-through">
               {formattedComparePrice}
             </span>
           )}
           {product.discountPercentage && product.discountPercentage > 0 ? (
-            <span
-              style={{
-                fontSize: "0.68rem",
-                fontWeight: 700,
-                color: "var(--success-text)",
-                backgroundColor: "var(--success-bg)",
-                padding: "0.1rem 0.35rem",
-                borderRadius: "2px",
-                lineHeight: 1.2,
-              }}
-            >
+            <span className="text-[10px] font-bold text-green-700 bg-green-100 dark:text-green-300 dark:bg-green-900/30 px-1.5 py-0.5 rounded-sm">
               {product.discountPercentage}% OFF
             </span>
           ) : null}

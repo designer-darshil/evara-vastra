@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useShop } from "../../context/ShopContext";
 import { useData } from "../../context/DataContext";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Search,
   Heart,
@@ -14,15 +15,18 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
+import { Button } from "../ui/button";
+import { cn } from "../../lib/utils";
 
 interface NavbarProps {
-  onNavigate: (href: string) => void;
+  onNavigate?: (href: string) => void;
   onOpenMobileMenu: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) => {
   const { cartCount, wishlistCount, openSearch, openCartDrawer, theme, toggleTheme } = useShop();
   const { activeCategories, activeCollections, isAdminAuthenticated } = useData();
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const megaMenuTimeoutRef = useRef<any>(null);
@@ -46,583 +50,193 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, onOpenMobileMenu }) 
     }, 180);
   };
 
+  const handleNav = (href: string) => {
+    setIsMegaMenuOpen(false);
+    if (onNavigate) {
+      onNavigate(href);
+    } else {
+      navigate(href);
+    }
+  };
+
   return (
     <header
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 999,
-        backgroundColor: isScrolled ? "var(--bg-header-scrolled)" : "var(--bg-header)",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        borderBottom: "1px solid var(--border-subtle)",
-        transition: "background-color 0.3s ease, border-color 0.3s ease",
-      }}
+      className={cn(
+        "sticky top-0 z-40 w-full border-b backdrop-blur-md transition-all duration-300",
+        isScrolled ? "bg-background/95 border-border" : "bg-background/80 border-transparent"
+      )}
     >
-      <div className="container">
-        <div
-          style={{
-            height: "var(--header-height)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-          className="header-inner"
-        >
-          {/* Left: Mobile Menu & Primary Links */}
-          <div style={{ display: "flex", alignItems: "center", gap: "clamp(0.5rem, 2vw, 1.25rem)", flex: 1 }}>
-            <button
-              onClick={onOpenMobileMenu}
-              aria-label="Open mobile navigation menu"
-              className="mobile-only btn-icon"
-              style={{
-                color: "var(--text-primary)",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: "0.5rem",
-              }}
-            >
-              <Menu size={22} />
-            </button>
-
-            {/* Desktop Navigation Links */}
-            <nav
-              className="desktop-only"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "1.5rem",
-              }}
-            >
-              {/* Mega Menu Trigger */}
-              <div
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-                style={{ position: "relative" }}
-              >
-                <button
-                  onClick={() => onNavigate("/shop")}
-                  style={{
-                    fontSize: "0.8rem",
-                    fontWeight: 600,
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
-                    color: isMegaMenuOpen ? "var(--accent-wine)" : "var(--text-primary)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.3rem",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: "0.5rem 0",
-                    transition: "color 0.2s ease",
-                  }}
-                >
-                  Shop <ChevronDown size={14} style={{ transform: isMegaMenuOpen ? "rotate(180deg)" : "rotate(0)", transition: "transform 0.2s ease" }} />
-                </button>
-
-                {/* MEGA MENU DROPDOWN */}
-                {isMegaMenuOpen && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "100%",
-                      left: "-2rem",
-                      width: "860px",
-                      backgroundColor: "var(--bg-surface)",
-                      boxShadow: "var(--shadow-elevated)",
-                      border: "1px solid var(--border-subtle)",
-                      borderRadius: "0 0 6px 6px",
-                      padding: "2rem",
-                      display: "grid",
-                      gridTemplateColumns: "1.2fr 1.2fr 1fr 1.4fr",
-                      gap: "2rem",
-                      zIndex: 1000,
-                    }}
-                  >
-                    {/* Col 1: Shop By Category */}
-                    <div>
-                      <span
-                        style={{
-                          fontSize: "0.7rem",
-                          fontWeight: 700,
-                          letterSpacing: "0.18em",
-                          textTransform: "uppercase",
-                          color: "var(--accent-wine)",
-                          display: "block",
-                          marginBottom: "0.85rem",
-                        }}
-                      >
-                        CATEGORIES
-                      </span>
-                      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-                        {activeCategories.map((cat) => (
-                          <li key={cat.id}>
-                            <button
-                              onClick={() => {
-                                setIsMegaMenuOpen(false);
-                                onNavigate(`/shop/${cat.slug}`);
-                              }}
-                              style={{
-                                background: "none",
-                                border: "none",
-                                color: "var(--text-secondary)",
-                                fontSize: "0.85rem",
-                                cursor: "pointer",
-                                padding: 0,
-                                textAlign: "left",
-                                transition: "color 0.15s ease",
-                              }}
-                              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent-wine)")}
-                              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
-                            >
-                              {cat.name}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Col 2: Curated Collections */}
-                    <div>
-                      <span
-                        style={{
-                          fontSize: "0.7rem",
-                          fontWeight: 700,
-                          letterSpacing: "0.18em",
-                          textTransform: "uppercase",
-                          color: "var(--accent-wine)",
-                          display: "block",
-                          marginBottom: "0.85rem",
-                        }}
-                      >
-                        COLLECTIONS
-                      </span>
-                      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-                        {activeCollections.map((col) => (
-                          <li key={col.id}>
-                            <button
-                              onClick={() => {
-                                setIsMegaMenuOpen(false);
-                                onNavigate(`/collections/${col.slug}`);
-                              }}
-                              style={{
-                                background: "none",
-                                border: "none",
-                                color: "var(--text-secondary)",
-                                fontSize: "0.85rem",
-                                cursor: "pointer",
-                                padding: 0,
-                                textAlign: "left",
-                                transition: "color 0.15s ease",
-                              }}
-                              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent-wine)")}
-                              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
-                            >
-                              {col.title}
-                            </button>
-                          </li>
-                        ))}
-                        <li>
-                          <button
-                            onClick={() => {
-                              setIsMegaMenuOpen(false);
-                              onNavigate("/collections");
-                            }}
-                            style={{
-                              background: "none",
-                              border: "none",
-                              color: "var(--accent-gold)",
-                              fontSize: "0.82rem",
-                              fontWeight: 600,
-                              cursor: "pointer",
-                              padding: "0.2rem 0 0 0",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "0.3rem",
-                            }}
-                          >
-                            All Collections <ArrowRight size={13} />
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-
-                    {/* Col 3: Occasions & Edits */}
-                    <div>
-                      <span
-                        style={{
-                          fontSize: "0.7rem",
-                          fontWeight: 700,
-                          letterSpacing: "0.18em",
-                          textTransform: "uppercase",
-                          color: "var(--accent-wine)",
-                          display: "block",
-                          marginBottom: "0.85rem",
-                        }}
-                      >
-                        DISCOVERY
-                      </span>
-                      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-                        <li>
-                          <button
-                            onClick={() => {
-                              setIsMegaMenuOpen(false);
-                              onNavigate("/shop?filter=newArrival");
-                            }}
-                            style={{
-                              background: "none",
-                              border: "none",
-                              color: "var(--accent-wine)",
-                              fontSize: "0.85rem",
-                              fontWeight: 600,
-                              cursor: "pointer",
-                              padding: 0,
-                              textAlign: "left",
-                            }}
-                          >
-                            ★ New Season Drops
-                          </button>
-                        </li>
-                        <li>
-                          <button
-                            onClick={() => {
-                              setIsMegaMenuOpen(false);
-                              onNavigate("/shop?filter=bestseller");
-                            }}
-                            style={{
-                              background: "none",
-                              border: "none",
-                              color: "var(--text-secondary)",
-                              fontSize: "0.85rem",
-                              cursor: "pointer",
-                              padding: 0,
-                              textAlign: "left",
-                            }}
-                          >
-                            Bestselling Sets
-                          </button>
-                        </li>
-                        <li>
-                          <button
-                            onClick={() => {
-                              setIsMegaMenuOpen(false);
-                              onNavigate("/about");
-                            }}
-                            style={{
-                              background: "none",
-                              border: "none",
-                              color: "var(--text-secondary)",
-                              fontSize: "0.85rem",
-                              cursor: "pointer",
-                              padding: 0,
-                              textAlign: "left",
-                            }}
-                          >
-                            Our Heritage Story
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-
-                    {/* Col 4: Visual Spotlight Card */}
-                    <div
-                      style={{
-                        backgroundColor: "var(--bg-surface-subtle)",
-                        padding: "1.25rem",
-                        borderRadius: "4px",
-                        border: "1px solid var(--border-subtle)",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", color: "var(--accent-wine)", marginBottom: "0.4rem" }}>
-                          <Sparkles size={14} />
-                          <span style={{ fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-                            ATELIER SPOTLIGHT
-                          </span>
-                        </div>
-                        <h4 className="font-serif" style={{ fontSize: "1.15rem", margin: "0 0 0.4rem 0", color: "var(--text-primary)" }}>
-                          Aurelia Fendy Satin Saree
-                        </h4>
-                        <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.4, margin: "0 0 1rem 0" }}>
-                          Heavy Resham & Zari Cutwork embroidery in vibrant festive shades.
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setIsMegaMenuOpen(false);
-                          onNavigate("/product/aurelia-saree-floral-embroidery-fendy-satin-saree-collection");
-                        }}
-                        className="btn btn-primary"
-                        style={{ padding: "0.5rem 1rem", fontSize: "0.75rem", width: "100%" }}
-                      >
-                        Shop Spotlight Drape
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <button
-                onClick={() => onNavigate("/shop/sarees")}
-                style={{
-                  fontSize: "0.8rem",
-                  fontWeight: 600,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  color: "var(--text-primary)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                Sarees
-              </button>
-
-              <button
-                onClick={() => onNavigate("/shop/coord-sets")}
-                style={{
-                  fontSize: "0.8rem",
-                  fontWeight: 600,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  color: "var(--text-primary)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                Co-ord Sets
-              </button>
-
-              <button
-                onClick={() => onNavigate("/shop/kurta-sets")}
-                style={{
-                  fontSize: "0.8rem",
-                  fontWeight: 600,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  color: "var(--text-primary)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                Kurta Sets
-              </button>
-
-              <button
-                onClick={() => onNavigate("/shop?filter=newArrival")}
-                style={{
-                  fontSize: "0.8rem",
-                  fontWeight: 600,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  color: "var(--accent-wine)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                New In
-              </button>
-            </nav>
-          </div>
-
-          {/* Center Brand Identity */}
-          <div style={{ textAlign: "center", flexShrink: 0 }}>
-            <button
-              onClick={() => onNavigate("/")}
-              aria-label="Evara Vastra Home"
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: "0.25rem 0",
-              }}
-            >
-              <span
-                className="font-serif"
-                style={{
-                  fontSize: "clamp(1.25rem, 2.5vw, 1.85rem)",
-                  fontWeight: 600,
-                  letterSpacing: "0.2em",
-                  color: "var(--text-primary)",
-                  display: "block",
-                  lineHeight: 1.1,
-                }}
-              >
-                EVARA VASTRA
-              </span>
-              <span
-                style={{
-                  fontSize: "0.55rem",
-                  letterSpacing: "0.32em",
-                  textTransform: "uppercase",
-                  color: "var(--accent-wine)",
-                  display: "block",
-                  marginTop: "0.15rem",
-                  fontWeight: 700,
-                }}
-              >
-                SURAT • INDIA
-              </span>
-            </button>
-          </div>
-
-          {/* Right Action Icons */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-end",
-              gap: "0.6rem",
-              flex: 1,
-            }}
+      <div className="container flex h-16 items-center justify-between">
+        {/* Left: Mobile Menu & Desktop Navigation Links */}
+        <div className="flex flex-1 items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={onOpenMobileMenu}
+            aria-label="Open menu"
           >
-            {/* Theme Switcher Toggle */}
-            <button
-              onClick={toggleTheme}
-              aria-label={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
-              title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
-              className="btn-icon"
-              style={{
-                color: "var(--text-primary)",
-                cursor: "pointer",
-              }}
-            >
-              {theme === "light" ? <Moon size={18} /> : <Sun size={18} style={{ color: "var(--accent-gold)" }} />}
-            </button>
+            <Menu className="h-5 w-5" />
+          </Button>
 
-            {/* Search */}
-            <button
-              onClick={openSearch}
-              aria-label="Search catalog"
-              title="Search"
-              className="btn-icon"
-              style={{
-                color: "var(--text-primary)",
-                cursor: "pointer",
-              }}
+          <nav className="hidden lg:flex items-center gap-6">
+            <div
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+              className="relative"
             >
-              <Search size={18} />
-            </button>
+              <button
+                onClick={() => handleNav("/shop")}
+                className={cn(
+                  "flex items-center gap-1 text-sm font-semibold tracking-widest uppercase transition-colors",
+                  isMegaMenuOpen ? "text-accent" : "text-foreground hover:text-accent"
+                )}
+              >
+                Shop <ChevronDown className={cn("h-4 w-4 transition-transform", isMegaMenuOpen && "rotate-180")} />
+              </button>
 
-            {/* Wishlist */}
-            <button
-              onClick={() => onNavigate("/wishlist")}
-              aria-label={`View wishlist (${wishlistCount} saved)`}
-              title="Wishlist"
-              className="btn-icon"
-              style={{
-                position: "relative",
-                color: "var(--text-primary)",
-                cursor: "pointer",
-              }}
-            >
-              <Heart size={18} />
-              {wishlistCount > 0 && (
-                <span
-                  style={{
-                    position: "absolute",
-                    top: "-2px",
-                    right: "-2px",
-                    backgroundColor: "var(--accent-wine)",
-                    color: "var(--text-inverse)",
-                    fontSize: "0.6rem",
-                    fontWeight: 700,
-                    width: "17px",
-                    height: "17px",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {wishlistCount}
-                </span>
+              {/* Mega Menu Dropdown */}
+              {isMegaMenuOpen && (
+                <div className="absolute top-full -left-4 w-[860px] bg-background border rounded-b-md shadow-lg p-8 grid grid-cols-4 gap-8">
+                  {/* Categories */}
+                  <div>
+                    <span className="text-xs font-bold tracking-widest uppercase text-accent mb-4 block">Categories</span>
+                    <ul className="space-y-3">
+                      {activeCategories.map((cat) => (
+                        <li key={cat.id}>
+                          <button
+                            onClick={() => handleNav(`/shop/${cat.slug}`)}
+                            className="text-sm text-muted-foreground hover:text-accent transition-colors"
+                          >
+                            {cat.name}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Collections */}
+                  <div>
+                    <span className="text-xs font-bold tracking-widest uppercase text-accent mb-4 block">Collections</span>
+                    <ul className="space-y-3">
+                      {activeCollections.map((col) => (
+                        <li key={col.id}>
+                          <button
+                            onClick={() => handleNav(`/collections/${col.slug}`)}
+                            className="text-sm text-muted-foreground hover:text-accent transition-colors"
+                          >
+                            {col.title}
+                          </button>
+                        </li>
+                      ))}
+                      <li>
+                        <button
+                          onClick={() => handleNav("/collections")}
+                          className="text-sm font-semibold text-primary hover:text-accent inline-flex items-center gap-1 pt-2"
+                        >
+                          All Collections <ArrowRight className="h-3 w-3" />
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Discovery */}
+                  <div>
+                    <span className="text-xs font-bold tracking-widest uppercase text-accent mb-4 block">Discovery</span>
+                    <ul className="space-y-3">
+                      <li>
+                        <button onClick={() => handleNav("/shop?filter=newArrival")} className="text-sm font-semibold text-accent">
+                          ★ New Season Drops
+                        </button>
+                      </li>
+                      <li>
+                        <button onClick={() => handleNav("/shop?filter=bestseller")} className="text-sm text-muted-foreground hover:text-accent">
+                          Bestselling Sets
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Spotlight */}
+                  <div className="bg-secondary p-5 rounded-md border flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-1 text-accent mb-2">
+                        <Sparkles className="h-3 w-3" />
+                        <span className="text-[10px] font-bold tracking-widest uppercase">Spotlight</span>
+                      </div>
+                      <h4 className="font-serif text-lg text-foreground mb-1">Aurelia Fendy Satin Saree</h4>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Heavy Resham & Zari Cutwork embroidery in vibrant festive shades.
+                      </p>
+                    </div>
+                    <Button onClick={() => handleNav("/products/aurelia-saree")} variant="evara" className="mt-4 w-full">
+                      Shop Spotlight
+                    </Button>
+                  </div>
+                </div>
               )}
-            </button>
+            </div>
 
-            {/* Account / Track Order (Desktop) */}
-            <button
-              onClick={() => onNavigate("/account")}
-              aria-label="Client Account"
-              title="Account & Orders"
-              className="desktop-only btn-icon"
-              style={{
-                color: "var(--text-primary)",
-                cursor: "pointer",
-              }}
-            >
-              <User size={18} />
-            </button>
+            <button onClick={() => handleNav("/shop/sarees")} className="text-sm font-semibold tracking-widest uppercase text-foreground hover:text-accent transition-colors">Sarees</button>
+            <button onClick={() => handleNav("/shop/coord-sets")} className="text-sm font-semibold tracking-widest uppercase text-foreground hover:text-accent transition-colors">Co-ord Sets</button>
+            <button onClick={() => handleNav("/shop/kurta-sets")} className="text-sm font-semibold tracking-widest uppercase text-foreground hover:text-accent transition-colors">Kurta Sets</button>
+            <button onClick={() => handleNav("/shop?filter=newArrival")} className="text-sm font-semibold tracking-widest uppercase text-accent hover:text-accent/80 transition-colors">New In</button>
+          </nav>
+        </div>
 
-            {/* Cart Drawer Trigger */}
-            <button
-              onClick={openCartDrawer}
-              aria-label={`View shopping bag (${cartCount} items)`}
-              title="Shopping Bag"
-              className="btn-icon"
-              style={{
-                position: "relative",
-                color: "var(--text-primary)",
-                cursor: "pointer",
-              }}
-            >
-              <ShoppingBag size={18} />
-              {cartCount > 0 && (
-                <span
-                  style={{
-                    position: "absolute",
-                    top: "-2px",
-                    right: "-2px",
-                    backgroundColor: "var(--accent-wine)",
-                    color: "var(--text-inverse)",
-                    fontSize: "0.6rem",
-                    fontWeight: 700,
-                    width: "17px",
-                    height: "17px",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {cartCount}
-                </span>
-              )}
-            </button>
+        {/* Center Brand Identity */}
+        <div className="flex-shrink-0 text-center">
+          <Link to="/" className="flex flex-col items-center">
+            <span className="font-serif text-2xl lg:text-3xl font-semibold tracking-[0.2em] text-foreground leading-none">
+              EVARA VASTRA
+            </span>
+            <span className="text-[9px] tracking-[0.3em] uppercase text-accent font-bold mt-1">
+              SURAT • INDIA
+            </span>
+          </Link>
+        </div>
 
-            {/* Admin Dashboard Entry */}
-            <button
-              onClick={() => onNavigate("/admin")}
-              title="Atelier Admin Portal"
-              aria-label="Atelier Admin Suite"
-              style={{
-                backgroundColor: isAdminAuthenticated ? "var(--accent-wine)" : "var(--bg-surface-subtle)",
-                color: isAdminAuthenticated ? "var(--text-inverse)" : "var(--text-secondary)",
-                border: "1px solid var(--border-subtle)",
-                borderRadius: "3px",
-                padding: "0.35rem 0.6rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.3rem",
-                fontSize: "0.68rem",
-                fontWeight: 700,
-                letterSpacing: "0.08em",
-                cursor: "pointer",
-                height: "36px",
-              }}
-            >
-              <Shield size={13} />
-              <span className="desktop-only">ADMIN</span>
-            </button>
-          </div>
+        {/* Right Action Icons */}
+        <div className="flex flex-1 items-center justify-end gap-1 sm:gap-2">
+          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle Theme">
+            {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4 text-primary" />}
+          </Button>
+
+          <Button variant="ghost" size="icon" onClick={openSearch} aria-label="Search">
+            <Search className="h-4 w-4" />
+          </Button>
+
+          <Button variant="ghost" size="icon" onClick={() => handleNav("/wishlist")} aria-label="Wishlist" className="relative">
+            <Heart className="h-4 w-4" />
+            {wishlistCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 h-4 w-4 rounded-full bg-accent text-[9px] font-bold text-accent-foreground flex items-center justify-center">
+                {wishlistCount}
+              </span>
+            )}
+          </Button>
+
+          <Button variant="ghost" size="icon" onClick={() => handleNav("/account")} aria-label="Account" className="hidden lg:inline-flex">
+            <User className="h-4 w-4" />
+          </Button>
+
+          <Button variant="ghost" size="icon" onClick={openCartDrawer} aria-label="Cart" className="relative">
+            <ShoppingBag className="h-4 w-4" />
+            {cartCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 h-4 w-4 rounded-full bg-accent text-[9px] font-bold text-accent-foreground flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </Button>
+
+          <Button
+            variant={isAdminAuthenticated ? "default" : "outline"}
+            size="sm"
+            onClick={() => handleNav("/admin")}
+            className="ml-2 hidden lg:flex text-[10px] tracking-widest px-2"
+          >
+            <Shield className="h-3 w-3 mr-1" />
+            ADMIN
+          </Button>
         </div>
       </div>
     </header>

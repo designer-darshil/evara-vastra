@@ -176,7 +176,7 @@ export const ShoppableVideosSection: React.FC<{ onNavigate: (href: string) => vo
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      onNavigate(`/product/${video.productSlug}`);
+                      onNavigate(`/products/${video.productSlug}`);
                     }}
                     style={{
                       backgroundColor: "#FFFFFF",
@@ -280,7 +280,7 @@ export const ShoppableVideosSection: React.FC<{ onNavigate: (href: string) => vo
               <button
                 onClick={() => {
                   setActiveVideo(null);
-                  onNavigate(`/product/${activeVideo.productSlug}`);
+                  onNavigate(`/products/${activeVideo.productSlug}`);
                 }}
                 className="btn btn-primary"
                 style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}

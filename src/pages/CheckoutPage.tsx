@@ -3,12 +3,23 @@ import { useShop, CartItem } from "../context/ShopContext";
 import { useData } from "../context/DataContext";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { CheckCircle2, ArrowRight, CreditCard, Smartphone, Building, Truck, Lock } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Card, CardContent } from "../components/ui/card";
+import { useNavigate } from "react-router-dom";
+import { cn } from "../lib/utils";
 
-export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
+export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
   onNavigate,
 }) => {
   const { cart, cartSubtotal, clearCart, showToast } = useShop();
   const { addOrder } = useData();
+  const navigate = useNavigate();
+
+  const handleNav = (href: string) => {
+    if (onNavigate) onNavigate(href);
+    else navigate(href);
+  };
 
   // Form State
   const [formData, setFormData] = useState({
@@ -101,90 +112,51 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
   // Order Confirmed State
   if (confirmedOrder) {
     return (
-      <div className="animate-fade-in" style={{ padding: "5rem 0 8rem 0" }}>
-        <div className="container" style={{ maxWidth: "680px" }}>
-          <div
-            style={{
-              backgroundColor: "var(--bg-surface)",
-              padding: "clamp(2rem, 5vw, 3.5rem)",
-              border: "1px solid var(--border-subtle)",
-              boxShadow: "var(--shadow-medium)",
-              textAlign: "center",
-            }}
-          >
-            <div
-              style={{
-                width: "68px",
-                height: "68px",
-                borderRadius: "50%",
-                backgroundColor: "var(--accent-wine-subtle)",
-                color: "var(--accent-wine)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                margin: "0 auto 1.5rem auto",
-              }}
-            >
-              <CheckCircle2 size={36} />
+      <div className="animate-in fade-in duration-500 py-20 pb-32">
+        <div className="container max-w-[680px]">
+          <div className="bg-background p-8 md:p-14 border border-border shadow-md text-center rounded-sm">
+            <div className="w-[68px] h-[68px] rounded-full bg-accent/10 text-accent flex items-center justify-center mx-auto mb-6">
+              <CheckCircle2 className="w-9 h-9" />
             </div>
 
-            <span
-              style={{
-                fontSize: "0.72rem",
-                fontWeight: 600,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "var(--accent-gold)",
-                display: "block",
-                marginBottom: "0.3rem",
-              }}
-            >
+            <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-primary block mb-1">
               ORDER CONFIRMED & REGISTERED IN ATELIER DATABASE
             </span>
 
-            <h1 className="font-serif" style={{ fontSize: "2.4rem", color: "var(--text-primary)", marginBottom: "0.5rem" }}>
+            <h1 className="font-serif text-4xl text-foreground mb-2 m-0">
               Thank You for Your Order
             </h1>
 
-            <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", lineHeight: 1.6 }}>
-              Order Reference: <strong style={{ color: "var(--accent-wine)" }}>{confirmedOrder.orderNumber}</strong>
+            <p className="text-[15px] text-muted-foreground leading-relaxed m-0">
+              Order Reference: <strong className="text-accent">{confirmedOrder.orderNumber}</strong>
             </p>
 
-            <div
-              style={{
-                backgroundColor: "var(--bg-primary)",
-                padding: "1.25rem",
-                border: "1px solid var(--border-subtle)",
-                margin: "2rem 0",
-                textAlign: "left",
-                fontSize: "0.85rem",
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                <span style={{ color: "var(--text-muted)" }}>Recipient</span>
-                <strong>{confirmedOrder.customerName}</strong>
+            <div className="bg-secondary/50 p-5 border border-border my-8 text-left text-sm rounded-sm">
+              <div className="flex justify-between mb-2">
+                <span className="text-muted-foreground">Recipient</span>
+                <strong className="text-foreground">{confirmedOrder.customerName}</strong>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                <span style={{ color: "var(--text-muted)" }}>Delivery Address</span>
-                <span>{confirmedOrder.shippingAddress}, {confirmedOrder.city} {confirmedOrder.pincode}</span>
+              <div className="flex justify-between mb-2">
+                <span className="text-muted-foreground">Delivery Address</span>
+                <span className="text-foreground text-right">{confirmedOrder.shippingAddress}, {confirmedOrder.city} {confirmedOrder.pincode}</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                <span style={{ color: "var(--text-muted)" }}>Tracking Courier</span>
-                <strong>{confirmedOrder.carrier} (#{confirmedOrder.trackingNumber})</strong>
+              <div className="flex justify-between mb-2">
+                <span className="text-muted-foreground">Tracking Courier</span>
+                <strong className="text-foreground">{confirmedOrder.carrier} <br/> (#{confirmedOrder.trackingNumber})</strong>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "var(--text-muted)" }}>Payment Method</span>
-                <span>{confirmedOrder.paymentMethod}</span>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Payment Method</span>
+                <span className="text-foreground text-right">{confirmedOrder.paymentMethod}</span>
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
-              <button onClick={() => onNavigate("/orders")} className="btn-secondary">
-                View Order History & Timeline
-              </button>
-              <button onClick={() => onNavigate("/shop")} className="btn-wine">
-                Continue Shopping <ArrowRight size={15} />
-              </button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button onClick={() => handleNav("/account/orders")} variant="secondary" className="h-12 px-6">
+                View Order History
+              </Button>
+              <Button onClick={() => handleNav("/shop")} className="h-12 px-6">
+                Continue Shopping <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
             </div>
           </div>
         </div>
@@ -194,284 +166,250 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
 
   // Active Cart Checkout Form
   return (
-    <div className="animate-fade-in" style={{ paddingBottom: "7rem", paddingTop: "2.5rem" }}>
+    <div className="animate-in fade-in duration-500 pt-10 pb-28">
       <div className="container">
         <Breadcrumbs
           items={[{ label: "Shopping Bag", href: "/cart" }, { label: "Checkout" }]}
           onNavigate={onNavigate}
         />
 
-        <div style={{ marginBottom: "2.5rem" }}>
-          <h1 className="font-serif" style={{ fontSize: "clamp(2rem, 3.5vw, 3rem)", color: "var(--text-primary)" }}>
+        <div className="mb-10">
+          <h1 className="font-serif text-4xl md:text-5xl text-foreground m-0">
             Express Checkout
           </h1>
-          <p style={{ fontSize: "0.85rem", color: "var(--accent-wine)", fontWeight: 500, marginTop: "0.2rem" }}>
+          <p className="text-[13px] text-accent font-semibold mt-2">
             ✦ Instant dynamic registration in Atelier Order Records
           </p>
         </div>
 
         {cart.length === 0 ? (
-          <div
-            style={{
-              padding: "4rem 2rem",
-              textAlign: "center",
-              backgroundColor: "var(--bg-surface)",
-              border: "1px solid var(--border-subtle)",
-            }}
-          >
-            <h3 className="font-serif" style={{ fontSize: "1.6rem" }}>Your Bag is Empty</h3>
-            <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", margin: "0.5rem 0 1.5rem 0" }}>
+          <div className="py-16 px-8 text-center bg-secondary/50 border border-border rounded-sm">
+            <h3 className="font-serif text-3xl m-0 text-foreground">Your Bag is Empty</h3>
+            <p className="text-[15px] text-muted-foreground mt-2 mb-6">
               Please add at least one saree to your bag before proceeding to checkout.
             </p>
-            <button onClick={() => onNavigate("/shop")} className="btn-wine">
+            <Button onClick={() => handleNav("/shop")} className="px-8">
               Browse Catalog
-            </button>
+            </Button>
           </div>
         ) : (
           <form onSubmit={handleSubmitOrder}>
-            <div
-              className="checkout-grid"
-            >
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-10 items-start">
               {/* Left Form Inputs */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+              <div className="flex flex-col gap-8">
                 {/* 1. Contact Info */}
-                <div style={{ backgroundColor: "var(--bg-surface)", padding: "2rem", border: "1px solid var(--border-subtle)" }}>
-                  <h3 className="font-serif" style={{ fontSize: "1.35rem", marginBottom: "1.25rem", color: "var(--text-primary)" }}>
-                    1. Contact Information
-                  </h3>
+                <Card className="bg-background border-border rounded-sm">
+                  <CardContent className="p-8">
+                    <h3 className="font-serif text-[22px] mb-6 text-foreground m-0">
+                      1. Contact Information
+                    </h3>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                    <div>
-                      <label style={{ display: "block", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 600, color: "var(--text-muted)", marginBottom: "0.3rem" }}>
-                        First Name *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.firstName}
-                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                        style={{ width: "100%", padding: "0.75rem", border: "1px solid var(--border-medium)", outline: "none" }}
-                      />
-                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs uppercase font-bold text-muted-foreground mb-1.5">
+                          First Name *
+                        </label>
+                        <Input
+                          type="text"
+                          required
+                          value={formData.firstName}
+                          onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                        />
+                      </div>
 
-                    <div>
-                      <label style={{ display: "block", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 600, color: "var(--text-muted)", marginBottom: "0.3rem" }}>
-                        Last Name *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.lastName}
-                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                        style={{ width: "100%", padding: "0.75rem", border: "1px solid var(--border-medium)", outline: "none" }}
-                      />
-                    </div>
+                      <div>
+                        <label className="block text-xs uppercase font-bold text-muted-foreground mb-1.5">
+                          Last Name *
+                        </label>
+                        <Input
+                          type="text"
+                          required
+                          value={formData.lastName}
+                          onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                        />
+                      </div>
 
-                    <div>
-                      <label style={{ display: "block", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 600, color: "var(--text-muted)", marginBottom: "0.3rem" }}>
-                        Email Address *
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        style={{ width: "100%", padding: "0.75rem", border: "1px solid var(--border-medium)", outline: "none" }}
-                      />
-                    </div>
+                      <div>
+                        <label className="block text-xs uppercase font-bold text-muted-foreground mb-1.5">
+                          Email Address *
+                        </label>
+                        <Input
+                          type="email"
+                          required
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        />
+                      </div>
 
-                    <div>
-                      <label style={{ display: "block", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 600, color: "var(--text-muted)", marginBottom: "0.3rem" }}>
-                        Phone / WhatsApp *
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        style={{ width: "100%", padding: "0.75rem", border: "1px solid var(--border-medium)", outline: "none" }}
-                      />
+                      <div>
+                        <label className="block text-xs uppercase font-bold text-muted-foreground mb-1.5">
+                          Phone / WhatsApp *
+                        </label>
+                        <Input
+                          type="tel"
+                          required
+                          value={formData.phone}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        />
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
 
                 {/* 2. Delivery Address */}
-                <div style={{ backgroundColor: "var(--bg-surface)", padding: "2rem", border: "1px solid var(--border-subtle)" }}>
-                  <h3 className="font-serif" style={{ fontSize: "1.35rem", marginBottom: "1.25rem", color: "var(--text-primary)" }}>
-                    2. Shipping Address
-                  </h3>
+                <Card className="bg-background border-border rounded-sm">
+                  <CardContent className="p-8">
+                    <h3 className="font-serif text-[22px] mb-6 text-foreground m-0">
+                      2. Shipping Address
+                    </h3>
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    <div>
-                      <label style={{ display: "block", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 600, color: "var(--text-muted)", marginBottom: "0.3rem" }}>
-                        Street Address & Landmark *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        style={{ width: "100%", padding: "0.75rem", border: "1px solid var(--border-medium)", outline: "none" }}
-                      />
-                    </div>
-
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
+                    <div className="flex flex-col gap-4">
                       <div>
-                        <label style={{ display: "block", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 600, color: "var(--text-muted)", marginBottom: "0.3rem" }}>
-                          City *
+                        <label className="block text-xs uppercase font-bold text-muted-foreground mb-1.5">
+                          Street Address & Landmark *
                         </label>
-                        <input
+                        <Input
                           type="text"
                           required
-                          value={formData.city}
-                          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                          style={{ width: "100%", padding: "0.75rem", border: "1px solid var(--border-medium)", outline: "none" }}
+                          value={formData.address}
+                          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                         />
                       </div>
-                      <div>
-                        <label style={{ display: "block", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 600, color: "var(--text-muted)", marginBottom: "0.3rem" }}>
-                          State *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={formData.state}
-                          onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                          style={{ width: "100%", padding: "0.75rem", border: "1px solid var(--border-medium)", outline: "none" }}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ display: "block", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 600, color: "var(--text-muted)", marginBottom: "0.3rem" }}>
-                          PIN Code *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={formData.pincode}
-                          onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
-                          style={{ width: "100%", padding: "0.75rem", border: "1px solid var(--border-medium)", outline: "none" }}
-                        />
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-xs uppercase font-bold text-muted-foreground mb-1.5">
+                            City *
+                          </label>
+                          <Input
+                            type="text"
+                            required
+                            value={formData.city}
+                            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs uppercase font-bold text-muted-foreground mb-1.5">
+                            State *
+                          </label>
+                          <Input
+                            type="text"
+                            required
+                            value={formData.state}
+                            onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs uppercase font-bold text-muted-foreground mb-1.5">
+                            PIN Code *
+                          </label>
+                          <Input
+                            type="text"
+                            required
+                            value={formData.pincode}
+                            onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
 
                 {/* 3. Payment Method */}
-                <div style={{ backgroundColor: "var(--bg-surface)", padding: "2rem", border: "1px solid var(--border-subtle)" }}>
-                  <h3 className="font-serif" style={{ fontSize: "1.35rem", marginBottom: "1.25rem", color: "var(--text-primary)" }}>
-                    3. Payment Preference
-                  </h3>
+                <Card className="bg-background border-border rounded-sm">
+                  <CardContent className="p-8">
+                    <h3 className="font-serif text-[22px] mb-6 text-foreground m-0">
+                      3. Payment Preference
+                    </h3>
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                    {[
-                      { id: "upi", label: "Instant UPI (GPay / PhonePe / Paytm / BHIM)", icon: Smartphone },
-                      { id: "card", label: "Credit or Debit Card (Visa, Mastercard, RuPay, Amex)", icon: CreditCard },
-                      { id: "netbanking", label: "Net Banking (All Major Indian Banks)", icon: Building },
-                      { id: "cod", label: "Cash on Delivery (Available across India)", icon: Truck },
-                    ].map((p) => {
-                      const Icon = p.icon;
-                      const isSelected = formData.paymentMethod === p.id;
-                      return (
-                        <label
-                          key={p.id}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.85rem",
-                            padding: "1rem 1.25rem",
-                            border: isSelected ? "1px solid var(--accent-wine)" : "1px solid var(--border-subtle)",
-                            backgroundColor: isSelected ? "var(--accent-wine-subtle)" : "#FFFFFF",
-                            cursor: "pointer",
-                          }}
-                        >
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            checked={isSelected}
-                            onChange={() => setFormData({ ...formData, paymentMethod: p.id })}
-                            style={{ accentColor: "var(--accent-wine)" }}
-                          />
-                          <Icon size={18} style={{ color: isSelected ? "var(--accent-wine)" : "var(--text-secondary)" }} />
-                          <span style={{ fontSize: "0.85rem", fontWeight: isSelected ? 600 : 400 }}>
-                            {p.label}
-                          </span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                </div>
+                    <div className="flex flex-col gap-3">
+                      {[
+                        { id: "upi", label: "Instant UPI (GPay / PhonePe / Paytm / BHIM)", icon: Smartphone },
+                        { id: "card", label: "Credit or Debit Card (Visa, Mastercard, RuPay, Amex)", icon: CreditCard },
+                        { id: "netbanking", label: "Net Banking (All Major Indian Banks)", icon: Building },
+                        { id: "cod", label: "Cash on Delivery (Available across India)", icon: Truck },
+                      ].map((p) => {
+                        const Icon = p.icon;
+                        const isSelected = formData.paymentMethod === p.id;
+                        return (
+                          <label
+                            key={p.id}
+                            className={cn(
+                              "flex items-center gap-3.5 p-4 border rounded-sm cursor-pointer transition-colors",
+                              isSelected
+                                ? "border-accent bg-accent/5"
+                                : "border-border bg-background hover:bg-secondary/50"
+                            )}
+                          >
+                            <input
+                              type="radio"
+                              name="paymentMethod"
+                              checked={isSelected}
+                              onChange={() => setFormData({ ...formData, paymentMethod: p.id })}
+                              className="w-4 h-4 accent-accent"
+                            />
+                            <Icon className={cn("w-5 h-5", isSelected ? "text-accent" : "text-muted-foreground")} />
+                            <span className={cn("text-sm", isSelected ? "font-bold text-foreground" : "font-medium text-foreground")}>
+                              {p.label}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
 
               {/* Right Order Summary & Confirm */}
-              <div
-                style={{
-                  backgroundColor: "var(--bg-surface)",
-                  padding: "2rem",
-                  border: "1px solid var(--border-subtle)",
-                  boxShadow: "var(--shadow-subtle)",
-                  position: "sticky",
-                  top: "100px",
-                }}
-              >
-                <h4 className="font-serif" style={{ fontSize: "1.35rem", marginBottom: "1rem", borderBottom: "1px solid var(--border-subtle)", paddingBottom: "0.5rem" }}>
+              <div className="bg-background p-8 border border-border shadow-sm rounded-sm sticky top-24">
+                <h4 className="font-serif text-[22px] mb-4 border-b border-border pb-3 m-0 text-foreground">
                   Cart Recap ({cart.length} items)
                 </h4>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem", marginBottom: "1.5rem" }}>
+                <div className="flex flex-col gap-4 mb-6">
                   {cart.map((item: CartItem) => (
-                    <div key={item.product.id} style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+                    <div key={item.product.id} className="flex gap-3 items-center">
                       <img
                         src={item.product.images[0]}
                         alt={item.product.title}
-                        style={{ width: "48px", height: "64px", objectFit: "cover" }}
+                        className="w-12 h-16 object-cover bg-secondary rounded-sm"
                       />
-                      <div style={{ flex: 1, fontSize: "0.78rem" }}>
-                        <strong style={{ display: "block", color: "var(--text-primary)" }}>{item.product.title}</strong>
-                        <span style={{ color: "var(--text-secondary)" }}>Qty: {item.quantity}</span>
+                      <div className="flex-1 text-[13px]">
+                        <strong className="block text-foreground">{item.product.title}</strong>
+                        <span className="text-muted-foreground">Qty: {item.quantity}</span>
                       </div>
-                      <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>
+                      <span className="text-sm font-bold text-foreground">
                         {formatINR(item.product.price * item.quantity)}
                       </span>
                     </div>
                   ))}
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", fontSize: "0.85rem", borderTop: "1px solid var(--border-subtle)", paddingTop: "1rem" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div className="flex flex-col gap-2.5 text-sm border-t border-border pt-4 text-muted-foreground">
+                  <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span>{formatINR(cartSubtotal)}</span>
+                    <strong className="text-foreground">{formatINR(cartSubtotal)}</strong>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div className="flex justify-between">
                     <span>Shipping</span>
-                    <span style={{ color: "#234E3E" }}>Complimentary</span>
+                    <span className="text-green-700 dark:text-green-500 font-medium">Complimentary</span>
                   </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      fontSize: "1.2rem",
-                      fontWeight: 600,
-                      borderTop: "1px solid var(--border-medium)",
-                      paddingTop: "0.75rem",
-                      marginTop: "0.5rem",
-                    }}
-                  >
+                  <div className="flex justify-between text-[19px] font-bold text-foreground border-t border-border pt-4 mt-2">
                     <span>Total Amount</span>
-                    <span style={{ color: "var(--accent-wine)" }}>{formatINR(grandTotal)}</span>
+                    <span className="text-accent">{formatINR(grandTotal)}</span>
                   </div>
                 </div>
 
-                <button
+                <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="btn-wine"
-                  style={{ width: "100%", marginTop: "1.5rem", padding: "1.1rem" }}
+                  className="w-full mt-6 h-14 text-[15px] font-bold tracking-wide uppercase"
                 >
                   {isSubmitting ? "Placing Order..." : `Place Order (${formatINR(grandTotal)})`}
-                </button>
+                </Button>
 
-                <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", textAlign: "center", marginTop: "0.75rem" }}>
-                  <Lock size={12} style={{ display: "inline", marginRight: "4px" }} />
+                <p className="text-[11px] text-muted-foreground text-center mt-4 flex items-center justify-center gap-1.5 font-medium">
+                  <Lock className="w-3.5 h-3.5" />
                   Encrypted Checkout. Order saved to Atelier DB.
                 </p>
               </div>
@@ -479,8 +417,6 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
           </form>
         )}
       </div>
-
-
     </div>
   );
 };

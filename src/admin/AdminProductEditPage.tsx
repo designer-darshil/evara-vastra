@@ -175,7 +175,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
           {isEditing && (
             <button
               type="button"
-              onClick={() => onNavigate(`/product/${formData.slug}`)}
+              onClick={() => onNavigate(`/products/${formData.slug}`)}
               className="btn-secondary"
               style={{ padding: "0.65rem 1rem", fontSize: "0.78rem" }}
             >

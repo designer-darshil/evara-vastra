@@ -193,7 +193,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
             </button>
 
             <button
-              onClick={() => handleLink("/orders")}
+              onClick={() => handleLink("/account/orders")}
               style={{
                 textAlign: "left",
                 fontSize: "0.95rem",
@@ -290,11 +290,11 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
           </div>
 
           <div style={{ display: "flex", gap: "1rem", marginTop: "0.25rem", fontSize: "0.75rem", color: "var(--text-muted)" }}>
-            <button onClick={() => handleLink("/shipping")} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 0 }}>
+            <button onClick={() => handleLink("/shipping-policy")} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 0 }}>
               Shipping
             </button>
             <span>•</span>
-            <button onClick={() => handleLink("/returns")} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 0 }}>
+            <button onClick={() => handleLink("/replacement-exchange-policy")} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 0 }}>
               Exchange
             </button>
             <span>•</span>

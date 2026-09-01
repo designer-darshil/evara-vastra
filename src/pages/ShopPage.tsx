@@ -6,9 +6,13 @@ import { colors, occasions } from "../data/colors";
 import { ProductCard } from "../components/common/ProductCard";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { X, SlidersHorizontal, Grid3X3, Grid2X2 } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
+import { cn } from "../lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface ShopPageProps {
-  onNavigate: (href: string) => void;
+  onNavigate?: (href: string) => void;
   categoryParam?: string;
   searchParam?: string;
   fabricParam?: string;
@@ -28,7 +32,13 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 }) => {
   const { publishedProducts, activeCategories } = useData();
 
-  // Normalize color parameter slug (e.g. 'celestial-cobalt' -> 'indigo' / blue / cobalt)
+  const navigate = useNavigate();
+
+  const handleNav = (href: string) => {
+    if (onNavigate) onNavigate(href);
+    else navigate(href);
+  };
+
   const normalizeColorSlug = (slug?: string): string => {
     if (!slug) return "all";
     const clean = slug.toLowerCase().replace(/[-_]/g, " ").trim();
@@ -39,30 +49,14 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         clean.includes(c.id.toLowerCase())
     );
     if (matched) return matched.id;
-    if (clean.includes("cobalt") || clean.includes("blue") || clean.includes("indigo") || clean.includes("celestial") || clean.includes("peacock")) {
-      return "indigo";
-    }
-    if (clean.includes("maroon") || clean.includes("wine") || clean.includes("burgundy")) {
-      return "wine";
-    }
-    if (clean.includes("mustard") || clean.includes("gold") || clean.includes("yellow")) {
-      return "gold";
-    }
-    if (clean.includes("green") || clean.includes("emerald") || clean.includes("olive") || clean.includes("teal") || clean.includes("pista")) {
-      return "emerald";
-    }
-    if (clean.includes("blush") || clean.includes("rose") || clean.includes("pink") || clean.includes("mauve") || clean.includes("lavender") || clean.includes("purple")) {
-      return "rose";
-    }
-    if (clean.includes("rust") || clean.includes("terracotta") || clean.includes("orange")) {
-      return "rust";
-    }
-    if (clean.includes("ivory") || clean.includes("cream") || clean.includes("white")) {
-      return "ivory";
-    }
-    if (clean.includes("black") || clean.includes("charcoal") || clean.includes("obsidian")) {
-      return "charcoal";
-    }
+    if (clean.includes("cobalt") || clean.includes("blue") || clean.includes("indigo") || clean.includes("celestial") || clean.includes("peacock")) return "indigo";
+    if (clean.includes("maroon") || clean.includes("wine") || clean.includes("burgundy")) return "wine";
+    if (clean.includes("mustard") || clean.includes("gold") || clean.includes("yellow")) return "gold";
+    if (clean.includes("green") || clean.includes("emerald") || clean.includes("olive") || clean.includes("teal") || clean.includes("pista")) return "emerald";
+    if (clean.includes("blush") || clean.includes("rose") || clean.includes("pink") || clean.includes("mauve") || clean.includes("lavender") || clean.includes("purple")) return "rose";
+    if (clean.includes("rust") || clean.includes("terracotta") || clean.includes("orange")) return "rust";
+    if (clean.includes("ivory") || clean.includes("cream") || clean.includes("white")) return "ivory";
+    if (clean.includes("black") || clean.includes("charcoal") || clean.includes("obsidian")) return "charcoal";
     return clean;
   };
 
@@ -90,7 +84,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   // Filtering Logic
   const filteredProducts = useMemo(() => {
     return publishedProducts.filter((p: Product) => {
-      // Search param
       if (searchParam) {
         const q = searchParam.toLowerCase();
         const matchesQuery =
@@ -101,18 +94,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({
           p.category.toLowerCase().includes(q);
         if (!matchesQuery) return false;
       }
-
-      // Category
-      if (selectedCategory !== "all" && p.category !== selectedCategory) {
-        return false;
-      }
-
-      // Fabric
-      if (selectedFabric !== "all" && !p.fabric.toLowerCase().includes(selectedFabric.toLowerCase())) {
-        return false;
-      }
-
-      // Color
+      if (selectedCategory !== "all" && p.category !== selectedCategory) return false;
+      if (selectedFabric !== "all" && !p.fabric.toLowerCase().includes(selectedFabric.toLowerCase())) return false;
       if (selectedColor !== "all") {
         const normColor = selectedColor.toLowerCase();
         const prodColor = (p.color || "").toLowerCase();
@@ -129,24 +112,12 @@ export const ShopPage: React.FC<ShopPageProps> = ({
           (normColor === "rose" && (prodColor.includes("pink") || prodColor.includes("rose") || prodColor.includes("blush") || prodColor.includes("mauve") || prodColor.includes("purple") || prodColor.includes("lavender"))) ||
           (normColor === "gold" && (prodColor.includes("gold") || prodColor.includes("mustard") || prodColor.includes("yellow"))) ||
           (normColor === "rust" && (prodColor.includes("rust") || prodColor.includes("terracotta") || prodColor.includes("orange")));
-
         if (!matchesColor) return false;
       }
-
-      // Occasion
-      if (selectedOccasion !== "all" && !p.occasions.includes(selectedOccasion as any)) {
-        return false;
-      }
-
-      // Price
-      if (p.price > maxPrice) {
-        return false;
-      }
-
-      // Flags
+      if (selectedOccasion !== "all" && !p.occasions.includes(selectedOccasion as any)) return false;
+      if (p.price > maxPrice) return false;
       if (onlyNewArrivals && !p.newArrival) return false;
       if (onlyBestsellers && !p.bestseller) return false;
-
       return true;
     });
   }, [
@@ -164,15 +135,9 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   // Sorting Logic
   const sortedProducts = useMemo(() => {
     const list = [...filteredProducts];
-    if (sortBy === "price-low") {
-      return list.sort((a, b) => a.price - b.price);
-    }
-    if (sortBy === "price-high") {
-      return list.sort((a, b) => b.price - a.price);
-    }
-    if (sortBy === "newest") {
-      return list.sort((a, b) => (b.newArrival ? 1 : 0) - (a.newArrival ? 1 : 0));
-    }
+    if (sortBy === "price-low") return list.sort((a, b) => a.price - b.price);
+    if (sortBy === "price-high") return list.sort((a, b) => b.price - a.price);
+    if (sortBy === "newest") return list.sort((a, b) => (b.newArrival ? 1 : 0) - (a.newArrival ? 1 : 0));
     return list;
   }, [filteredProducts, sortBy]);
 
@@ -214,15 +179,9 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   };
 
   return (
-    <div className="animate-fade-in" style={{ paddingBottom: "7rem" }}>
+    <div className="animate-in fade-in duration-500 pb-28">
       {/* Header Banner */}
-      <div
-        style={{
-          backgroundColor: "var(--bg-surface-subtle)",
-          padding: "3.5rem 0 2.5rem 0",
-          borderBottom: "1px solid var(--border-subtle)",
-        }}
-      >
+      <div className="bg-secondary/50 py-14 border-b border-border">
         <div className="container">
           <Breadcrumbs
             items={[
@@ -232,101 +191,50 @@ export const ShopPage: React.FC<ShopPageProps> = ({
             onNavigate={onNavigate}
           />
 
-          <div style={{ maxWidth: "700px" }}>
-            <span
-              style={{
-                fontSize: "0.72rem",
-                fontWeight: 600,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "var(--accent-wine)",
-                display: "block",
-                marginBottom: "0.4rem",
-              }}
-            >
+          <div className="max-w-2xl">
+            <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-accent block mb-1.5">
               HANDWOVEN IN INDIA
             </span>
-            <h1
-              className="font-serif"
-              style={{ fontSize: "clamp(2.2rem, 4vw, 3.4rem)", color: "var(--text-primary)" }}
-            >
+            <h1 className="font-serif text-4xl md:text-5xl lg:text-[3.4rem] text-foreground m-0 leading-tight">
               {getPageTitle()}
             </h1>
-            <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", marginTop: "0.5rem" }}>
+            <p className="text-base text-muted-foreground mt-3 leading-relaxed">
               Explore our curated archive of pure mulberry silks, Varanasi Kadwa brocades, lightweight organic cottons, and architectural linens.
             </p>
           </div>
         </div>
       </div>
 
-      <div className="container" style={{ marginTop: "2.5rem" }}>
+      <div className="container mt-10">
         {/* Controls Bar */}
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "1.25rem",
-            paddingBottom: "1.5rem",
-            borderBottom: "1px solid var(--border-subtle)",
-            marginBottom: "2rem",
-          }}
-        >
-          {/* Mobile Filter Button */}
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <button
+        <div className="flex flex-wrap items-center justify-between gap-5 pb-6 border-b border-border mb-8">
+          {/* Mobile Filter Button & Meta */}
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setIsMobileFilterOpen(true)}
-              className="mobile-filter-btn"
-              style={{
-                display: "none",
-                alignItems: "center",
-                gap: "0.5rem",
-                padding: "0.6rem 1.2rem",
-                backgroundColor: "var(--bg-surface)",
-                border: "1px solid var(--border-medium)",
-                fontSize: "0.8rem",
-                fontWeight: 600,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-              }}
+              className="lg:hidden flex items-center gap-2 text-xs font-semibold tracking-widest uppercase h-9"
             >
-              <SlidersHorizontal size={15} />
+              <SlidersHorizontal className="h-4 w-4" />
               <span>Filters {activeFiltersCount > 0 && `(${activeFiltersCount})`}</span>
-            </button>
+            </Button>
 
-            <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-              Showing <strong style={{ color: "var(--text-primary)" }}>{sortedProducts.length}</strong> published sarees
+            <span className="text-sm text-muted-foreground hidden sm:inline-block">
+              Showing <strong className="text-foreground">{sortedProducts.length}</strong> published sarees
             </span>
           </div>
 
           {/* Right Controls */}
-          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span
-                style={{
-                  fontSize: "0.75rem",
-                  fontWeight: 600,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.1em",
-                  color: "var(--text-muted)",
-                }}
-              >
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground hidden sm:inline-block">
                 Sort By:
               </span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                style={{
-                  padding: "0.45rem 1.5rem 0.45rem 0.75rem",
-                  backgroundColor: "var(--bg-surface)",
-                  border: "1px solid var(--border-medium)",
-                  color: "var(--text-primary)",
-                  fontWeight: 500,
-                  fontSize: "0.8rem",
-                  cursor: "pointer",
-                  outline: "none",
-                }}
+                className="h-9 px-3 bg-background border border-input rounded-sm text-sm font-medium text-foreground outline-none focus:ring-1 focus:ring-accent"
               >
                 <option value="featured">Featured Curations</option>
                 <option value="price-low">Price: Low to High</option>
@@ -335,86 +243,56 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               </select>
             </div>
 
-            <div
-              className="desktop-only"
-              style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}
-            >
-              <button
+            <div className="hidden lg:flex items-center gap-1 border-l border-border pl-6">
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => setGridCols(3)}
-                aria-label="3 Column Grid"
-                style={{
-                  padding: "0.4rem",
-                  color: gridCols === 3 ? "var(--accent-wine)" : "var(--text-muted)",
-                }}
+                className={cn("h-8 w-8", gridCols === 3 ? "text-accent" : "text-muted-foreground")}
               >
-                <Grid3X3 size={18} />
-              </button>
-              <button
+                <Grid3X3 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => setGridCols(4)}
-                aria-label="4 Column Grid"
-                style={{
-                  padding: "0.4rem",
-                  color: gridCols === 4 ? "var(--accent-wine)" : "var(--text-muted)",
-                }}
+                className={cn("h-8 w-8", gridCols === 4 ? "text-accent" : "text-muted-foreground")}
               >
-                <Grid2X2 size={18} />
-              </button>
+                <Grid2X2 className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
 
         {/* Active Filter Badges */}
         {activeFiltersCount > 0 && (
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              gap: "0.5rem",
-              marginBottom: "2rem",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "0.7rem",
-                fontWeight: 600,
-                textTransform: "uppercase",
-                letterSpacing: "0.1em",
-                color: "var(--text-muted)",
-                marginRight: "0.5rem",
-              }}
-            >
+          <div className="flex flex-wrap items-center gap-2 mb-8">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mr-2">
               Active Filters:
             </span>
 
             {selectedCategory !== "all" && (
-              <span className="badge-tag" style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
+              <Badge variant="secondary" className="flex items-center gap-1.5 px-2.5 py-1">
                 Category: {selectedCategory}
-                <X size={12} style={{ cursor: "pointer" }} onClick={() => setSelectedCategory("all")} />
-              </span>
+                <X className="h-3 w-3 cursor-pointer hover:text-accent" onClick={() => setSelectedCategory("all")} />
+              </Badge>
             )}
             {selectedFabric !== "all" && (
-              <span className="badge-tag" style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
+              <Badge variant="secondary" className="flex items-center gap-1.5 px-2.5 py-1">
                 Fabric: {selectedFabric}
-                <X size={12} style={{ cursor: "pointer" }} onClick={() => setSelectedFabric("all")} />
-              </span>
+                <X className="h-3 w-3 cursor-pointer hover:text-accent" onClick={() => setSelectedFabric("all")} />
+              </Badge>
             )}
             {selectedColor !== "all" && (
-              <span className="badge-tag" style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
+              <Badge variant="secondary" className="flex items-center gap-1.5 px-2.5 py-1">
                 Color: {selectedColor}
-                <X size={12} style={{ cursor: "pointer" }} onClick={() => setSelectedColor("all")} />
-              </span>
+                <X className="h-3 w-3 cursor-pointer hover:text-accent" onClick={() => setSelectedColor("all")} />
+              </Badge>
             )}
 
             <button
               onClick={resetAllFilters}
-              style={{
-                fontSize: "0.75rem",
-                color: "var(--accent-wine)",
-                fontWeight: 600,
-                textDecoration: "underline",
-                marginLeft: "0.5rem",
-              }}
+              className="text-xs text-accent font-bold underline ml-2 hover:text-accent/80 transition-colors"
             >
               Clear All
             </button>
@@ -422,34 +300,18 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         )}
 
         {/* Main Content Layout */}
-        <div
-          className="shop-main-grid"
-        >
+        <div className="flex flex-col lg:flex-row gap-10">
           {/* Desktop Filter Sidebar */}
-          <aside className="desktop-filter-sidebar" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+          <aside className="hidden lg:flex flex-col gap-8 w-[240px] shrink-0">
             {/* Category Filter */}
             <div>
-              <h4
-                style={{
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  color: "var(--text-primary)",
-                  marginBottom: "0.85rem",
-                }}
-              >
+              <h4 className="text-xs font-bold tracking-widest uppercase text-foreground mb-4">
                 Categories
               </h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              <div className="flex flex-col gap-2.5">
                 <button
                   onClick={() => setSelectedCategory("all")}
-                  style={{
-                    textAlign: "left",
-                    fontSize: "0.825rem",
-                    fontWeight: selectedCategory === "all" ? 600 : 400,
-                    color: selectedCategory === "all" ? "var(--accent-wine)" : "var(--text-secondary)",
-                  }}
+                  className={cn("text-left text-sm transition-colors", selectedCategory === "all" ? "text-accent font-semibold" : "text-muted-foreground hover:text-foreground")}
                 >
                   All Categories ({publishedProducts.length})
                 </button>
@@ -457,12 +319,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                   <button
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.slug)}
-                    style={{
-                      textAlign: "left",
-                      fontSize: "0.825rem",
-                      fontWeight: selectedCategory === cat.slug ? 600 : 400,
-                      color: selectedCategory === cat.slug ? "var(--accent-wine)" : "var(--text-secondary)",
-                    }}
+                    className={cn("text-left text-sm transition-colors", selectedCategory === cat.slug ? "text-accent font-semibold" : "text-muted-foreground hover:text-foreground")}
                   >
                     {cat.name}
                   </button>
@@ -472,27 +329,13 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
             {/* Fabric Filter */}
             <div>
-              <h4
-                style={{
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  color: "var(--text-primary)",
-                  marginBottom: "0.85rem",
-                }}
-              >
+              <h4 className="text-xs font-bold tracking-widest uppercase text-foreground mb-4">
                 Fabric & Yarn
               </h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              <div className="flex flex-col gap-2.5">
                 <button
                   onClick={() => setSelectedFabric("all")}
-                  style={{
-                    textAlign: "left",
-                    fontSize: "0.825rem",
-                    fontWeight: selectedFabric === "all" ? 600 : 400,
-                    color: selectedFabric === "all" ? "var(--accent-wine)" : "var(--text-secondary)",
-                  }}
+                  className={cn("text-left text-sm transition-colors", selectedFabric === "all" ? "text-accent font-semibold" : "text-muted-foreground hover:text-foreground")}
                 >
                   All Fabrics
                 </button>
@@ -500,12 +343,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                   <button
                     key={f.id}
                     onClick={() => setSelectedFabric(f.id)}
-                    style={{
-                      textAlign: "left",
-                      fontSize: "0.825rem",
-                      fontWeight: selectedFabric === f.id ? 600 : 400,
-                      color: selectedFabric === f.id ? "var(--accent-wine)" : "var(--text-secondary)",
-                    }}
+                    className={cn("text-left text-sm transition-colors", selectedFabric === f.id ? "text-accent font-semibold" : "text-muted-foreground hover:text-foreground")}
                   >
                     {f.name.split(" ")[0]}
                   </button>
@@ -515,27 +353,13 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
             {/* Occasion Filter */}
             <div>
-              <h4
-                style={{
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  color: "var(--text-primary)",
-                  marginBottom: "0.85rem",
-                }}
-              >
+              <h4 className="text-xs font-bold tracking-widest uppercase text-foreground mb-4">
                 Occasion
               </h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              <div className="flex flex-col gap-2.5">
                 <button
                   onClick={() => setSelectedOccasion("all")}
-                  style={{
-                    textAlign: "left",
-                    fontSize: "0.825rem",
-                    fontWeight: selectedOccasion === "all" ? 600 : 400,
-                    color: selectedOccasion === "all" ? "var(--accent-wine)" : "var(--text-secondary)",
-                  }}
+                  className={cn("text-left text-sm transition-colors", selectedOccasion === "all" ? "text-accent font-semibold" : "text-muted-foreground hover:text-foreground")}
                 >
                   All Occasions
                 </button>
@@ -543,12 +367,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                   <button
                     key={occ.id}
                     onClick={() => setSelectedOccasion(occ.id)}
-                    style={{
-                      textAlign: "left",
-                      fontSize: "0.825rem",
-                      fontWeight: selectedOccasion === occ.id ? 600 : 400,
-                      color: selectedOccasion === occ.id ? "var(--accent-wine)" : "var(--text-secondary)",
-                    }}
+                    className={cn("text-left text-sm transition-colors", selectedOccasion === occ.id ? "text-accent font-semibold" : "text-muted-foreground hover:text-foreground")}
                   >
                     {occ.name}
                   </button>
@@ -558,19 +377,10 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
             {/* Color Swatches */}
             <div>
-              <h4
-                style={{
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  color: "var(--text-primary)",
-                  marginBottom: "0.85rem",
-                }}
-              >
+              <h4 className="text-xs font-bold tracking-widest uppercase text-foreground mb-4">
                 Palette
               </h4>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+              <div className="flex flex-wrap gap-2">
                 {colors.map((c) => {
                   const isSelected = selectedColor === c.name.split(" ")[0];
                   return (
@@ -580,17 +390,11 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                         setSelectedColor(isSelected ? "all" : c.name.split(" ")[0])
                       }
                       title={c.name}
-                      style={{
-                        width: "28px",
-                        height: "28px",
-                        borderRadius: "50%",
-                        backgroundColor: c.hex,
-                        border: isSelected
-                          ? "2px solid var(--accent-wine)"
-                          : "1px solid var(--border-medium)",
-                        boxShadow: isSelected ? "0 0 0 2px #FFFFFF" : "none",
-                        cursor: "pointer",
-                      }}
+                      className={cn(
+                        "w-7 h-7 rounded-full cursor-pointer transition-transform hover:scale-110",
+                        isSelected ? "ring-2 ring-accent ring-offset-2 ring-offset-background" : "border border-border shadow-sm"
+                      )}
+                      style={{ backgroundColor: c.hex }}
                     />
                   );
                 })}
@@ -599,26 +403,11 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
             {/* Price Range Slider */}
             <div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <h4
-                  style={{
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
-                    color: "var(--text-primary)",
-                  }}
-                >
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="text-xs font-bold tracking-widest uppercase text-foreground">
                   Max Price
                 </h4>
-                <span style={{ fontSize: "0.8rem", fontWeight: 600 }}>
+                <span className="text-sm font-semibold">
                   ₹{maxPrice.toLocaleString("en-IN")}
                 </span>
               </div>
@@ -629,58 +418,40 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                 step="250"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(Number(e.target.value))}
-                style={{ width: "100%", accentColor: "var(--accent-wine)" }}
+                className="w-full h-1 bg-secondary rounded-lg appearance-none cursor-pointer accent-accent"
               />
             </div>
           </aside>
 
           {/* Product Grid Area */}
-          <main>
+          <main className="flex-1">
             {sortedProducts.length === 0 ? (
-              <div
-                style={{
-                  padding: "5rem 2rem",
-                  textAlign: "center",
-                  backgroundColor: "var(--bg-surface)",
-                  border: "1px solid var(--border-subtle)",
-                  borderRadius: "4px",
-                }}
-              >
-                <h3 className="font-serif" style={{ fontSize: "1.85rem", color: "var(--text-primary)" }}>
+              <div className="py-20 px-8 text-center bg-secondary/30 border border-border rounded-md">
+                <h3 className="font-serif text-3xl text-foreground m-0">
                   No Products Match Selected Filters
                 </h3>
-                <p
-                  style={{
-                    fontSize: "0.9rem",
-                    color: "var(--text-secondary)",
-                    maxWidth: "420px",
-                    margin: "0.5rem auto 1.5rem auto",
-                  }}
-                >
+                <p className="text-sm text-muted-foreground max-w-md mx-auto mt-3 mb-6">
                   Try clearing some of your filter criteria or explore our complete contemporary collection.
                 </p>
-                <button onClick={resetAllFilters} className="btn btn-primary">
+                <Button onClick={resetAllFilters} variant="default">
                   Reset All Filters
-                </button>
+                </Button>
               </div>
             ) : (
               <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns:
-                    gridCols === 4
-                      ? "repeat(auto-fill, minmax(230px, 1fr))"
-                      : "repeat(auto-fill, minmax(280px, 1fr))",
-                  gap: "clamp(0.85rem, 2vw, 2.5rem) clamp(0.85rem, 2vw, 1.75rem)",
-                }}
-                className="product-grid"
+                className={cn(
+                  "grid gap-x-6 gap-y-10",
+                  gridCols === 4
+                    ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+                    : "grid-cols-2 lg:grid-cols-3"
+                )}
               >
                 {sortedProducts.map((product: Product, idx: number) => (
                   <ProductCard
                     key={product.id}
                     product={product}
                     index={idx}
-                    onNavigate={onNavigate}
+                    onNavigate={handleNav}
                   />
                 ))}
               </div>
@@ -692,45 +463,26 @@ export const ShopPage: React.FC<ShopPageProps> = ({
       {/* Mobile Filter Drawer */}
       {isMobileFilterOpen && (
         <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(0,0,0,0.6)",
-            zIndex: 99999,
-            display: "flex",
-            justifyContent: "flex-end",
-          }}
+          className="fixed inset-0 bg-black/60 z-[99999] flex justify-end"
           onClick={() => setIsMobileFilterOpen(false)}
         >
           <div
-            style={{
-              backgroundColor: "var(--bg-surface)",
-              color: "var(--text-primary)",
-              width: "85%",
-              maxWidth: "340px",
-              height: "100%",
-              overflowY: "auto",
-              padding: "2rem 1.5rem",
-              display: "flex",
-              flexDirection: "column",
-              gap: "1.5rem",
-              boxShadow: "var(--shadow-elevated)",
-            }}
+            className="bg-background w-[85%] max-w-[340px] h-full overflow-y-auto p-8 flex flex-col gap-8 shadow-xl animate-in slide-in-from-right duration-300"
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 className="font-serif" style={{ fontSize: "1.4rem", margin: 0, color: "var(--text-primary)" }}>Filters</h3>
-              <button onClick={() => setIsMobileFilterOpen(false)} style={{ border: "none", background: "none", cursor: "pointer", color: "var(--text-primary)" }}>
-                <X size={20} />
+            <div className="flex justify-between items-center pb-4 border-b border-border">
+              <h3 className="font-serif text-2xl m-0 text-foreground">Filters</h3>
+              <button onClick={() => setIsMobileFilterOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors">
+                <X className="w-6 h-6" />
               </button>
             </div>
 
             <div>
-              <h4 style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", marginBottom: "0.5rem" }}>Categories</h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+              <h4 className="text-xs font-bold tracking-widest uppercase text-foreground mb-4">Categories</h4>
+              <div className="flex flex-col gap-3">
                 <button
                   onClick={() => setSelectedCategory("all")}
-                  style={{ textAlign: "left", fontSize: "0.85rem", color: selectedCategory === "all" ? "var(--accent-wine)" : "var(--text-secondary)", fontWeight: selectedCategory === "all" ? 700 : 400 }}
+                  className={cn("text-left text-sm", selectedCategory === "all" ? "text-accent font-bold" : "text-muted-foreground")}
                 >
                   All Categories
                 </button>
@@ -738,7 +490,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                   <button
                     key={c.id}
                     onClick={() => setSelectedCategory(c.slug)}
-                    style={{ textAlign: "left", fontSize: "0.85rem", color: selectedCategory === c.slug ? "var(--accent-wine)" : "var(--text-secondary)", fontWeight: selectedCategory === c.slug ? 700 : 400 }}
+                    className={cn("text-left text-sm", selectedCategory === c.slug ? "text-accent font-bold" : "text-muted-foreground")}
                   >
                     {c.name}
                   </button>
@@ -746,14 +498,12 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               </div>
             </div>
 
-            <button onClick={() => setIsMobileFilterOpen(false)} className="btn-wine" style={{ marginTop: "auto" }}>
+            <Button onClick={() => setIsMobileFilterOpen(false)} className="mt-auto w-full h-12">
               Apply Filters
-            </button>
+            </Button>
           </div>
         </div>
       )}
-
-
     </div>
   );
 };
