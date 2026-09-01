@@ -189,8 +189,81 @@ export const AdminInventoryPage: React.FC<{ onNavigate?: (href: string) => void 
             </div>
           </div>
 
-          {/* Table Container with carefully controlled scroll */}
-          <div className="overflow-x-auto">
+          {/* Mobile View: Stacked Inventory Cards (Visible on <640px) */}
+          <div className="sm:hidden divide-y divide-neutral-200">
+            {filteredProducts.map((product) => {
+              const qty = product.inventoryCount ?? product.inventory ?? 0;
+              const isLow = qty <= 3 && qty > 0;
+              const isOut = qty <= 0 || !product.inStock;
+
+              return (
+                <div key={product.id} className="p-4 space-y-2.5 bg-white">
+                  <div className="flex items-start gap-3">
+                    <img
+                      src={product.images[0]}
+                      alt={product.title}
+                      className="w-12 h-14 object-cover rounded-xs border border-neutral-200 shrink-0 bg-neutral-100"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <span className="font-bold text-neutral-900 text-xs block truncate" title={product.title}>
+                        {product.title}
+                      </span>
+                      <span className="text-[10px] text-neutral-500 font-mono block">
+                        SKU: {product.sku} • {product.category}
+                      </span>
+                      <span className="text-[11px] font-semibold text-[#734E06] block mt-0.5">
+                        ₹{product.price.toLocaleString("en-IN")}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-neutral-100 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={`px-2 py-0.5 rounded-sm text-[11px] font-bold ${
+                          isOut
+                            ? "bg-red-100 text-red-800"
+                            : isLow
+                            ? "bg-amber-100 text-amber-900"
+                            : "bg-neutral-100 text-neutral-800"
+                        }`}
+                      >
+                        {qty} units
+                      </span>
+                      {isOut ? (
+                        <span className="text-[9px] font-bold uppercase text-red-700 bg-red-50 px-1.5 py-0.5 rounded-xs border border-red-200">
+                          Sold Out
+                        </span>
+                      ) : isLow ? (
+                        <span className="text-[9px] font-bold uppercase text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded-xs border border-amber-300">
+                          Low Stock
+                        </span>
+                      ) : (
+                        <span className="text-[9px] font-bold uppercase text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-xs border border-emerald-200">
+                          In Stock
+                        </span>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={() => handleOpenAdjust(product)}
+                      className="px-3 py-1 bg-white border border-neutral-300 hover:border-brand hover:text-brand text-neutral-800 font-bold rounded-sm text-xs shadow-2xs"
+                    >
+                      Adjust Stock
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+            {filteredProducts.length === 0 && (
+              <div className="p-8 text-center text-neutral-500 text-xs">
+                No products found matching the criteria.
+              </div>
+            )}
+          </div>
+
+          {/* Desktop Table View (Visible on >=640px) */}
+          <div className="hidden sm:block overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[700px]">
               <thead>
                 <tr className="bg-neutral-50 text-[11px] font-bold text-neutral-500 uppercase tracking-wider border-b border-neutral-200">

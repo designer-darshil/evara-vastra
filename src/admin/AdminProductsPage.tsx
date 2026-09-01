@@ -140,8 +140,101 @@ export const AdminProductsPage: React.FC<{ onNavigate?: (href: string) => void }
           </div>
         </div>
 
-        {/* Table Container */}
-        <div className="overflow-x-auto">
+        {/* Mobile View: Stacked Cards (Visible on <640px) */}
+        <div className="sm:hidden divide-y divide-neutral-200">
+          {filteredProducts.map((p) => {
+            const qty = p.inventoryCount ?? p.inventory ?? 0;
+            const isLow = qty <= 3 && qty > 0;
+            const isOut = qty <= 0 || !p.inStock;
+
+            return (
+              <div key={p.id} className="p-4 space-y-3 bg-white">
+                <div className="flex items-start gap-3">
+                  <img
+                    src={p.images[0]}
+                    alt={p.title}
+                    className="w-14 h-16 object-cover rounded-xs border border-neutral-200 shrink-0 bg-neutral-100"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <span className="font-bold text-neutral-900 text-xs block truncate" title={p.title}>
+                      {p.title}
+                    </span>
+                    <span className="text-[10px] text-neutral-500 font-mono block">
+                      {p.sku || p.code} • {p.category}
+                    </span>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="font-bold text-[#734E06] text-xs">
+                        {formatINR(p.price)}
+                      </span>
+                      {p.compareAtPrice && (
+                        <span className="text-[10px] text-neutral-400 line-through">
+                          {formatINR(p.compareAtPrice)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-neutral-100 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className={`px-2 py-0.5 rounded-sm font-bold text-[10px] ${
+                      isOut
+                        ? "bg-red-100 text-red-800"
+                        : isLow
+                        ? "bg-amber-100 text-amber-900"
+                        : "bg-neutral-100 text-neutral-800"
+                    }`}>
+                      {qty} units
+                    </span>
+                    <button
+                      onClick={() => handleTogglePublish(p)}
+                      className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm border ${
+                        p.status === "published"
+                          ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                          : "bg-neutral-100 text-neutral-600 border-neutral-200"
+                      }`}
+                    >
+                      {p.status}
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    {onNavigate && (
+                      <button
+                        onClick={() => onNavigate(`/admin/products/edit/${p.id}`)}
+                        className="px-2.5 py-1 text-xs font-semibold bg-white border border-neutral-300 rounded-sm text-neutral-800"
+                      >
+                        Edit
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleDuplicate(p.id)}
+                      className="p-1 text-neutral-600 border border-neutral-200 rounded-sm"
+                      title="Duplicate"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => setDeleteConfirmId(p.id)}
+                      className="p-1 text-red-600 border border-red-200 rounded-sm"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          {filteredProducts.length === 0 && (
+            <div className="p-8 text-center text-neutral-500 text-xs">
+              No products match the filter criteria.
+            </div>
+          )}
+        </div>
+
+        {/* Desktop View: Full Data Table (Visible on >=640px) */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[760px]">
             <thead>
               <tr className="bg-neutral-50 text-[11px] font-bold text-neutral-500 uppercase tracking-wider border-b border-neutral-200">

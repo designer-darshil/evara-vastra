@@ -288,8 +288,115 @@ export const AdminShipmentsPage: React.FC<{ onNavigate?: (href: string) => void 
           </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
+        {/* Mobile View: Stacked Shipment Cards (Visible on <640px) */}
+        <div className="sm:hidden divide-y divide-neutral-200">
+          {filteredShipments.map((shipment) => {
+            const relatedOrder = orders.find((o) => o.id === shipment.orderId);
+            const isLoading = loadingActionId === shipment.id;
+
+            return (
+              <div key={shipment.id} className="p-4 space-y-3 bg-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-bold text-neutral-900 text-xs block">
+                      {shipment.orderNumber}
+                    </span>
+                    <span className="text-[10px] text-neutral-400 font-mono">
+                      SR ID: #{shipment.providerOrderId || "—"}
+                    </span>
+                  </div>
+                  <div>{getStatusBadge(shipment.status)}</div>
+                </div>
+
+                <div className="flex justify-between text-xs">
+                  <div>
+                    <span className="font-medium text-neutral-900 block">
+                      {relatedOrder?.customerName || "Customer"}
+                    </span>
+                    <span className="text-[11px] text-neutral-500">
+                      {relatedOrder?.city} ({relatedOrder?.pincode || "—"})
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-bold text-neutral-800 block">
+                      {shipment.courierName || "Pending Carrier"}
+                    </span>
+                    {shipment.awb ? (
+                      <span className="font-mono text-[#734E06] font-bold text-[10px]">
+                        AWB: {shipment.awb}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-neutral-400 italic">No AWB yet</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-neutral-100 flex items-center justify-between gap-1">
+                  <span
+                    className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
+                      shipment.paymentMethod === "cod"
+                        ? "bg-amber-100 text-amber-800"
+                        : "bg-emerald-100 text-emerald-800"
+                    }`}
+                  >
+                    {shipment.paymentMethod.toUpperCase()}
+                  </span>
+
+                  <div className="flex items-center gap-1">
+                    {shipment.status === "CREATED" && (
+                      <Button
+                        size="sm"
+                        disabled={isLoading}
+                        onClick={() => handleAssignAWB(shipment)}
+                        className="h-7 px-2 text-[10px] bg-[#734E06] text-white"
+                      >
+                        Assign AWB
+                      </Button>
+                    )}
+                    {shipment.status === "AWB_ASSIGNED" && (
+                      <Button
+                        size="sm"
+                        disabled={isLoading}
+                        onClick={() => handleRequestPickup(shipment)}
+                        className="h-7 px-2 text-[10px] bg-neutral-900 text-white"
+                      >
+                        Pickup
+                      </Button>
+                    )}
+                    {shipment.awb && (
+                      <button
+                        onClick={() => setTrackingModalShipment(shipment)}
+                        className="p-1 text-neutral-700 border border-neutral-200 rounded-sm"
+                        title="Track"
+                      >
+                        <Truck className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    {shipment.labelUrl && (
+                      <a
+                        href={shipment.labelUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-1 text-neutral-700 border border-neutral-200 rounded-sm"
+                        title="Label"
+                      >
+                        <Printer className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          {filteredShipments.length === 0 && (
+            <div className="p-8 text-center text-neutral-400 text-xs">
+              No shipments found matching your criteria.
+            </div>
+          )}
+        </div>
+
+        {/* Desktop View: Full Table (Visible on >=640px) */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-left text-xs text-neutral-700">
             <thead className="bg-neutral-100 text-neutral-600 font-semibold border-b border-neutral-200 uppercase tracking-wider text-[10px]">
               <tr>

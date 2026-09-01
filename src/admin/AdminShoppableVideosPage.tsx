@@ -13,12 +13,14 @@ import {
   Video,
   ArrowUp,
   ArrowDown,
-  CheckCircle2,
-  AlertCircle,
   ShoppingBag,
+  UploadCloud,
+  Link2,
+  Loader2,
 } from "lucide-react";
 import { ShoppableVideo } from "../types";
 import { Button } from "../components/ui/button";
+import { mediaStorage, validateMediaFile } from "../lib/media/storage";
 
 export const AdminShoppableVideosPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
   onNavigate,
@@ -35,14 +37,62 @@ export const AdminShoppableVideosPage: React.FC<{ onNavigate?: (href: string) =>
   const [isNew, setIsNew] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
-  const [urlTestingStatus, setUrlTestingStatus] = useState<"idle" | "valid" | "invalid">("idle");
   const [productSearch, setProductSearch] = useState("");
+
+  // Media input mode states
+  const [videoInputMode, setVideoInputMode] = useState<"upload" | "url">("url");
+  const [posterInputMode, setPosterInputMode] = useState<"upload" | "url">("url");
+  const [isVideoUploading, setIsVideoUploading] = useState(false);
+  const [isPosterUploading, setIsPosterUploading] = useState(false);
+  const [videoUploadError, setVideoUploadError] = useState<string | null>(null);
+  const [posterUploadError, setPosterUploadError] = useState<string | null>(null);
 
   const sortedVideos = [...shoppableVideos].sort((a, b) => (a.order || 0) - (b.order || 0));
 
+  const handleUploadVideoFile = async (files: FileList | null) => {
+    if (!files || files.length === 0 || !editingVideo) return;
+    const file = files[0];
+    const validation = validateMediaFile(file, "video");
+    if (!validation.isValid) {
+      setVideoUploadError(validation.error || "Invalid video file.");
+      return;
+    }
+
+    setVideoUploadError(null);
+    setIsVideoUploading(true);
+    const result = await mediaStorage.upload(file, "video");
+    if (result.success && result.mediaItem) {
+      setEditingVideo((prev) => (prev ? { ...prev, videoUrl: result.mediaItem!.url } : null));
+    } else {
+      setVideoUploadError(result.error || "Video upload failed.");
+    }
+    setIsVideoUploading(false);
+  };
+
+  const handleUploadPosterFile = async (files: FileList | null) => {
+    if (!files || files.length === 0 || !editingVideo) return;
+    const file = files[0];
+    const validation = validateMediaFile(file, "image");
+    if (!validation.isValid) {
+      setPosterUploadError(validation.error || "Invalid poster file.");
+      return;
+    }
+
+    setPosterUploadError(null);
+    setIsPosterUploading(true);
+    const result = await mediaStorage.upload(file, "image");
+    if (result.success && result.mediaItem) {
+      setEditingVideo((prev) =>
+        prev ? { ...prev, thumbnailUrl: result.mediaItem!.url, posterUrl: result.mediaItem!.url } : null
+      );
+    } else {
+      setPosterUploadError(result.error || "Poster upload failed.");
+    }
+    setIsPosterUploading(false);
+  };
+
   const handleOpenNew = () => {
     setIsNew(true);
-    setUrlTestingStatus("idle");
     const firstProduct = publishedProducts[0];
     setEditingVideo({
       title: "",
@@ -65,7 +115,6 @@ export const AdminShoppableVideosPage: React.FC<{ onNavigate?: (href: string) =>
 
   const handleOpenEdit = (vid: ShoppableVideo) => {
     setIsNew(false);
-    setUrlTestingStatus("idle");
     setEditingVideo({ ...vid });
   };
 
@@ -83,15 +132,6 @@ export const AdminShoppableVideosPage: React.FC<{ onNavigate?: (href: string) =>
       thumbnailUrl: editingVideo.thumbnailUrl || prod.images[0],
       posterUrl: editingVideo.posterUrl || prod.images[0],
     });
-  };
-
-  const handleTestVideoUrl = (url?: string) => {
-    if (!url) {
-      setUrlTestingStatus("invalid");
-      return;
-    }
-    const isValidExtension = /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url) || url.includes("commondatastorage") || url.includes("cloudinary");
-    setUrlTestingStatus(isValidExtension ? "valid" : "invalid");
   };
 
   const handleSave = (e: React.FormEvent) => {
@@ -418,64 +458,177 @@ export const AdminShoppableVideosPage: React.FC<{ onNavigate?: (href: string) =>
                 </div>
               </div>
 
-              {/* Video URL & Validator */}
+              {/* Video Source (Upload vs URL) */}
               <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-sm space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="block font-bold uppercase tracking-wider text-neutral-700 m-0">
-                    Video Stream URL (MP4 / WebM) *
+                    Video Stream Source (MP4 / WebM) *
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => handleTestVideoUrl(editingVideo.videoUrl)}
-                    className="text-[11px] font-bold text-[#734E06] hover:underline"
-                  >
-                    Test URL Format
-                  </button>
+                  <div className="flex bg-neutral-200 p-0.5 rounded-xs text-[10px] font-bold uppercase">
+                    <button
+                      type="button"
+                      onClick={() => setVideoInputMode("upload")}
+                      className={`px-2.5 py-1 rounded-xs transition-colors ${
+                        videoInputMode === "upload" ? "bg-white text-neutral-900 shadow-xs" : "text-neutral-600"
+                      }`}
+                    >
+                      <UploadCloud className="w-3 h-3 inline mr-1" /> Upload
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setVideoInputMode("url")}
+                      className={`px-2.5 py-1 rounded-xs transition-colors ${
+                        videoInputMode === "url" ? "bg-white text-neutral-900 shadow-xs" : "text-neutral-600"
+                      }`}
+                    >
+                      <Link2 className="w-3 h-3 inline mr-1" /> URL
+                    </button>
+                  </div>
                 </div>
 
-                <input
-                  type="url"
-                  required
-                  value={editingVideo.videoUrl || ""}
-                  onChange={(e) => {
-                    setEditingVideo({ ...editingVideo, videoUrl: e.target.value });
-                    setUrlTestingStatus("idle");
-                  }}
-                  placeholder="https://commondatastorage.googleapis.com/.../video.mp4"
-                  className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm font-mono text-[11px] text-neutral-900 focus:border-[#734E06] outline-none"
-                />
-
-                {urlTestingStatus === "valid" && (
-                  <div className="flex items-center gap-1.5 text-emerald-700 font-semibold text-[11px]">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Video URL structure verified.
+                {videoUploadError && (
+                  <div className="p-2 bg-red-50 border border-red-200 text-red-700 text-[11px] rounded-sm">
+                    {videoUploadError}
                   </div>
                 )}
-                {urlTestingStatus === "invalid" && (
-                  <div className="flex items-center gap-1.5 text-red-700 font-semibold text-[11px]">
-                    <AlertCircle className="w-3.5 h-3.5" /> Please enter a valid MP4 or WebM video link.
+
+                {videoInputMode === "upload" ? (
+                  <div>
+                    <label className="border border-dashed border-neutral-300 hover:border-neutral-400 bg-white rounded-sm p-4 text-center cursor-pointer flex flex-col items-center justify-center gap-1.5 transition-colors block">
+                      <input
+                        type="file"
+                        accept="video/*"
+                        onChange={(e) => handleUploadVideoFile(e.target.files)}
+                        className="hidden"
+                      />
+                      {isVideoUploading ? (
+                        <div className="flex items-center gap-1.5 text-xs text-neutral-600">
+                          <Loader2 className="w-4 h-4 animate-spin text-[#734E06]" />
+                          <span>Processing video file...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <UploadCloud className="w-5 h-5 text-[#734E06]" />
+                          <span className="text-xs font-bold text-neutral-800">
+                            Select video from device / gallery
+                          </span>
+                          <span className="text-[10px] text-neutral-500">MP4, WebM up to 100MB</span>
+                        </>
+                      )}
+                    </label>
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      type="url"
+                      required
+                      value={editingVideo.videoUrl || ""}
+                      onChange={(e) =>
+                        setEditingVideo({ ...editingVideo, videoUrl: e.target.value })
+                      }
+                      placeholder="https://commondatastorage.googleapis.com/.../video.mp4"
+                      className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm font-mono text-[11px] text-neutral-900 focus:border-[#734E06] outline-none"
+                    />
+                  </div>
+                )}
+
+                {editingVideo.videoUrl && (
+                  <div className="text-[11px] text-neutral-500 truncate">
+                    <span className="font-bold text-neutral-700">Active Source:</span> {editingVideo.videoUrl}
                   </div>
                 )}
               </div>
 
-              {/* Poster Image URL */}
-              <div>
-                <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                  Poster / Thumbnail Image URL *
-                </label>
-                <input
-                  type="url"
-                  required
-                  value={editingVideo.thumbnailUrl || ""}
-                  onChange={(e) =>
-                    setEditingVideo({
-                      ...editingVideo,
-                      thumbnailUrl: e.target.value,
-                      posterUrl: e.target.value,
-                    })
-                  }
-                  placeholder="https://cdn.shopify.com/.../poster.jpg"
-                  className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 focus:bg-white focus:border-[#734E06] outline-none"
-                />
+              {/* Poster Image (Upload vs URL) */}
+              <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-sm space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="block font-bold uppercase tracking-wider text-neutral-700 m-0">
+                    Poster / Thumbnail Image *
+                  </label>
+                  <div className="flex bg-neutral-200 p-0.5 rounded-xs text-[10px] font-bold uppercase">
+                    <button
+                      type="button"
+                      onClick={() => setPosterInputMode("upload")}
+                      className={`px-2.5 py-1 rounded-xs transition-colors ${
+                        posterInputMode === "upload" ? "bg-white text-neutral-900 shadow-xs" : "text-neutral-600"
+                      }`}
+                    >
+                      <UploadCloud className="w-3 h-3 inline mr-1" /> Upload
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPosterInputMode("url")}
+                      className={`px-2.5 py-1 rounded-xs transition-colors ${
+                        posterInputMode === "url" ? "bg-white text-neutral-900 shadow-xs" : "text-neutral-600"
+                      }`}
+                    >
+                      <Link2 className="w-3 h-3 inline mr-1" /> URL
+                    </button>
+                  </div>
+                </div>
+
+                {posterUploadError && (
+                  <div className="p-2 bg-red-50 border border-red-200 text-red-700 text-[11px] rounded-sm">
+                    {posterUploadError}
+                  </div>
+                )}
+
+                {posterInputMode === "upload" ? (
+                  <div>
+                    <label className="border border-dashed border-neutral-300 hover:border-neutral-400 bg-white rounded-sm p-4 text-center cursor-pointer flex flex-col items-center justify-center gap-1.5 transition-colors block">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleUploadPosterFile(e.target.files)}
+                        className="hidden"
+                      />
+                      {isPosterUploading ? (
+                        <div className="flex items-center gap-1.5 text-xs text-neutral-600">
+                          <Loader2 className="w-4 h-4 animate-spin text-[#734E06]" />
+                          <span>Processing image file...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <UploadCloud className="w-5 h-5 text-[#734E06]" />
+                          <span className="text-xs font-bold text-neutral-800">
+                            Select poster photo from device
+                          </span>
+                          <span className="text-[10px] text-neutral-500">JPEG, PNG, WebP up to 10MB</span>
+                        </>
+                      )}
+                    </label>
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      type="url"
+                      required
+                      value={editingVideo.thumbnailUrl || ""}
+                      onChange={(e) =>
+                        setEditingVideo({
+                          ...editingVideo,
+                          thumbnailUrl: e.target.value,
+                          posterUrl: e.target.value,
+                        })
+                      }
+                      placeholder="https://cdn.shopify.com/.../poster.jpg"
+                      className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-neutral-900 focus:border-[#734E06] outline-none"
+                    />
+                  </div>
+                )}
+
+                {editingVideo.thumbnailUrl && (
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={editingVideo.thumbnailUrl}
+                      alt="Thumbnail Preview"
+                      className="w-12 h-12 object-cover rounded-xs border border-neutral-200"
+                    />
+                    <div className="text-[11px] text-neutral-500 truncate">
+                      <span className="font-bold text-neutral-700">Preview:</span> {editingVideo.thumbnailUrl}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Product Association Selector */}

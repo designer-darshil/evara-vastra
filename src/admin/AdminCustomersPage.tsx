@@ -61,8 +61,51 @@ export const AdminCustomersPage: React.FC<{ onNavigate?: (href: string) => void 
           </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
+        {/* Mobile View: Stacked Cards (Visible on <640px) */}
+        <div className="sm:hidden divide-y divide-neutral-200">
+          {filteredCustomers.map((cust) => (
+            <div key={cust.id} className="p-4 space-y-2 bg-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-full bg-brand/10 text-brand flex items-center justify-center font-bold text-xs shrink-0">
+                    {cust.name.charAt(0)}
+                  </div>
+                  <div>
+                    <strong className="text-xs font-bold text-neutral-900 block">{cust.name}</strong>
+                    <span className="text-[10px] text-neutral-400 font-mono">ID: {cust.id}</span>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 bg-neutral-100 font-bold rounded-sm text-[10px] text-neutral-800">
+                  {cust.totalOrders} order{cust.totalOrders > 1 ? "s" : ""}
+                </span>
+              </div>
+
+              <div className="space-y-0.5 text-xs">
+                <span className="text-neutral-800 flex items-center gap-1">
+                  <Mail className="w-3 h-3 text-neutral-400" /> {cust.email}
+                </span>
+                <span className="text-neutral-500 flex items-center gap-1 font-mono text-[11px]">
+                  <Phone className="w-3 h-3 text-neutral-400" /> {cust.phone} • {cust.city}
+                </span>
+              </div>
+
+              <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-xs">
+                <span className="text-[11px] text-neutral-500 font-mono">Joined: {cust.joinedDate}</span>
+                <span className="font-mono font-bold text-neutral-900">
+                  {formatINR(cust.totalSpend)}
+                </span>
+              </div>
+            </div>
+          ))}
+          {filteredCustomers.length === 0 && (
+            <div className="p-8 text-center text-neutral-500 text-xs">
+              No customer profiles match your search.
+            </div>
+          )}
+        </div>
+
+        {/* Desktop View: Full Data Table (Visible on >=640px) */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[700px]">
             <thead>
               <tr className="bg-neutral-50 text-[11px] font-bold text-neutral-500 uppercase tracking-wider border-b border-neutral-200">

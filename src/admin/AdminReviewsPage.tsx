@@ -53,7 +53,95 @@ export const AdminReviewsPage: React.FC<{ onNavigate?: (href: string) => void }>
 
       {/* Reviews Table */}
       <div className="bg-white border border-neutral-200 rounded-sm shadow-xs overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile View: Stacked Review Cards (Visible on <640px) */}
+        <div className="sm:hidden divide-y divide-neutral-200">
+          {filteredReviews.map((review) => (
+            <div key={review.id} className="p-4 space-y-2.5 bg-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <strong className="text-xs font-bold text-neutral-900 block">{review.customerName}</strong>
+                  <span className="text-[10px] text-neutral-400 font-mono">{review.date}</span>
+                </div>
+                <div className="flex text-amber-500">
+                  {Array.from({ length: review.rating }).map((_, i) => (
+                    <Star key={i} className="w-3 h-3 fill-amber-500" />
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <strong className="text-xs text-neutral-900 block mb-0.5">{review.title}</strong>
+                <p className="text-xs text-neutral-600 leading-relaxed m-0">"{review.comment}"</p>
+                <span className="text-[10px] text-neutral-400 block mt-1">
+                  Product: {review.productTitle || "General Experience"}
+                </span>
+              </div>
+
+              <div className="pt-2 border-t border-neutral-100 flex items-center justify-between gap-1">
+                <div className="flex items-center gap-1">
+                  <span
+                    className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm border ${
+                      review.status === "approved"
+                        ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                        : review.status === "rejected"
+                        ? "bg-red-50 text-red-800 border-red-200"
+                        : "bg-amber-50 text-amber-800 border-amber-200"
+                    }`}
+                  >
+                    {review.status}
+                  </span>
+                  <button
+                    onClick={() => updateReview(review.id, { isFeaturedOnHome: !review.isFeaturedOnHome })}
+                    className={`px-2 py-0.5 text-[9px] font-bold rounded-sm border flex items-center gap-0.5 ${
+                      review.isFeaturedOnHome
+                        ? "bg-[#734E06] text-white border-[#734E06]"
+                        : "bg-neutral-50 text-neutral-600 border-neutral-300"
+                    }`}
+                  >
+                    <Sparkles className="w-2.5 h-2.5" />
+                    {review.isFeaturedOnHome ? "Pinned" : "Pin"}
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  {review.status !== "approved" && (
+                    <button
+                      onClick={() => updateReview(review.id, { status: "approved" })}
+                      className="p-1.5 text-emerald-700 bg-emerald-50 rounded-sm"
+                      title="Approve"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                  {review.status !== "rejected" && (
+                    <button
+                      onClick={() => updateReview(review.id, { status: "rejected" })}
+                      className="p-1.5 text-amber-700 bg-amber-50 rounded-sm"
+                      title="Reject"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => deleteReview(review.id)}
+                    className="p-1.5 text-red-700 bg-red-50 rounded-sm"
+                    title="Delete"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+          {filteredReviews.length === 0 && (
+            <div className="p-8 text-center text-neutral-500 text-xs">
+              No customer reviews in this status tab.
+            </div>
+          )}
+        </div>
+
+        {/* Desktop View: Full Table (Visible on >=640px) */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[760px]">
             <thead>
               <tr className="bg-neutral-50 text-[11px] font-bold text-neutral-500 uppercase tracking-wider border-b border-neutral-200">
@@ -151,7 +239,7 @@ export const AdminReviewsPage: React.FC<{ onNavigate?: (href: string) => void }>
                       )}
                       <button
                         onClick={() => deleteReview(review.id)}
-                        className="p-1.5 text-red-600 hover:bg-red-50 rounded-sm transition-colors"
+                        className="p-1.5 text-red-700 hover:bg-red-50 rounded-sm transition-colors"
                         title="Delete Review"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -164,7 +252,7 @@ export const AdminReviewsPage: React.FC<{ onNavigate?: (href: string) => void }>
               {filteredReviews.length === 0 && (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-neutral-500">
-                    No customer reviews found matching the selected filter.
+                    No customer reviews in this status tab.
                   </td>
                 </tr>
               )}

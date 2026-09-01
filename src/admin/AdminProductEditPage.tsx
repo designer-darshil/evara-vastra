@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useData } from "../context/DataContext";
 import { Product, ProductStatus } from "../types";
+import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import {
   ArrowLeft,
   Save,
@@ -8,21 +9,47 @@ import {
   Plus,
   ExternalLink,
   Check,
+  AlertCircle,
+  Layers,
+  Sparkles,
+  DollarSign,
+  Package,
+  Truck,
+  Globe,
+  Tag,
+  AlertTriangle,
 } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { AdminMediaInput } from "../components/admin/AdminMediaInput";
+import { ManagedMediaItem } from "../lib/media/types";
 
 interface AdminProductEditPageProps {
   productId?: string;
   onNavigate: (href: string) => void;
 }
 
+interface ProductVariantState {
+  id: string;
+  size: string;
+  color: string;
+  sku: string;
+  price: number;
+  inventory: number;
+}
+
 export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
   productId,
   onNavigate,
 }) => {
-  const { products, addProduct, updateProduct, categories, collections } = useData();
+  const { products, addProduct, updateProduct, deleteProduct, categories, collections } = useData();
 
   const isEditing = !!productId && productId !== "new";
   const existingProduct = isEditing ? products.find((p) => p.id === productId) : null;
+
+  // Unsaved changes tracking
+  const [isDirty, setIsDirty] = useState(false);
+  const [showUnsavedModal, setShowUnsavedModal] = useState(false);
+  const [pendingNavigationHref, setPendingNavigationHref] = useState<string | null>(null);
 
   // Form State
   const [formData, setFormData] = useState<Partial<Product>>({
@@ -32,7 +59,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
     category: "silk",
     collection: "silk-edit",
     price: 12500,
-    compareAtPrice: undefined,
+    compareAtPrice: 15500,
     fabric: "Pure Mulberry Silk",
     color: "Wine",
     colorHex: "#7C2430",
@@ -44,12 +71,9 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
     bestseller: false,
     newArrival: true,
     inStock: true,
-    inventoryCount: 5,
+    inventoryCount: 10,
     status: "published" as ProductStatus,
-    images: [
-      "https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=1200&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1200&auto=format&fit=crop",
-    ],
+    images: [],
     details: {
       length: "5.5 metres",
       width: "45 inches (1.14 m)",
@@ -69,651 +93,1023 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
     seoDescription: "",
   });
 
-  const [activeTab, setActiveTab] = useState<"general" | "pricing" | "specs" | "media" | "seo">("general");
-  const [newImageUrl, setNewImageUrl] = useState("");
-  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  // Media Items State (for AdminMediaInput)
+  const [mediaItems, setMediaItems] = useState<ManagedMediaItem[]>([]);
 
+  // Variants State
+  const [variants, setVariants] = useState<ProductVariantState[]>([
+    { id: "var-1", size: "Free Size (5.5m + 0.8m Blouse)", color: "Wine", sku: "EV-SILK-WINE-FS", price: 12500, inventory: 10 },
+  ]);
+
+  // UI state
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [showSeoSection, setShowSeoSection] = useState(false);
+  const [showShippingSection, setShowShippingSection] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Initialize from existing product
   useEffect(() => {
     if (existingProduct) {
       setFormData(existingProduct);
+      if (existingProduct.images && existingProduct.images.length > 0) {
+        setMediaItems(
+          existingProduct.images.map((url, idx) => ({
+            id: `img-${idx}-${Date.now()}`,
+            url,
+            source: url.startsWith("data:") ? "UPLOAD" : "URL",
+            type: "image",
+            alt: `${existingProduct.title} - View ${idx + 1}`,
+            sortOrder: idx,
+            createdAt: new Date().toISOString(),
+          }))
+        );
+      }
+      setIsDirty(false);
     }
   }, [existingProduct]);
+
+  // Form field modifier with dirty tracking
+  const updateField = <K extends keyof Product>(key: K, value: Product[K]) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
+    setIsDirty(true);
+  };
+
+  const updateDetailsField = (key: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      details: {
+        ...prev.details,
+        [key]: value,
+      },
+    }));
+    setIsDirty(true);
+  };
 
   const handleTitleChange = (val: string) => {
     const autoSlug = val
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
+
     setFormData((prev) => ({
       ...prev,
       title: val,
       slug: !isEditing ? autoSlug : prev.slug,
-      code: !isEditing && !prev.code ? `EV-${val.slice(0, 3).toUpperCase()}-${Math.floor(10 + Math.random() * 89)}` : prev.code,
+      code: !isEditing && !prev.code ? `EV-${val.slice(0, 3).toUpperCase()}-${Math.floor(100 + Math.random() * 899)}` : prev.code,
     }));
+    setIsDirty(true);
   };
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.title || !formData.price) {
-      alert("Please fill in the product title and price.");
+  // Media state change
+  const handleMediaChange = (newMedia: ManagedMediaItem[]) => {
+    setMediaItems(newMedia);
+    setFormData((prev) => ({
+      ...prev,
+      images: newMedia.map((m) => m.url),
+    }));
+    setIsDirty(true);
+  };
+
+  // Variant Actions
+  const handleAddVariant = () => {
+    const newVar: ProductVariantState = {
+      id: `var-${Date.now()}`,
+      size: "Custom / Made to Measure",
+      color: formData.color || "Standard",
+      sku: `${formData.code || "EV"}-${variants.length + 1}`,
+      price: formData.price || 0,
+      inventory: 5,
+    };
+    setVariants([...variants, newVar]);
+    setIsDirty(true);
+  };
+
+  const handleRemoveVariant = (id: string) => {
+    setVariants(variants.filter((v) => v.id !== id));
+    setIsDirty(true);
+  };
+
+  const handleVariantChange = (id: string, field: keyof ProductVariantState, value: any) => {
+    setVariants(
+      variants.map((v) => (v.id === id ? { ...v, [field]: value } : v))
+    );
+    setIsDirty(true);
+  };
+
+  // Safe Navigation Handler
+  const safeNavigate = (href: string) => {
+    if (isDirty) {
+      setPendingNavigationHref(href);
+      setShowUnsavedModal(true);
+    } else {
+      onNavigate(href);
+    }
+  };
+
+  // Save / Publish
+  const handleSave = (targetStatus?: ProductStatus) => {
+    setErrorMessage(null);
+
+    if (!formData.title?.trim()) {
+      setErrorMessage("Product title is required.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
-    if (isEditing && existingProduct) {
-      updateProduct(existingProduct.id, formData);
-      setSaveMessage("Product updated successfully!");
-    } else {
-      const created = addProduct(formData as any);
-      setSaveMessage("Product created successfully!");
-      setTimeout(() => onNavigate(`/admin/products/edit/${created.id}`), 400);
+    if (!formData.price || formData.price <= 0) {
+      setErrorMessage("Please enter a valid product selling price.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
     }
 
-    setTimeout(() => setSaveMessage(null), 3000);
+    setIsSaving(true);
+
+    const now = new Date().toISOString();
+    const productPayload: Product = {
+      ...(existingProduct || {}),
+      id: isEditing && existingProduct ? existingProduct.id : `prod-${Date.now()}`,
+      title: formData.title.trim(),
+      slug: formData.slug || formData.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+      sku: formData.code || formData.sku || `EV-${Math.floor(1000 + Math.random() * 9000)}`,
+      code: formData.code || formData.sku || `EV-${Math.floor(1000 + Math.random() * 9000)}`,
+      category: formData.category || "silk",
+      collection: formData.collection || "silk-edit",
+      collections: formData.collection ? [formData.collection] : (existingProduct?.collections || ["silk-edit"]),
+      price: Number(formData.price),
+      compareAtPrice: formData.compareAtPrice ? Number(formData.compareAtPrice) : undefined,
+      discountPercentage: discountPercentage || undefined,
+      fabric: formData.fabric || "Pure Silk",
+      color: formData.color || "Crimson",
+      colorHex: formData.colorHex || "#734E06",
+      colors: [formData.color || "Crimson"],
+      sizes: variants.map((v) => v.size),
+      variants: variants.map((v) => ({
+        id: v.id,
+        title: v.size,
+        size: v.size,
+        color: v.color,
+        sku: v.sku,
+        price: v.price,
+        inStock: v.inventory > 0,
+      })),
+      occasions: formData.occasions || ["festive"],
+      craft: formData.craft || "Handloom",
+      shortDescription: formData.shortDescription || "",
+      description: formData.description || "",
+      featured: !!formData.featured,
+      bestseller: !!formData.bestseller,
+      newArrival: !!formData.newArrival,
+      inStock: formData.inStock ?? true,
+      inventory: Number(formData.inventoryCount || 0),
+      inventoryCount: Number(formData.inventoryCount || 0),
+      status: targetStatus || formData.status || "published",
+      images: mediaItems.map((m) => m.url),
+      tags: existingProduct?.tags || ["saree", "luxury", "handloom"],
+      details: formData.details || {},
+      stylingNotes: formData.stylingNotes || "",
+      drapeTip: formData.drapeTip || "",
+      seoTitle: formData.seoTitle || formData.title,
+      seoDescription: formData.seoDescription || formData.shortDescription,
+      createdAt: existingProduct?.createdAt || now,
+      updatedAt: now,
+    };
+
+    try {
+      if (isEditing && existingProduct) {
+        updateProduct(existingProduct.id, productPayload);
+      } else {
+        addProduct(productPayload);
+      }
+
+      setIsDirty(false);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 4000);
+    } catch {
+      setErrorMessage("Failed to save product. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleAddImage = () => {
-    if (!newImageUrl.trim()) return;
-    setFormData((prev) => ({
-      ...prev,
-      images: [...(prev.images || []), newImageUrl.trim()],
-    }));
-    setNewImageUrl("");
-  };
-
-  const handleRemoveImage = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      images: (prev.images || []).filter((_, i) => i !== index),
-    }));
-  };
+  const discountPercentage =
+    formData.compareAtPrice && formData.price && formData.compareAtPrice > formData.price
+      ? Math.round(((formData.compareAtPrice - formData.price) / formData.compareAtPrice) * 100)
+      : null;
 
   return (
-    <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-      {/* Top Controls Header */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "1rem",
-          borderBottom: "1px solid var(--admin-border)",
-          paddingBottom: "1rem",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <button
-            type="button"
-            onClick={() => onNavigate("/admin/products")}
-            style={{
-              padding: "0.5rem 0.75rem",
-              backgroundColor: "var(--admin-surface)",
-              border: "1px solid #D9D2C7",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.4rem",
-              fontSize: "0.8rem",
-            }}
-          >
-            <ArrowLeft size={14} /> Back to Catalog
-          </button>
-          <div>
-            <h1 className="font-serif" style={{ fontSize: "1.8rem", color: "var(--admin-text)", margin: 0 }}>
-              {isEditing ? `Edit: ${formData.title || "Untitled"}` : "Create New Handcrafted Saree"}
+    <div className="space-y-6 max-w-7xl mx-auto pb-24 lg:pb-12">
+      {/* Top Breadcrumb & Action Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200 pb-4">
+        <div>
+          <Breadcrumbs
+            items={[
+              { label: "Admin", href: "/admin" },
+              { label: "Products", href: "/admin/products" },
+              { label: isEditing ? (formData.title || "Edit Product") : "New Product" },
+            ]}
+            onNavigate={safeNavigate}
+          />
+          <div className="flex items-center gap-2 mt-1">
+            <button
+              type="button"
+              onClick={() => safeNavigate("/admin/products")}
+              className="p-1 text-neutral-500 hover:text-neutral-900 rounded-sm"
+              title="Back to Products"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <h1 className="text-xl sm:text-2xl font-serif font-bold text-neutral-900 m-0">
+              {isEditing ? "Edit Product" : "Create New Product"}
             </h1>
-            <span style={{ fontSize: "0.75rem", color: "#8E8276" }}>
-              {isEditing ? `SKU: ${formData.code} • Status: ${formData.status?.toUpperCase()}` : "Draft new product for catalog"}
-            </span>
+            {isDirty && (
+              <span className="text-[10px] uppercase tracking-wider font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded-sm border border-amber-300">
+                Unsaved Changes
+              </span>
+            )}
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          {isEditing && (
+        {/* Desktop Top Save Actions */}
+        <div className="hidden sm:flex items-center gap-2.5">
+          <Button
+            variant="outline"
+            onClick={() => safeNavigate("/admin/products")}
+            className="text-xs font-semibold"
+          >
+            Cancel
+          </Button>
+
+          {isEditing && formData.slug && (
             <button
               type="button"
-              onClick={() => onNavigate(`/products/${formData.slug}`)}
-              className="btn-secondary"
-              style={{ padding: "0.65rem 1rem", fontSize: "0.78rem" }}
+              onClick={() => window.open(`/product/${formData.slug}`, "_blank")}
+              className="p-2 border border-neutral-300 text-neutral-700 hover:bg-neutral-50 rounded-sm text-xs flex items-center gap-1.5"
+              title="View on Storefront"
             >
-              <ExternalLink size={14} /> Preview Storefront
+              <ExternalLink className="w-4 h-4" /> Storefront
             </button>
           )}
-          <button
-            type="submit"
-            className="btn-wine"
-            style={{ padding: "0.65rem 1.4rem", fontSize: "0.825rem" }}
+
+          <Button
+            variant="outline"
+            onClick={() => handleSave("draft")}
+            disabled={isSaving}
+            className="text-xs font-semibold"
           >
-            <Save size={15} /> Save & Publish Changes
-          </button>
+            Save Draft
+          </Button>
+
+          <Button
+            onClick={() => handleSave("published")}
+            disabled={isSaving}
+            className="bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider px-5 shadow-xs"
+          >
+            <Save className="w-4 h-4 mr-1.5" />
+            {isSaving ? "Saving..." : isEditing ? "Save & Update" : "Publish Product"}
+          </Button>
         </div>
       </div>
 
-      {saveMessage && (
-        <div
-          style={{
-            backgroundColor: "rgba(35,78,62,0.1)",
-            border: "1px solid #234E3E",
-            color: "#234E3E",
-            padding: "0.75rem 1.25rem",
-            fontSize: "0.85rem",
-            fontWeight: 600,
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-          }}
-        >
-          <Check size={16} /> {saveMessage}
+      {/* Notifications */}
+      {saveSuccess && (
+        <div className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs rounded-sm flex items-center gap-2 font-medium">
+          <Check className="w-4 h-4 text-emerald-700 shrink-0" />
+          <span>Product saved and published successfully across storefront and catalog indices.</span>
         </div>
       )}
 
-      {/* Tabs Selector */}
-      <div style={{ display: "flex", gap: "0.5rem", borderBottom: "1px solid var(--admin-border)" }}>
-        {[
-          { id: "general", label: "1. General Information" },
-          { id: "pricing", label: "2. Pricing & Inventory" },
-          { id: "specs", label: "3. Specifications" },
-          { id: "media", label: `4. Images (${formData.images?.length || 0})` },
-          { id: "seo", label: "5. SEO & Metadata" },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setActiveTab(tab.id as any)}
-            style={{
-              padding: "0.75rem 1.2rem",
-              fontSize: "0.825rem",
-              fontWeight: activeTab === tab.id ? 700 : 500,
-              color: activeTab === tab.id ? "#7C2430" : "#6F6257",
-              backgroundColor: activeTab === tab.id ? "#FFFFFF" : "transparent",
-              border: activeTab === tab.id ? "1px solid #E5DFD5" : "1px solid transparent",
-              borderBottom: activeTab === tab.id ? "1px solid #FFFFFF" : "1px solid transparent",
-              marginBottom: "-1px",
-              cursor: "pointer",
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {errorMessage && (
+        <div className="p-4 bg-red-50 border border-red-300 text-red-900 text-xs rounded-sm flex items-center gap-2 font-medium">
+          <AlertCircle className="w-4 h-4 text-red-700 shrink-0" />
+          <span>{errorMessage}</span>
+        </div>
+      )}
 
-      {/* Tab 1: General */}
-      {activeTab === "general" && (
-        <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-              Saree Title *
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.title || ""}
-              onChange={(e) => handleTitleChange(e.target.value)}
-              placeholder="e.g. Raga Katan Silk Saree in Deep Wine"
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.9rem" }}
-            />
-          </div>
+      {/* Responsive Layout Grid: Main Column + Side Column */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* ======================================================== */}
+        {/* MAIN COLUMN (2 cols on Desktop, Full Width on Mobile)     */}
+        {/* ======================================================== */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Section 1: Product Information */}
+          <div className="bg-white p-5 sm:p-6 border border-neutral-200 rounded-sm shadow-2xs space-y-4">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-900 m-0 pb-2 border-b border-neutral-100 flex items-center gap-2">
+              <Tag className="w-4 h-4 text-[#734E06]" /> 1. Product Identification
+            </h2>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                URL Slug *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.slug || ""}
-                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem" }}
-              />
-            </div>
-
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                SKU / Atelier Code *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.code || ""}
-                onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem" }}
-              />
-            </div>
-
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Primary Category *
-              </label>
-              <select
-                value={formData.category || "silk"}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem", backgroundColor: "var(--admin-surface)" }}
-              >
-                {categories.map((c) => (
-                  <option key={c.id} value={c.slug}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Assigned Collection
-              </label>
-              <select
-                value={formData.collection || "silk-edit"}
-                onChange={(e) => setFormData({ ...formData, collection: e.target.value })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem", backgroundColor: "var(--admin-surface)" }}
-              >
-                {collections.map((col) => (
-                  <option key={col.id} value={col.slug}>
-                    {col.title} ({col.season})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Fabric Name *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.fabric || ""}
-                onChange={(e) => setFormData({ ...formData, fabric: e.target.value })}
-                placeholder="e.g. Pure Katan Silk"
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem" }}
-              />
-            </div>
-
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Color Name & Hex *
-              </label>
-              <div style={{ display: "flex", gap: "0.5rem" }}>
+            <div className="space-y-4 text-xs">
+              <div>
+                <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                  Product Title *
+                </label>
                 <input
                   type="text"
-                  value={formData.color || ""}
-                  onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                  style={{ flex: 1, padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem" }}
+                  required
+                  value={formData.title || ""}
+                  onChange={(e) => handleTitleChange(e.target.value)}
+                  placeholder="e.g. Royal Crimson Kadwa Handloom Saree"
+                  className="w-full px-3 py-2.5 bg-white border border-neutral-300 rounded-sm text-sm text-neutral-900 focus:border-[#734E06] outline-none"
                 />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                    Product Code / Base SKU *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.code || ""}
+                    onChange={(e) => updateField("code", e.target.value)}
+                    placeholder="EV-SILK-001"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs text-neutral-900 focus:border-[#734E06] outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                    URL Slug
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.slug || ""}
+                    onChange={(e) => updateField("slug", e.target.value)}
+                    placeholder="royal-crimson-kadwa-saree"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs text-neutral-900 focus:border-[#734E06] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                    Primary Category *
+                  </label>
+                  <select
+                    value={formData.category || "silk"}
+                    onChange={(e) => updateField("category", e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs text-neutral-900 focus:border-[#734E06] outline-none font-medium cursor-pointer"
+                  >
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.slug}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                    Curated Collection
+                  </label>
+                  <select
+                    value={formData.collection || ""}
+                    onChange={(e) => updateField("collection", e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs text-neutral-900 focus:border-[#734E06] outline-none font-medium cursor-pointer"
+                  >
+                    <option value="">None (Standard Catalog)</option>
+                    {collections.map((col) => (
+                      <option key={col.id} value={col.slug}>
+                        {col.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                    Fabric Composition
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.fabric || ""}
+                    onChange={(e) => updateField("fabric", e.target.value)}
+                    placeholder="Pure Katan Silk"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs text-neutral-900 focus:border-[#734E06] outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                    Color Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.color || ""}
+                    onChange={(e) => updateField("color", e.target.value)}
+                    placeholder="Crimson Red"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs text-neutral-900 focus:border-[#734E06] outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                    Color Swatch Hex
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={formData.colorHex || "#734E06"}
+                      onChange={(e) => updateField("colorHex", e.target.value)}
+                      className="w-8 h-8 rounded-xs border border-neutral-300 p-0.5 cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={formData.colorHex || "#734E06"}
+                      onChange={(e) => updateField("colorHex", e.target.value)}
+                      className="w-full px-2 py-1.5 bg-white border border-neutral-300 rounded-sm text-xs uppercase"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                  Weaving Technique & Craft Legacy
+                </label>
                 <input
-                  type="color"
-                  value={formData.colorHex || "#7C2430"}
-                  onChange={(e) => setFormData({ ...formData, colorHex: e.target.value })}
-                  style={{ width: "42px", height: "42px", border: "1px solid #D9D2C7", cursor: "pointer" }}
+                  type="text"
+                  value={formData.craft || ""}
+                  onChange={(e) => updateField("craft", e.target.value)}
+                  placeholder="Handloom Kadwa Weave on Pit Loom with Antique Gold Zari"
+                  className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs text-neutral-900 focus:border-[#734E06] outline-none"
                 />
               </div>
             </div>
           </div>
 
-          <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-              Short Tagline / Teaser Description
-            </label>
-            <input
-              type="text"
-              value={formData.shortDescription || ""}
-              onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
-              placeholder="A brief summary for product cards and quick views"
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem" }}
+          {/* Section 2: Media Management */}
+          <div className="bg-white p-5 sm:p-6 border border-neutral-200 rounded-sm shadow-2xs space-y-4">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-900 m-0 pb-2 border-b border-neutral-100 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#734E06]" /> 2. Product Imagery & Media
+            </h2>
+
+            <AdminMediaInput
+              type="image"
+              items={mediaItems}
+              onChange={handleMediaChange}
+              maxItems={8}
+              label="High-Resolution Gallery"
+              helperText="Upload images from device / mobile gallery or paste external CDN URLs. Drag or use arrows to reorder."
             />
           </div>
 
-          <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-              Full Editorial Product Story
-            </label>
-            <textarea
-              rows={4}
-              value={formData.description || ""}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem" }}
-            />
-          </div>
-        </div>
-      )}
+          {/* Section 3: Description & Atelier Notes */}
+          <div className="bg-white p-5 sm:p-6 border border-neutral-200 rounded-sm shadow-2xs space-y-4">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-900 m-0 pb-2 border-b border-neutral-100 flex items-center gap-2">
+              <Layers className="w-4 h-4 text-[#734E06]" /> 3. Descriptions & Artisan Story
+            </h2>
 
-      {/* Tab 2: Pricing & Stock */}
-      {activeTab === "pricing" && (
-        <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1.5rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Price (INR ₹) *
-              </label>
-              <input
-                type="number"
-                required
-                value={formData.price || 0}
-                onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.95rem", fontWeight: 600 }}
-              />
-            </div>
-
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Compare-at Original Price (Optional)
-              </label>
-              <input
-                type="number"
-                value={formData.compareAtPrice || ""}
-                onChange={(e) => setFormData({ ...formData, compareAtPrice: e.target.value ? Number(e.target.value) : undefined })}
-                placeholder="Leave blank if not on promotion"
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.95rem" }}
-              />
-            </div>
-
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Inventory Count (Physical Stock) *
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={formData.inventoryCount || 0}
-                onChange={(e) => {
-                  const count = Number(e.target.value);
-                  setFormData({ ...formData, inventoryCount: count, inStock: count > 0 });
-                }}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.95rem", fontWeight: 600 }}
-              />
-            </div>
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", borderTop: "1px solid #F0EBE1", paddingTop: "1.5rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.5rem" }}>
-                Publication Status *
-              </label>
-              <select
-                value={formData.status || "published"}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem", backgroundColor: "var(--admin-surface)" }}
-              >
-                <option value="published">Published (Visible on storefront)</option>
-                <option value="draft">Draft (Hidden from customers)</option>
-                <option value="archived">Archived (Unlisted)</option>
-              </select>
-            </div>
-
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.5rem" }}>
-                Badges & Merchandising
-              </label>
-              <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-                <label style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.85rem", cursor: "pointer" }}>
-                  <input
-                    type="checkbox"
-                    checked={formData.featured || false}
-                    onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                    style={{ accentColor: "#7C2430" }}
-                  />
-                  <span>Featured Saree</span>
+            <div className="space-y-4 text-xs">
+              <div>
+                <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                  Brief Summary (Card & Quick View)
                 </label>
-                <label style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.85rem", cursor: "pointer" }}>
-                  <input
-                    type="checkbox"
-                    checked={formData.bestseller || false}
-                    onChange={(e) => setFormData({ ...formData, bestseller: e.target.checked })}
-                    style={{ accentColor: "#7C2430" }}
-                  />
-                  <span>Bestseller</span>
+                <input
+                  type="text"
+                  value={formData.shortDescription || ""}
+                  onChange={(e) => updateField("shortDescription", e.target.value)}
+                  placeholder="A handwoven masterpiece in pure mulberry silk featuring tested zari jaal."
+                  className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs text-neutral-900 focus:border-[#734E06] outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                  Full Craft Narrative & Product Description
                 </label>
-                <label style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.85rem", cursor: "pointer" }}>
-                  <input
-                    type="checkbox"
-                    checked={formData.newArrival || false}
-                    onChange={(e) => setFormData({ ...formData, newArrival: e.target.checked })}
-                    style={{ accentColor: "#7C2430" }}
+                <textarea
+                  rows={4}
+                  value={formData.description || ""}
+                  onChange={(e) => updateField("description", e.target.value)}
+                  placeholder="Elaborate craft description, artisan history, and fabric heritage..."
+                  className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs text-neutral-900 focus:border-[#734E06] outline-none leading-relaxed"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                    Drape & Styling Advice
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={formData.drapeTip || ""}
+                    onChange={(e) => updateField("drapeTip", e.target.value)}
+                    placeholder="Structure 5–6 pleats for a regal drape..."
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs text-neutral-900 focus:border-[#734E06] outline-none"
                   />
-                  <span>New Arrival</span>
-                </label>
+                </div>
+
+                <div>
+                  <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                    Garment Care Instructions
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={formData.details?.care || ""}
+                    onChange={(e) => updateDetailsField("care", e.target.value)}
+                    placeholder="Dry clean only. Wrap in breathable muslin..."
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs text-neutral-900 focus:border-[#734E06] outline-none"
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* Tab 3: Specifications */}
-      {activeTab === "specs" && (
-        <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Garment Length
-              </label>
-              <input
-                type="text"
-                value={formData.details?.length || "5.5 metres"}
-                onChange={(e) => setFormData({ ...formData, details: { ...formData.details!, length: e.target.value } })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-              />
+          {/* Section 4: Variants Management */}
+          <div className="bg-white p-5 sm:p-6 border border-neutral-200 rounded-sm shadow-2xs space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-neutral-100">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-900 m-0 flex items-center gap-2">
+                <Package className="w-4 h-4 text-[#734E06]" /> 4. Product Variants & SKU Matrix
+              </h2>
+              <button
+                type="button"
+                onClick={handleAddVariant}
+                className="flex items-center gap-1 text-xs font-bold text-[#734E06] hover:underline"
+              >
+                <Plus className="w-3.5 h-3.5" /> Add Variant
+              </button>
             </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Width / Dimensions
-              </label>
-              <input
-                type="text"
-                value={formData.details?.width || "45 inches"}
-                onChange={(e) => setFormData({ ...formData, details: { ...formData.details!, width: e.target.value } })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-              />
+
+            {/* Desktop Table View */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-neutral-200 bg-neutral-50 text-neutral-600 font-bold uppercase tracking-wider text-[10px]">
+                    <th className="py-2.5 px-3">Size / Cut</th>
+                    <th className="py-2.5 px-3">Color</th>
+                    <th className="py-2.5 px-3">Variant SKU</th>
+                    <th className="py-2.5 px-3">Price (₹)</th>
+                    <th className="py-2.5 px-3">Stock</th>
+                    <th className="py-2.5 px-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-neutral-100">
+                  {variants.map((v) => (
+                    <tr key={v.id}>
+                      <td className="py-2 px-3">
+                        <input
+                          type="text"
+                          value={v.size}
+                          onChange={(e) => handleVariantChange(v.id, "size", e.target.value)}
+                          className="w-full px-2 py-1 bg-white border border-neutral-300 rounded-xs text-xs"
+                        />
+                      </td>
+                      <td className="py-2 px-3">
+                        <input
+                          type="text"
+                          value={v.color}
+                          onChange={(e) => handleVariantChange(v.id, "color", e.target.value)}
+                          className="w-full px-2 py-1 bg-white border border-neutral-300 rounded-xs text-xs"
+                        />
+                      </td>
+                      <td className="py-2 px-3">
+                        <input
+                          type="text"
+                          value={v.sku}
+                          onChange={(e) => handleVariantChange(v.id, "sku", e.target.value)}
+                          className="w-full px-2 py-1 bg-white border border-neutral-300 rounded-xs text-xs font-mono"
+                        />
+                      </td>
+                      <td className="py-2 px-3">
+                        <input
+                          type="number"
+                          value={v.price}
+                          onChange={(e) => handleVariantChange(v.id, "price", Number(e.target.value))}
+                          className="w-24 px-2 py-1 bg-white border border-neutral-300 rounded-xs text-xs"
+                        />
+                      </td>
+                      <td className="py-2 px-3">
+                        <input
+                          type="number"
+                          value={v.inventory}
+                          onChange={(e) => handleVariantChange(v.id, "inventory", Number(e.target.value))}
+                          className="w-16 px-2 py-1 bg-white border border-neutral-300 rounded-xs text-xs"
+                        />
+                      </td>
+                      <td className="py-2 px-3 text-right">
+                        {variants.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveVariant(v.id)}
+                            className="text-red-600 hover:text-red-800 p-1"
+                            title="Delete Variant"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Fit Type
-              </label>
-              <input
-                type="text"
-                value={formData.details?.fit || "Comfortable & Regular Fit"}
-                onChange={(e) => setFormData({ ...formData, details: { ...formData.details!, fit: e.target.value } })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-              />
+
+            {/* Mobile Stacked Card View (320px - 640px) */}
+            <div className="sm:hidden space-y-3">
+              {variants.map((v, idx) => (
+                <div key={v.id} className="p-3.5 bg-neutral-50 border border-neutral-200 rounded-sm space-y-2.5 text-xs">
+                  <div className="flex items-center justify-between font-bold text-neutral-800">
+                    <span>Variant #{idx + 1}</span>
+                    {variants.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveVariant(v.id)}
+                        className="text-red-600 p-1"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-0.5">Size / Cut</label>
+                    <input
+                      type="text"
+                      value={v.size}
+                      onChange={(e) => handleVariantChange(v.id, "size", e.target.value)}
+                      className="w-full px-2.5 py-1.5 bg-white border border-neutral-300 rounded-xs"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-0.5">SKU</label>
+                      <input
+                        type="text"
+                        value={v.sku}
+                        onChange={(e) => handleVariantChange(v.id, "sku", e.target.value)}
+                        className="w-full px-2.5 py-1.5 bg-white border border-neutral-300 rounded-xs font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-0.5">Price (₹)</label>
+                      <input
+                        type="number"
+                        value={v.price}
+                        onChange={(e) => handleVariantChange(v.id, "price", Number(e.target.value))}
+                        className="w-full px-2.5 py-1.5 bg-white border border-neutral-300 rounded-xs"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-0.5">Stock Units</label>
+                    <input
+                      type="number"
+                      value={v.inventory}
+                      onChange={(e) => handleVariantChange(v.id, "inventory", Number(e.target.value))}
+                      className="w-full px-2.5 py-1.5 bg-white border border-neutral-300 rounded-xs"
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-              Package Details
-            </label>
-            <input
-              type="text"
-              value={formData.details?.packageDetails || "1 Complete Outfit / Set"}
-              onChange={(e) => setFormData({ ...formData, details: { ...formData.details!, packageDetails: e.target.value } })}
-              placeholder="e.g. 1 Saree, 1 Cotton Preservation Pouch, Artisan Card"
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-            />
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Weaving Technique
-              </label>
-              <input
-                type="text"
-                value={formData.details?.weaveType || ""}
-                onChange={(e) => setFormData({ ...formData, details: { ...formData.details!, weaveType: e.target.value } })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Zari Type
-              </label>
-              <input
-                type="text"
-                value={formData.details?.zariType || ""}
-                onChange={(e) => setFormData({ ...formData, details: { ...formData.details!, zariType: e.target.value } })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Origin & Cluster
-              </label>
-              <input
-                type="text"
-                value={formData.details?.origin || ""}
-                onChange={(e) => setFormData({ ...formData, details: { ...formData.details!, origin: e.target.value } })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-              />
-            </div>
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Curator Styling Advice
-              </label>
-              <textarea
-                rows={2}
-                value={formData.stylingNotes || ""}
-                onChange={(e) => setFormData({ ...formData, stylingNotes: e.target.value })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-                Draping Masterclass Tip
-              </label>
-              <textarea
-                rows={2}
-                value={formData.drapeTip || ""}
-                onChange={(e) => setFormData({ ...formData, drapeTip: e.target.value })}
-                style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Tab 4: Media Gallery */}
-      {activeTab === "media" && (
-        <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          <div>
-            <h3 className="font-serif" style={{ fontSize: "1.2rem", margin: "0 0 0.5rem 0" }}>
-              Product Image Gallery
-            </h3>
-            <p style={{ fontSize: "0.8rem", color: "#8E8276", margin: 0 }}>
-              The first image serves as the primary catalog thumbnail. Add high-resolution URLs below.
-            </p>
-          </div>
-
-          {/* Add Image URL Input */}
-          <div style={{ display: "flex", gap: "0.75rem" }}>
-            <input
-              type="url"
-              placeholder="Paste direct image URL (https://...)..."
-              value={newImageUrl}
-              onChange={(e) => setNewImageUrl(e.target.value)}
-              style={{ flex: 1, padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem" }}
-            />
+          {/* Section 5: Shipping Dimensions (Collapsible) */}
+          <div className="bg-white border border-neutral-200 rounded-sm shadow-2xs overflow-hidden">
             <button
               type="button"
-              onClick={handleAddImage}
-              className="btn-wine"
-              style={{ padding: "0.75rem 1.25rem", fontSize: "0.8rem" }}
+              onClick={() => setShowShippingSection(!showShippingSection)}
+              className="w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-neutral-50 transition-colors"
             >
-              <Plus size={15} /> Add Image
-            </button>
-          </div>
-
-          {/* Image Grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "1.25rem", marginTop: "1rem" }}>
-            {formData.images?.map((img, idx) => (
-              <div
-                key={idx}
-                style={{
-                  position: "relative",
-                  border: idx === 0 ? "2px solid #7C2430" : "1px solid #E5DFD5",
-                  backgroundColor: "var(--admin-surface-subtle)",
-                  overflow: "hidden",
-                }}
-              >
-                <div style={{ aspectRatio: "3/4", overflow: "hidden" }}>
-                  <img src={img} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                </div>
-                {idx === 0 && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: "0.4rem",
-                      left: "0.4rem",
-                      backgroundColor: "#7C2430",
-                      color: "#FFFFFF",
-                      fontSize: "0.6rem",
-                      fontWeight: 700,
-                      padding: "0.15rem 0.4rem",
-                    }}
-                  >
-                    PRIMARY
-                  </span>
-                )}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveImage(idx)}
-                  style={{
-                    position: "absolute",
-                    top: "0.4rem",
-                    right: "0.4rem",
-                    backgroundColor: "rgba(23,21,19,0.8)",
-                    color: "#FFFFFF",
-                    border: "none",
-                    width: "26px",
-                    height: "26px",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                  }}
-                >
-                  <Trash2 size={13} />
-                </button>
+              <div className="flex items-center gap-2">
+                <Truck className="w-4 h-4 text-[#734E06]" />
+                <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-900 m-0">
+                  5. Shipping & Logistics Dimensions
+                </h2>
               </div>
-            ))}
+              <span className="text-xs text-[#734E06] font-bold">
+                {showShippingSection ? "Collapse ▲" : "Expand ▼"}
+              </span>
+            </button>
+
+            {showShippingSection && (
+              <div className="p-5 sm:p-6 border-t border-neutral-200 space-y-4 text-xs bg-neutral-50/50">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                  <div>
+                    <label className="block font-bold uppercase text-neutral-700 mb-1">Weight (g)</label>
+                    <input
+                      type="text"
+                      value={formData.details?.weight || "550 grams"}
+                      onChange={(e) => updateDetailsField("weight", e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold uppercase text-neutral-700 mb-1">Length</label>
+                    <input
+                      type="text"
+                      value={formData.details?.length || "5.5 metres"}
+                      onChange={(e) => updateDetailsField("length", e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold uppercase text-neutral-700 mb-1">Width</label>
+                    <input
+                      type="text"
+                      value={formData.details?.width || "45 inches"}
+                      onChange={(e) => updateDetailsField("width", e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold uppercase text-neutral-700 mb-1">Origin City</label>
+                    <input
+                      type="text"
+                      value={formData.details?.origin || "Surat, Gujarat"}
+                      onChange={(e) => updateDetailsField("origin", e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Section 6: Search Engine Optimization (SEO) (Collapsible) */}
+          <div className="bg-white border border-neutral-200 rounded-sm shadow-2xs overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowSeoSection(!showSeoSection)}
+              className="w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-neutral-50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-[#734E06]" />
+                <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-900 m-0">
+                  6. Search Engine Optimization (SEO)
+                </h2>
+              </div>
+              <span className="text-xs text-[#734E06] font-bold">
+                {showSeoSection ? "Collapse ▲" : "Expand ▼"}
+              </span>
+            </button>
+
+            {showSeoSection && (
+              <div className="p-5 sm:p-6 border-t border-neutral-200 space-y-4 text-xs bg-neutral-50/50">
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <label className="font-bold uppercase text-neutral-700">SEO Page Title</label>
+                    <span className="text-[10px] text-neutral-400">
+                      {(formData.seoTitle || "").length} / 70 characters
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    value={formData.seoTitle || ""}
+                    onChange={(e) => updateField("seoTitle", e.target.value)}
+                    placeholder={formData.title || "Custom search title"}
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs focus:border-[#734E06] outline-none"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <label className="font-bold uppercase text-neutral-700">Meta Description</label>
+                    <span className="text-[10px] text-neutral-400">
+                      {(formData.seoDescription || "").length} / 160 characters
+                    </span>
+                  </div>
+                  <textarea
+                    rows={3}
+                    value={formData.seoDescription || ""}
+                    onChange={(e) => updateField("seoDescription", e.target.value)}
+                    placeholder="Concise, keyword-rich summary for search listings..."
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs focus:border-[#734E06] outline-none"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ======================================================== */}
+        {/* SIDEBAR COLUMN (Right Column on Desktop, Stacked on Mobile) */}
+        {/* ======================================================== */}
+        <div className="space-y-6">
+          {/* Side Card 1: Publishing & Status */}
+          <div className="bg-white p-5 border border-neutral-200 rounded-sm shadow-2xs space-y-4">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900 m-0 pb-2 border-b border-neutral-100 flex items-center justify-between">
+              <span>Publishing Status</span>
+              <span
+                className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                  formData.status === "published"
+                    ? "bg-emerald-100 text-emerald-900"
+                    : formData.status === "draft"
+                    ? "bg-amber-100 text-amber-900"
+                    : "bg-neutral-200 text-neutral-800"
+                }`}
+              >
+                {formData.status}
+              </span>
+            </h3>
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block font-bold text-neutral-700 mb-1">Visibility Status</label>
+                <select
+                  value={formData.status || "published"}
+                  onChange={(e) => updateField("status", e.target.value as ProductStatus)}
+                  className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs font-semibold cursor-pointer"
+                >
+                  <option value="published">Published (Visible in Store)</option>
+                  <option value="draft">Draft (Hidden)</option>
+                  <option value="archived">Archived (Delisted)</option>
+                </select>
+              </div>
+
+              <div className="pt-2 border-t border-neutral-100 space-y-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!formData.featured}
+                    onChange={(e) => updateField("featured", e.target.checked)}
+                    className="w-4 h-4 text-[#734E06] rounded-xs"
+                  />
+                  <span className="text-neutral-700 font-medium">Feature on Homepage</span>
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!formData.bestseller}
+                    onChange={(e) => updateField("bestseller", e.target.checked)}
+                    className="w-4 h-4 text-[#734E06] rounded-xs"
+                  />
+                  <span className="text-neutral-700 font-medium">Bestseller Ribbon</span>
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!formData.newArrival}
+                    onChange={(e) => updateField("newArrival", e.target.checked)}
+                    className="w-4 h-4 text-[#734E06] rounded-xs"
+                  />
+                  <span className="text-neutral-700 font-medium">New Arrival Badge</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {/* Side Card 2: Pricing & Value */}
+          <div className="bg-white p-5 border border-neutral-200 rounded-sm shadow-2xs space-y-4">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900 m-0 pb-2 border-b border-neutral-100 flex items-center gap-1.5">
+              <DollarSign className="w-4 h-4 text-[#734E06]" /> Pricing & Offers
+            </h3>
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block font-bold uppercase text-neutral-700 mb-1">
+                  Active Selling Price (₹) *
+                </label>
+                <input
+                  type="number"
+                  required
+                  value={formData.price || ""}
+                  onChange={(e) => updateField("price", Number(e.target.value))}
+                  placeholder="12500"
+                  className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-sm font-bold text-neutral-900 focus:border-[#734E06] outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold uppercase text-neutral-700 mb-1">
+                  Compare-at (Original MRP) (₹)
+                </label>
+                <input
+                  type="number"
+                  value={formData.compareAtPrice || ""}
+                  onChange={(e) => updateField("compareAtPrice", e.target.value ? Number(e.target.value) : undefined)}
+                  placeholder="15500"
+                  className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs text-neutral-600 focus:border-[#734E06] outline-none"
+                />
+              </div>
+
+              {discountPercentage !== null && discountPercentage > 0 && (
+                <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-sm text-emerald-900 text-[11px] flex items-center justify-between font-bold">
+                  <span>Customer Discount:</span>
+                  <span>{discountPercentage}% OFF MRP</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Side Card 3: Inventory Stock Controls */}
+          <div className="bg-white p-5 border border-neutral-200 rounded-sm shadow-2xs space-y-4">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900 m-0 pb-2 border-b border-neutral-100 flex items-center gap-1.5">
+              <Package className="w-4 h-4 text-[#734E06]" /> Inventory & Stock
+            </h3>
+
+            <div className="space-y-3 text-xs">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.inStock ?? true}
+                  onChange={(e) => updateField("inStock", e.target.checked)}
+                  className="w-4 h-4 text-[#734E06] rounded-xs"
+                />
+                <span className="text-neutral-900 font-bold">Allow Immediate Purchase</span>
+              </label>
+
+              <div>
+                <label className="block font-bold uppercase text-neutral-700 mb-1">
+                  Available Quantity in Atelier
+                </label>
+                <input
+                  type="number"
+                  value={formData.inventoryCount || 0}
+                  onChange={(e) => updateField("inventoryCount", Number(e.target.value))}
+                  className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-xs font-semibold"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Side Card 4: Delete Product (Editing mode only) */}
+          {isEditing && existingProduct && (
+            <div className="bg-red-50/50 p-4 border border-red-200 rounded-sm space-y-2">
+              <span className="text-xs font-bold text-red-900 block">Danger Zone</span>
+              <p className="text-[11px] text-red-700 m-0">
+                Permanently delist and remove this piece from the catalog.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm(`Are you sure you want to permanently delete "${formData.title}"?`)) {
+                    deleteProduct(existingProduct.id);
+                    onNavigate("/admin/products");
+                  }
+                }}
+                className="w-full py-2 bg-white border border-red-300 text-red-700 hover:bg-red-50 text-xs font-bold uppercase tracking-wider rounded-sm transition-colors mt-2"
+              >
+                Delete Product
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ======================================================== */}
+      {/* MOBILE STICKY ACTION FOOTER (Visible on Mobile only)       */}
+      {/* ======================================================== */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-neutral-200 p-3 sm:hidden shadow-lg flex items-center justify-between gap-2">
+        <Button
+          variant="outline"
+          onClick={() => handleSave("draft")}
+          disabled={isSaving}
+          className="flex-1 text-xs font-bold"
+        >
+          Save Draft
+        </Button>
+        <Button
+          onClick={() => handleSave("published")}
+          disabled={isSaving}
+          className="flex-1 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider"
+        >
+          <Save className="w-4 h-4 mr-1" />
+          {isSaving ? "Saving..." : isEditing ? "Save & Update" : "Publish"}
+        </Button>
+      </div>
+
+      {/* Unsaved Changes Confirmation Modal */}
+      {showUnsavedModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-neutral-200 rounded-sm max-w-sm w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center gap-2 text-amber-700">
+              <AlertTriangle className="w-5 h-5" />
+              <h3 className="text-sm font-bold text-neutral-900 m-0">Unsaved Changes</h3>
+            </div>
+            <p className="text-xs text-neutral-600 m-0 leading-relaxed">
+              You have unsaved changes on this product. Navigating away now will discard your recent updates.
+            </p>
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowUnsavedModal(false)}
+                className="px-3 py-1.5 border border-neutral-300 text-neutral-700 text-xs rounded-sm hover:bg-neutral-50 font-medium"
+              >
+                Continue Editing
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowUnsavedModal(false);
+                  setIsDirty(false);
+                  if (pendingNavigationHref) onNavigate(pendingNavigationHref);
+                }}
+                className="px-3 py-1.5 bg-red-700 text-white text-xs font-bold uppercase rounded-sm hover:bg-red-800"
+              >
+                Leave Without Saving
+              </button>
+            </div>
           </div>
         </div>
       )}
-
-      {/* Tab 5: SEO */}
-      {activeTab === "seo" && (
-        <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-              Custom SEO Title Tag
-            </label>
-            <input
-              type="text"
-              value={formData.seoTitle || ""}
-              onChange={(e) => setFormData({ ...formData, seoTitle: e.target.value })}
-              placeholder={formData.title ? `${formData.title} — EVARA VASTRA` : "EVARA VASTRA — Contemporary Indian Sarees"}
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem" }}
-            />
-          </div>
-
-          <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.35rem" }}>
-              SEO Meta Description
-            </label>
-            <textarea
-              rows={3}
-              value={formData.seoDescription || ""}
-              onChange={(e) => setFormData({ ...formData, seoDescription: e.target.value })}
-              placeholder={formData.shortDescription || "Handcrafted pure silk saree woven on generational looms."}
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", fontSize: "0.85rem" }}
-            />
-          </div>
-        </div>
-      )}
-    </form>
+    </div>
   );
 };

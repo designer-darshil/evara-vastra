@@ -107,9 +107,81 @@ export const AdminOrdersPage: React.FC<{ onNavigate?: (href: string) => void }> 
           </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[760px]">
+        {/* Mobile View: Stacked Cards (Visible on <640px) */}
+        <div className="sm:hidden divide-y divide-neutral-200">
+          {filteredOrders.map((order) => {
+            const totalQty = order.items.reduce((s, i) => s + i.quantity, 0);
+            return (
+              <div key={order.id} className="p-4 space-y-2.5 bg-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-mono font-bold text-neutral-900 text-xs block">
+                      {order.orderNumber}
+                    </span>
+                    <span className="text-[10px] text-neutral-500 font-mono">{order.date}</span>
+                  </div>
+                  <button
+                    onClick={() => handleOpenStatusModal(order)}
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider border ${
+                      order.status === "Delivered"
+                        ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                        : order.status === "Shipped"
+                        ? "bg-blue-50 text-blue-800 border-blue-200"
+                        : order.status === "Cancelled" || order.status === "Returned"
+                        ? "bg-red-50 text-red-800 border-red-200"
+                        : "bg-amber-50 text-amber-800 border-amber-200"
+                    }`}
+                  >
+                    {order.status}
+                  </button>
+                </div>
+
+                <div className="flex justify-between text-xs">
+                  <div>
+                    <span className="font-semibold text-neutral-900 block">{order.customerName}</span>
+                    <span className="text-[11px] text-neutral-500">{order.city}, {order.state}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-bold text-neutral-900 block">{formatINR(order.total)}</span>
+                    <span className="text-[10px] text-neutral-500">{totalQty} item{totalQty > 1 ? "s" : ""}</span>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-neutral-100 flex items-center justify-between gap-2">
+                  <span className="text-[10px] text-neutral-500">
+                    {order.paymentMethod} • {order.paymentStatus}
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    {onNavigate && (
+                      <button
+                        onClick={() => onNavigate(`/admin/orders/${order.id}`)}
+                        className="px-2.5 py-1 text-xs font-semibold border border-neutral-300 rounded-sm text-neutral-800"
+                      >
+                        View Order
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleOpenStatusModal(order)}
+                      className="p-1 text-neutral-600 hover:text-[#734E06] border border-neutral-200 rounded-sm"
+                      title="Update Status"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          {filteredOrders.length === 0 && (
+            <div className="p-8 text-center text-neutral-500 text-xs">
+              No orders match the filter criteria.
+            </div>
+          )}
+        </div>
+
+        {/* Desktop View: Full Data Table (Visible on >=640px) */}
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[720px]">
             <thead>
               <tr className="bg-neutral-50 text-[11px] font-bold text-neutral-500 uppercase tracking-wider border-b border-neutral-200">
                 <th className="py-3 px-4">Order # & Date</th>
