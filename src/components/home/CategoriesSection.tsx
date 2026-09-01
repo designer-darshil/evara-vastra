@@ -1,15 +1,17 @@
 import React from "react";
-import { categories } from "../../data/categories";
+import { useData } from "../../context/DataContext";
 import { ArrowRight } from "lucide-react";
 
 export const CategoriesSection: React.FC<{ onNavigate: (href: string) => void }> = ({
   onNavigate,
 }) => {
+  const { activeCategories } = useData();
+
   return (
     <section
       style={{
         paddingTop: "6rem",
-        paddingBottom: "6rem",
+        paddingBottom: "5rem",
         backgroundColor: "var(--bg-primary)",
       }}
     >
@@ -19,10 +21,11 @@ export const CategoriesSection: React.FC<{ onNavigate: (href: string) => void }>
           style={{
             display: "flex",
             flexWrap: "wrap",
-            alignItems: "flex-end",
             justifyContent: "space-between",
+            alignItems: "flex-end",
             marginBottom: "3rem",
-            gap: "1.5rem",
+            borderBottom: "1px solid var(--border-subtle)",
+            paddingBottom: "1.25rem",
           }}
         >
           <div>
@@ -34,64 +37,64 @@ export const CategoriesSection: React.FC<{ onNavigate: (href: string) => void }>
                 textTransform: "uppercase",
                 color: "var(--accent-wine)",
                 display: "block",
-                marginBottom: "0.4rem",
+                marginBottom: "0.3rem",
               }}
             >
-              SHOP BY CRAFT & FIBER
+              EXPLORE BY WEAVE
             </span>
             <h2
               className="font-serif"
-              style={{ fontSize: "clamp(2rem, 3.5vw, 3rem)", color: "var(--text-primary)" }}
+              style={{
+                fontSize: "clamp(2rem, 3.5vw, 3rem)",
+                color: "var(--text-primary)",
+                lineHeight: 1.15,
+                margin: 0,
+              }}
             >
-              Curated Weaves & Textures
+              The Master Categories
             </h2>
           </div>
 
           <button
             onClick={() => onNavigate("/shop")}
             className="btn-link"
+            style={{ fontSize: "0.825rem", paddingBottom: "0.25rem" }}
           >
-            View All Sarees <ArrowRight size={14} />
+            View Complete Catalog ({activeCategories.length} Categories) <ArrowRight size={14} />
           </button>
         </div>
 
-        {/* Categories Grid */}
+        {/* Asymmetrical Grid of Categories */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
             gap: "1.75rem",
           }}
         >
-          {categories.slice(0, 6).map((cat, idx) => (
+          {activeCategories.map((cat, idx) => (
             <div
               key={cat.id}
               onClick={() => onNavigate(`/shop/${cat.slug}`)}
+              data-cursor="EXPLORE"
               style={{
                 cursor: "pointer",
                 backgroundColor: "#FFFFFF",
                 border: "1px solid var(--border-subtle)",
                 overflow: "hidden",
-                transition: "transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease",
+                boxShadow: "var(--shadow-subtle)",
                 display: "flex",
                 flexDirection: "column",
+                transition: "transform 0.3s ease, box-shadow 0.3s ease",
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-4px)";
-                e.currentTarget.style.boxShadow = "var(--shadow-medium)";
-                e.currentTarget.style.borderColor = "var(--border-medium)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "none";
-                e.currentTarget.style.borderColor = "var(--border-subtle)";
-              }}
+              className="category-card"
             >
               <div
                 style={{
-                  aspectRatio: "4/3",
+                  aspectRatio: idx % 3 === 0 ? "4/5" : "1/1",
                   overflow: "hidden",
                   backgroundColor: "#EDE7DD",
+                  position: "relative",
                 }}
               >
                 <img
@@ -102,68 +105,37 @@ export const CategoriesSection: React.FC<{ onNavigate: (href: string) => void }>
                     width: "100%",
                     height: "100%",
                     objectFit: "cover",
-                    transition: "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
+                    transition: "transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
                 />
               </div>
 
               <div
                 style={{
-                  padding: "1.5rem",
+                  padding: "1.25rem 1.5rem",
                   display: "flex",
                   flexDirection: "column",
-                  flex: 1,
                   justifyContent: "space-between",
+                  flex: 1,
                 }}
               >
                 <div>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      marginBottom: "0.4rem",
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontSize: "0.65rem",
-                        fontWeight: 600,
-                        letterSpacing: "0.14em",
-                        textTransform: "uppercase",
-                        color: "var(--accent-gold)",
-                      }}
-                    >
-                      CATEGORY / 0{idx + 1}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: "0.7rem",
-                        color: "var(--text-muted)",
-                      }}
-                    >
-                      {cat.itemCount} Designs
-                    </span>
-                  </div>
-
                   <h3
                     className="font-serif"
                     style={{
-                      fontSize: "1.45rem",
+                      fontSize: "1.35rem",
                       color: "var(--text-primary)",
-                      marginBottom: "0.4rem",
+                      marginBottom: "0.3rem",
                     }}
                   >
                     {cat.name}
                   </h3>
-
                   <p
                     style={{
                       fontSize: "0.8rem",
                       color: "var(--text-secondary)",
                       lineHeight: 1.5,
+                      margin: 0,
                     }}
                   >
                     {cat.shortDescription}
@@ -172,19 +144,19 @@ export const CategoriesSection: React.FC<{ onNavigate: (href: string) => void }>
 
                 <div
                   style={{
-                    marginTop: "1.25rem",
+                    marginTop: "1rem",
                     display: "flex",
                     alignItems: "center",
-                    gap: "0.4rem",
+                    gap: "0.35rem",
                     fontSize: "0.75rem",
                     fontWeight: 600,
-                    letterSpacing: "0.1em",
                     textTransform: "uppercase",
-                    color: "var(--text-primary)",
+                    letterSpacing: "0.1em",
+                    color: "var(--accent-wine)",
                   }}
                 >
-                  <span>Explore Edit</span>
-                  <ArrowRight size={13} style={{ color: "var(--accent-wine)" }} />
+                  <span>Explore</span>
+                  <ArrowRight size={13} />
                 </div>
               </div>
             </div>

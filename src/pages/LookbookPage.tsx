@@ -1,11 +1,13 @@
 import React from "react";
-import { lookbookItems, LookbookItem } from "../data/lookbook";
+import { useData } from "../context/DataContext";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { ArrowRight, MapPin } from "lucide-react";
 
 export const LookbookPage: React.FC<{ onNavigate: (href: string) => void }> = ({
   onNavigate,
 }) => {
+  const { publishedLookbookItems } = useData();
+
   return (
     <div className="animate-fade-in" style={{ paddingBottom: "7rem", paddingTop: "2.5rem" }}>
       <div className="container">
@@ -35,7 +37,7 @@ export const LookbookPage: React.FC<{ onNavigate: (href: string) => void }> = ({
 
         {/* Lookbook Items Stack */}
         <div style={{ display: "flex", flexDirection: "column", gap: "5rem" }}>
-          {lookbookItems.map((look: LookbookItem, idx: number) => {
+          {publishedLookbookItems.map((look, idx) => {
             const isEven = idx % 2 === 0;
             return (
               <div
@@ -71,7 +73,7 @@ export const LookbookPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                   />
                 </div>
 
-                {/* Editorial Content & Styling Breakdown */}
+                {/* Editorial Content */}
                 <div
                   style={{
                     order: isEven ? 2 : 1,
@@ -100,19 +102,21 @@ export const LookbookPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                     </p>
 
                     {/* Styling Notes Checklist */}
-                    <div style={{ backgroundColor: "var(--bg-primary)", padding: "1.25rem", border: "1px solid var(--border-subtle)", marginBottom: "1.5rem" }}>
-                      <strong style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--text-muted)", display: "block", marginBottom: "0.5rem" }}>
-                        Styling Ensemble
-                      </strong>
-                      <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.35rem", fontSize: "0.825rem", color: "var(--text-secondary)" }}>
-                        {look.stylingDetails.map((detail: string, dIdx: number) => (
-                          <li key={dIdx} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                            <span style={{ color: "var(--accent-wine)" }}>✦</span>
-                            <span>{detail}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    {look.stylingDetails && look.stylingDetails.length > 0 && (
+                      <div style={{ backgroundColor: "var(--bg-primary)", padding: "1.25rem", border: "1px solid var(--border-subtle)", marginBottom: "1.5rem" }}>
+                        <strong style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--text-muted)", display: "block", marginBottom: "0.5rem" }}>
+                          Styling Ensemble
+                        </strong>
+                        <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.35rem", fontSize: "0.825rem", color: "var(--text-secondary)" }}>
+                          {look.stylingDetails.map((detail, dIdx) => (
+                            <li key={dIdx} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                              <span style={{ color: "var(--accent-wine)" }}>✦</span>
+                              <span>{detail}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
 
                   {/* Saree Card Connection */}

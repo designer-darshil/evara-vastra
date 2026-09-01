@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { products, Product } from "../data/products";
+import { useData } from "../context/DataContext";
+import { Product } from "../types";
 import { useShop } from "../context/ShopContext";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { ProductCard } from "../components/common/ProductCard";
@@ -26,9 +27,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   slug,
   onNavigate,
 }) => {
+  const { publishedProducts } = useData();
   const { addToCart, toggleWishlist, isInWishlist, addRecentlyViewed } = useShop();
 
-  const product = products.find((p) => p.slug === slug) || products[0];
+  const product = publishedProducts.find((p) => p.slug === slug) || publishedProducts[0];
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
@@ -44,7 +46,21 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       setActiveImageIndex(0);
       window.scrollTo(0, 0);
     }
-  }, [product.id]);
+  }, [product?.id]);
+
+  if (!product) {
+    return (
+      <div className="container" style={{ padding: "6rem 0", textAlign: "center" }}>
+        <h2 className="font-serif" style={{ fontSize: "2rem" }}>Saree Not Found</h2>
+        <p style={{ color: "var(--text-secondary)", marginTop: "0.5rem" }}>
+          This handcrafted drape may have been archived or is temporarily unlisted.
+        </p>
+        <button onClick={() => onNavigate("/shop")} className="btn-wine" style={{ marginTop: "1.5rem" }}>
+          Explore Saree Catalog
+        </button>
+      </div>
+    );
+  }
 
   const isSaved = isInWishlist(product.id);
 
@@ -77,7 +93,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   };
 
   // Related products from same category or collection
-  const relatedProducts = products
+  const relatedProducts = publishedProducts
     .filter((p: Product) => p.id !== product.id && (p.category === product.category || p.collection === product.collection))
     .slice(0, 3);
 
@@ -118,7 +134,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             <X size={22} />
           </button>
 
-          {/* Prev */}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -152,7 +167,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             onClick={(e) => e.stopPropagation()}
           />
 
-          {/* Next */}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -260,7 +274,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 }}
               />
 
-              {/* Lightbox trigger */}
               <button
                 onClick={() => setIsLightboxOpen(true)}
                 aria-label="Expand image"
@@ -300,7 +313,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             </div>
           </div>
 
-          {/* Right Product Purchase Details */}
+          {/* Right Product Details */}
           <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
             <div>
               <div
@@ -347,7 +360,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 {product.title}
               </h1>
 
-              {/* Price & Taxes */}
+              {/* Price */}
               <div
                 style={{
                   display: "flex",
@@ -398,7 +411,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               {product.description}
             </p>
 
-            {/* Micro Highlight Grid */}
+            {/* Quick Specs */}
             <div
               style={{
                 display: "grid",
@@ -436,10 +449,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               </div>
             </div>
 
-            {/* Quantity and Actions */}
+            {/* Actions */}
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginTop: "0.5rem" }}>
               <div style={{ display: "flex", gap: "1rem" }}>
-                {/* Quantity */}
                 <div
                   style={{
                     display: "flex",
@@ -454,13 +466,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   >
                     -
                   </button>
-                  <span
-                    style={{
-                      padding: "0 0.75rem",
-                      fontWeight: 600,
-                      fontSize: "0.9rem",
-                    }}
-                  >
+                  <span style={{ padding: "0 0.75rem", fontWeight: 600, fontSize: "0.9rem" }}>
                     {quantity}
                   </span>
                   <button
@@ -471,7 +477,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   </button>
                 </div>
 
-                {/* Add to Bag */}
                 <button
                   onClick={() => addToCart(product, quantity)}
                   className="btn-wine"
@@ -480,7 +485,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   <ShoppingBag size={17} /> Add to Shopping Bag
                 </button>
 
-                {/* Wishlist Button */}
                 <button
                   onClick={() => toggleWishlist(product.id)}
                   aria-label="Toggle Wishlist"
@@ -499,7 +503,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 </button>
               </div>
 
-              {/* Buy Now Direct */}
               <button
                 onClick={handleBuyNow}
                 className="btn-primary"
@@ -509,7 +512,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               </button>
             </div>
 
-            {/* Pincode Delivery Estimator */}
+            {/* Pincode Estimator */}
             <div
               style={{
                 backgroundColor: "#FFFFFF",
@@ -593,7 +596,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
         {/* Detailed Tabs Section */}
         <div style={{ marginTop: "5rem" }}>
-          {/* Tab Headers */}
           <div
             style={{
               display: "flex",
@@ -630,7 +632,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             ))}
           </div>
 
-          {/* Tab Contents */}
           <div
             style={{
               backgroundColor: "#FFFFFF",
@@ -670,10 +671,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 <div>
                   <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", textTransform: "uppercase" }}>Border Design</span>
                   <p style={{ fontWeight: 600, color: "var(--text-primary)" }}>{product.details.borderDetails}</p>
-                </div>
-                <div>
-                  <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", textTransform: "uppercase" }}>Box Packaging Includes</span>
-                  <p style={{ fontWeight: 600, color: "var(--text-primary)" }}>{product.details.boxIncludes}</p>
                 </div>
               </div>
             )}
@@ -728,11 +725,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 <p style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}>
                   {product.details.care}
                 </p>
-                <ul style={{ paddingLeft: "1.25rem", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.7 }}>
-                  <li>Never spray perfumes or deodorants directly on the zari border.</li>
-                  <li>Refold along fresh lines every 4 to 6 months to prevent creasing wear.</li>
-                  <li>Store in our complimentary unbleached pure cotton muslin pouch.</li>
-                </ul>
               </div>
             )}
 
@@ -742,10 +734,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   Insured Delivery & Hassle-Free Returns
                 </h4>
                 <p style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}>
-                  All EVARA orders are dispatched in tamper-evident luxury keepsake boxes, wrapped in protective archival sleeves. Shipments within India take 3–5 business days. International deliveries to 45+ countries take 5–8 business days via DHL.
-                </p>
-                <p style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}>
-                  Returns are accepted within 7 days of delivery for unstitched, unworn sarees with intact security tags.
+                  All EVARA VASTRA orders are dispatched in tamper-evident luxury keepsake boxes, wrapped in protective archival sleeves. Shipments within India take 3–5 business days. International deliveries take 5–8 business days via DHL.
                 </p>
               </div>
             )}
@@ -777,7 +766,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
                 gap: "2rem",
               }}
             >

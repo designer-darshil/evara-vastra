@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { Product, products } from "../data/products";
+import { Product } from "../types";
 
 export interface CartItem {
   product: Product;
@@ -157,13 +157,12 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Wishlist operations
   const toggleWishlist = (productId: string) => {
     const isCurrentlySaved = wishlist.includes(productId);
-    const prod = products.find((p) => p.id === productId);
     if (isCurrentlySaved) {
       setWishlist((prev) => prev.filter((id) => id !== productId));
-      showToast(`Removed from your saved pieces.`, "wishlist");
+      showToast("Removed from your saved pieces.", "wishlist");
     } else {
       setWishlist((prev) => [...prev, productId]);
-      showToast(`Saved "${prod ? prod.title : "saree"}" to your wishlist.`, "wishlist");
+      showToast("Added to your saved pieces.", "wishlist");
     }
   };
 

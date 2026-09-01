@@ -1,6 +1,5 @@
 import React from "react";
-import { collections, Collection } from "../data/collections";
-import { products, Product } from "../data/products";
+import { useData } from "../context/DataContext";
 import { ProductCard } from "../components/common/ProductCard";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { ArrowRight } from "lucide-react";
@@ -9,14 +8,31 @@ export const CollectionDetailPage: React.FC<{
   collectionSlug: string;
   onNavigate: (href: string) => void;
 }> = ({ collectionSlug, onNavigate }) => {
-  const collection =
-    collections.find((c: Collection) => c.slug === collectionSlug) || collections[0];
+  const { collections, publishedProducts } = useData();
 
-  const collectionProducts = products.filter(
-    (p: Product) => p.collection === collection.slug || p.category === (collection.slug.includes("silk") ? "silk" : "banarasi")
+  const collection =
+    collections.find((c) => c.slug === collectionSlug && c.isPublished) ||
+    collections.find((c) => c.isPublished) ||
+    collections[0];
+
+  if (!collection) {
+    return (
+      <div className="container" style={{ padding: "6rem 0", textAlign: "center" }}>
+        <h2>Collection Not Found</h2>
+        <button onClick={() => onNavigate("/collections")} className="btn-wine" style={{ marginTop: "1rem" }}>
+          View Collections
+        </button>
+      </div>
+    );
+  }
+
+  const collectionProducts = publishedProducts.filter(
+    (p) => p.collection === collection.slug || p.category === (collection.slug.includes("silk") ? "silk" : "banarasi")
   );
 
-  const relatedCollections = collections.filter((c: Collection) => c.id !== collection.id).slice(0, 2);
+  const relatedCollections = collections
+    .filter((c) => c.id !== collection.id && c.isPublished)
+    .slice(0, 2);
 
   return (
     <div className="animate-fade-in" style={{ paddingBottom: "7rem" }}>
@@ -128,77 +144,79 @@ export const CollectionDetailPage: React.FC<{
               gap: "2.5rem 1.75rem",
             }}
           >
-            {collectionProducts.map((p: Product, idx: number) => (
+            {collectionProducts.map((p, idx) => (
               <ProductCard key={p.id} product={p} index={idx} onNavigate={onNavigate} />
             ))}
           </div>
         </div>
 
         {/* Related Collections */}
-        <div style={{ marginTop: "6rem", borderTop: "1px solid var(--border-subtle)", paddingTop: "4rem" }}>
-          <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-            <span
-              style={{
-                fontSize: "0.72rem",
-                fontWeight: 600,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "var(--accent-wine)",
-                display: "block",
-                marginBottom: "0.3rem",
-              }}
-            >
-              EXPLORE OTHER EDITS
-            </span>
-            <h3 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--text-primary)" }}>
-              More Atelier Collections
-            </h3>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-              gap: "2rem",
-            }}
-          >
-            {relatedCollections.map((col: Collection) => (
-              <div
-                key={col.id}
-                onClick={() => onNavigate(`/collections/${col.slug}`)}
+        {relatedCollections.length > 0 && (
+          <div style={{ marginTop: "6rem", borderTop: "1px solid var(--border-subtle)", paddingTop: "4rem" }}>
+            <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+              <span
                 style={{
-                  cursor: "pointer",
-                  backgroundColor: "#FFFFFF",
-                  border: "1px solid var(--border-subtle)",
-                  overflow: "hidden",
+                  fontSize: "0.72rem",
+                  fontWeight: 600,
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  color: "var(--accent-wine)",
+                  display: "block",
+                  marginBottom: "0.3rem",
                 }}
               >
-                <div style={{ aspectRatio: "16/9", overflow: "hidden", backgroundColor: "#EDE7DD" }}>
-                  <img
-                    src={col.heroImage}
-                    alt={col.title}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  />
-                </div>
-                <div style={{ padding: "1.5rem" }}>
-                  <span style={{ fontSize: "0.7rem", color: "var(--accent-gold)", fontWeight: 600, textTransform: "uppercase" }}>
-                    {col.season}
-                  </span>
-                  <h4 className="font-serif" style={{ fontSize: "1.4rem", color: "var(--text-primary)", margin: "0.3rem 0" }}>
-                    {col.title}
-                  </h4>
-                  <p style={{ fontSize: "0.825rem", color: "var(--text-secondary)", lineHeight: 1.5 }}>
-                    {col.subtitle}
-                  </p>
-                  <div style={{ marginTop: "1rem", display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.75rem", fontWeight: 600, textTransform: "uppercase" }}>
-                    <span>Discover</span>
-                    <ArrowRight size={13} style={{ color: "var(--accent-wine)" }} />
+                EXPLORE OTHER EDITS
+              </span>
+              <h3 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--text-primary)" }}>
+                More Atelier Collections
+              </h3>
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+                gap: "2rem",
+              }}
+            >
+              {relatedCollections.map((col) => (
+                <div
+                  key={col.id}
+                  onClick={() => onNavigate(`/collections/${col.slug}`)}
+                  style={{
+                    cursor: "pointer",
+                    backgroundColor: "#FFFFFF",
+                    border: "1px solid var(--border-subtle)",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div style={{ aspectRatio: "16/9", overflow: "hidden", backgroundColor: "#EDE7DD" }}>
+                    <img
+                      src={col.heroImage}
+                      alt={col.title}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  </div>
+                  <div style={{ padding: "1.5rem" }}>
+                    <span style={{ fontSize: "0.7rem", color: "var(--accent-gold)", fontWeight: 600, textTransform: "uppercase" }}>
+                      {col.season}
+                    </span>
+                    <h4 className="font-serif" style={{ fontSize: "1.4rem", color: "var(--text-primary)", margin: "0.3rem 0" }}>
+                      {col.title}
+                    </h4>
+                    <p style={{ fontSize: "0.825rem", color: "var(--text-secondary)", lineHeight: 1.5 }}>
+                      {col.subtitle}
+                    </p>
+                    <div style={{ marginTop: "1rem", display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.75rem", fontWeight: 600, textTransform: "uppercase" }}>
+                      <span>Discover</span>
+                      <ArrowRight size={13} style={{ color: "var(--accent-wine)" }} />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

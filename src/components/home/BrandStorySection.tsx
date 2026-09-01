@@ -1,17 +1,18 @@
 import React from "react";
-import { media } from "../../data/media";
+import { useData } from "../../context/DataContext";
 import { ArrowRight } from "lucide-react";
 
 export const BrandStorySection: React.FC<{ onNavigate: (href: string) => void }> = ({
   onNavigate,
 }) => {
+  const { homepageCMS } = useData();
+
   return (
     <section
       style={{
-        paddingTop: "7rem",
-        paddingBottom: "7rem",
+        paddingTop: "6.5rem",
+        paddingBottom: "6.5rem",
         backgroundColor: "var(--bg-primary)",
-        position: "relative",
       }}
     >
       <div className="container">
@@ -24,11 +25,10 @@ export const BrandStorySection: React.FC<{ onNavigate: (href: string) => void }>
           }}
           className="brand-story-grid"
         >
-          {/* Left Dual Visual Composition */}
+          {/* Visual Showcase Left */}
           <div style={{ position: "relative" }}>
             <div
               style={{
-                width: "85%",
                 aspectRatio: "4/5",
                 backgroundColor: "#EDE7DD",
                 overflow: "hidden",
@@ -36,37 +36,46 @@ export const BrandStorySection: React.FC<{ onNavigate: (href: string) => void }>
               }}
             >
               <img
-                src={media.brandStory}
-                alt="Artisanal Saree Drape"
+                src={homepageCMS.manifestoImage}
+                alt="Evara Vastra Saree Drape"
                 loading="lazy"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
               />
             </div>
 
-            {/* Overlapping Loom Detail Shot */}
+            {/* Overlapping Loom Inset */}
             <div
+              className="desktop-only"
               style={{
                 position: "absolute",
-                bottom: "-10%",
-                right: "0",
+                bottom: "-2rem",
+                right: "-2rem",
                 width: "55%",
                 aspectRatio: "1/1",
-                backgroundColor: "var(--bg-dark)",
+                backgroundColor: "#EDE7DD",
                 border: "6px solid var(--bg-primary)",
                 boxShadow: "var(--shadow-elevated)",
                 overflow: "hidden",
               }}
             >
               <img
-                src={media.craftLoom}
-                alt="Silk Looms in Varanasi"
+                src={homepageCMS.manifestoLoomImage}
+                alt="Master Weaver on Pit Loom"
                 loading="lazy"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
               />
             </div>
           </div>
 
-          {/* Right Editorial Story */}
+          {/* Right Narrative */}
           <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
             <span
               style={{
@@ -75,9 +84,10 @@ export const BrandStorySection: React.FC<{ onNavigate: (href: string) => void }>
                 letterSpacing: "0.2em",
                 textTransform: "uppercase",
                 color: "var(--accent-wine)",
+                display: "block",
               }}
             >
-              THE PHILOSOPHY
+              OUR MANIFESTO
             </span>
 
             <h2
@@ -86,37 +96,41 @@ export const BrandStorySection: React.FC<{ onNavigate: (href: string) => void }>
                 fontSize: "clamp(2rem, 3.8vw, 3.2rem)",
                 lineHeight: 1.15,
                 color: "var(--text-primary)",
+                margin: 0,
               }}
             >
-              "Some pieces are made to be worn once. Others become part of a family story."
+              "{homepageCMS.manifestoQuote}"
             </h2>
 
             <p
               style={{
                 fontSize: "0.95rem",
-                color: "var(--text-secondary)",
                 lineHeight: 1.7,
+                color: "var(--text-secondary)",
+                margin: 0,
               }}
             >
-              At EVARA, we believe a saree is not just six yards of fabric; it is an enduring repository of craft, patience, and human touch. Each warp and weft is counted by hand, spun from unadulterated natural yarns, and hand-locked by generational master weavers in Varanasi, Chanderi, and Bengal.
+              {homepageCMS.manifestoNarrative1}
             </p>
 
             <p
               style={{
                 fontSize: "0.95rem",
-                color: "var(--text-secondary)",
                 lineHeight: 1.7,
+                color: "var(--text-secondary)",
+                margin: 0,
               }}
             >
-              We strip away synthetic fast-fashion shortcuts to create quiet, commanding silhouettes that feel weightless today and remain timeless thirty years from now.
+              {homepageCMS.manifestoNarrative2}
             </p>
 
-            <div style={{ marginTop: "1rem" }}>
+            <div style={{ paddingTop: "0.75rem" }}>
               <button
                 onClick={() => onNavigate("/about")}
-                className="btn-primary"
+                className="btn-wine"
+                style={{ padding: "0.9rem 1.75rem", fontSize: "0.825rem" }}
               >
-                Read Our Story & Atelier Roots <ArrowRight size={15} />
+                Read The Atelier Story <ArrowRight size={15} />
               </button>
             </div>
           </div>
@@ -124,7 +138,7 @@ export const BrandStorySection: React.FC<{ onNavigate: (href: string) => void }>
       </div>
 
       <style>{`
-        @media (max-width: 900px) {
+        @media (max-width: 860px) {
           .brand-story-grid {
             grid-template-columns: 1fr !important;
           }

@@ -1,11 +1,13 @@
 import React from "react";
-import { collections, Collection } from "../data/collections";
+import { useData } from "../context/DataContext";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { ArrowRight, Sparkles } from "lucide-react";
 
 export const CollectionsListPage: React.FC<{ onNavigate: (href: string) => void }> = ({
   onNavigate,
 }) => {
+  const { activeCollections } = useData();
+
   return (
     <div className="animate-fade-in" style={{ paddingBottom: "7rem", paddingTop: "2.5rem" }}>
       <div className="container">
@@ -26,7 +28,7 @@ export const CollectionsListPage: React.FC<{ onNavigate: (href: string) => void 
               marginBottom: "0.4rem",
             }}
           >
-            <Sparkles size={14} /> SIGNATURE CURATIONS
+            <Sparkles size={14} /> SIGNATURE EDITS
           </span>
           <h1 className="font-serif" style={{ fontSize: "clamp(2.4rem, 4vw, 3.6rem)", color: "var(--text-primary)" }}>
             The Atelier Collections
@@ -38,7 +40,7 @@ export const CollectionsListPage: React.FC<{ onNavigate: (href: string) => void 
 
         {/* Collections Stack */}
         <div style={{ display: "flex", flexDirection: "column", gap: "3.5rem" }}>
-          {collections.map((col: Collection, idx: number) => {
+          {activeCollections.map((col, idx) => {
             const isEven = idx % 2 === 0;
             return (
               <div

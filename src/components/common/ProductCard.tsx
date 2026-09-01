@@ -1,29 +1,22 @@
 import React from "react";
-import { Product } from "../../data/products";
+import { Product } from "../../types";
 import { useShop } from "../../context/ShopContext";
-import { Heart, Eye, ShoppingBag } from "lucide-react";
+import { Heart, ShoppingBag, Eye } from "lucide-react";
 
 interface ProductCardProps {
   product: Product;
-  onNavigate: (href: string) => void;
   index?: number;
+  onNavigate: (href: string) => void;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
   product,
+  index = 0,
   onNavigate,
-  index,
 }) => {
-  const {
-    isInWishlist,
-    toggleWishlist,
-    addToCart,
-    openQuickView,
-    setCursorLabel,
-  } = useShop();
+  const { toggleWishlist, isInWishlist, addToCart, openQuickView } = useShop();
 
   const isSaved = isInWishlist(product.id);
-  const secondaryImage = product.images[1] || product.images[0];
 
   const formattedPrice = new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -39,36 +32,84 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       }).format(product.compareAtPrice)
     : null;
 
+  const handleCardClick = () => {
+    onNavigate(`/product/${product.slug}`);
+  };
+
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    addToCart(product, 1);
+  };
+
+  const handleQuickViewClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    openQuickView(product);
+  };
+
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleWishlist(product.id);
+  };
+
+  const isLowStock = product.inventoryCount <= 3 && product.inventoryCount > 0;
+  const isOutOfStock = !product.inStock || product.inventoryCount <= 0;
+
   return (
-    <div
-      className="product-card"
-      onMouseEnter={() => setCursorLabel("VIEW")}
-      onMouseLeave={() => setCursorLabel(null)}
+    <article
+      className="product-card group"
+      onClick={handleCardClick}
+      data-cursor="VIEW"
       style={{
+        position: "relative",
         display: "flex",
         flexDirection: "column",
+        cursor: "pointer",
+        animationDelay: `${(index % 8) * 0.08}s`,
       }}
     >
-      {/* Image Wrap */}
+      {/* Visual Image Container */}
       <div
         className="product-image-container"
-        onClick={() => onNavigate(`/product/${product.slug}`)}
-        style={{ cursor: "pointer" }}
+        style={{
+          position: "relative",
+          aspectRatio: "3/4",
+          overflow: "hidden",
+          backgroundColor: "#EDE7DD",
+          marginBottom: "0.85rem",
+        }}
       >
         <img
           src={product.images[0]}
           alt={product.title}
-          className="product-image"
           loading="lazy"
-        />
-        <img
-          src={secondaryImage}
-          alt={`${product.title} detail`}
-          className="product-image-secondary"
-          loading="lazy"
+          className="product-primary-img"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            transition: "transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease",
+          }}
         />
 
-        {/* Top Badges */}
+        {product.images[1] && (
+          <img
+            src={product.images[1]}
+            alt={`${product.title} detail`}
+            loading="lazy"
+            className="product-secondary-img"
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              opacity: 0,
+              transition: "opacity 0.6s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)",
+            }}
+          />
+        )}
+
+        {/* Badges */}
         <div
           style={{
             position: "absolute",
@@ -80,196 +121,144 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             zIndex: 2,
           }}
         >
-          {product.newArrival && (
-            <span className="badge-tag badge-tag-wine">NEW ARRIVAL</span>
-          )}
-          {product.bestseller && (
-            <span className="badge-tag badge-tag-gold">BESTSELLER</span>
+          {isOutOfStock ? (
+            <span className="badge-tag" style={{ backgroundColor: "#171513", color: "#FFFFFF" }}>
+              SOLD OUT
+            </span>
+          ) : isLowStock ? (
+            <span className="badge-tag badge-tag-wine">
+              ONLY {product.inventoryCount} LEFT
+            </span>
+          ) : product.bestseller ? (
+            <span className="badge-tag badge-tag-wine">BESTSELLER</span>
+          ) : product.newArrival ? (
+            <span className="badge-tag">NEW SEASON</span>
+          ) : (
+            <span className="badge-tag">{product.craft.split(" ")[0]}</span>
           )}
         </div>
 
         {/* Wishlist Button */}
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleWishlist(product.id);
-          }}
+          onClick={handleWishlistClick}
           aria-label={isSaved ? "Remove from wishlist" : "Add to wishlist"}
+          className="wishlist-btn"
           style={{
             position: "absolute",
             top: "0.75rem",
             right: "0.75rem",
+            zIndex: 3,
             width: "36px",
             height: "36px",
             borderRadius: "50%",
-            backgroundColor: "rgba(255, 255, 255, 0.9)",
+            backgroundColor: "rgba(248, 244, 238, 0.9)",
+            backdropFilter: "blur(4px)",
+            border: "none",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             color: isSaved ? "var(--accent-wine)" : "var(--text-primary)",
-            zIndex: 3,
             transition: "transform 0.2s ease, background-color 0.2s ease",
-            backdropFilter: "blur(4px)",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.1)")}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
         >
-          <Heart
-            size={18}
-            fill={isSaved ? "var(--accent-wine)" : "none"}
-            strokeWidth={1.8}
-          />
+          <Heart size={16} fill={isSaved ? "var(--accent-wine)" : "none"} strokeWidth={1.75} />
         </button>
 
-        {/* Quick Actions Hover Bar (Desktop) */}
-        <div
-          className="product-quick-actions"
-          style={{
-            position: "absolute",
-            bottom: "0",
-            left: "0",
-            right: "0",
-            display: "flex",
-            backgroundColor: "rgba(23, 21, 19, 0.9)",
-            backdropFilter: "blur(8px)",
-            padding: "0.6rem",
-            gap: "0.5rem",
-            transform: "translateY(100%)",
-            transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-            zIndex: 3,
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <button
-            onClick={() => openQuickView(product)}
+        {/* Hover Quick Action Drawer */}
+        {!isOutOfStock && (
+          <div
+            className="product-actions-overlay"
             style={{
-              flex: 1,
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              padding: "0.75rem",
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "0.4rem",
-              fontSize: "0.7rem",
-              fontWeight: 600,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              color: "#F8F4EE",
-              padding: "0.5rem",
-              border: "1px solid rgba(248, 244, 238, 0.2)",
+              gap: "0.5rem",
+              zIndex: 3,
+              transform: "translateY(100%)",
+              transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           >
-            <Eye size={14} /> Quick View
-          </button>
-          <button
-            onClick={() => addToCart(product, 1)}
-            style={{
-              flex: 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "0.4rem",
-              fontSize: "0.7rem",
-              fontWeight: 600,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              backgroundColor: "var(--accent-wine)",
-              color: "#ffffff",
-              padding: "0.5rem",
-              border: "1px solid var(--accent-wine)",
-            }}
-          >
-            <ShoppingBag size={14} /> Add
-          </button>
-        </div>
+            <button
+              onClick={handleQuickAdd}
+              className="btn-primary"
+              style={{
+                flex: 1,
+                padding: "0.6rem 0.75rem",
+                fontSize: "0.72rem",
+                justifyContent: "center",
+                backgroundColor: "var(--accent-wine)",
+                color: "#FFFFFF",
+                borderColor: "var(--accent-wine)",
+              }}
+            >
+              <ShoppingBag size={14} /> Quick Add
+            </button>
+            <button
+              onClick={handleQuickViewClick}
+              className="btn-secondary"
+              title="Quick Preview"
+              style={{
+                padding: "0.6rem 0.75rem",
+                backgroundColor: "#FFFFFF",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Eye size={15} />
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Product Information */}
-      <div
-        style={{
-          paddingTop: "0.85rem",
-          display: "flex",
-          flexDirection: "column",
-          gap: "0.3rem",
-        }}
-      >
-        <div
+      {/* Product Metadata Details */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+        <span
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            fontSize: "0.7rem",
+            fontSize: "0.68rem",
             fontWeight: 600,
-            letterSpacing: "0.12em",
+            letterSpacing: "0.14em",
             textTransform: "uppercase",
-            color: "var(--text-muted)",
+            color: "var(--accent-gold)",
           }}
         >
-          <span>{product.craft}</span>
-          {index !== undefined && <span>0{index + 1}</span>}
-        </div>
+          {product.fabric} • {product.color}
+        </span>
 
-        <h4
-          onClick={() => onNavigate(`/product/${product.slug}`)}
+        <h3
           style={{
             fontSize: "0.95rem",
             fontWeight: 500,
             color: "var(--text-primary)",
-            cursor: "pointer",
             lineHeight: 1.35,
-            fontFamily: "var(--font-sans)",
-            marginTop: "0.1rem",
+            transition: "color 0.2s ease",
+            margin: 0,
           }}
         >
           {product.title}
-        </h4>
+        </h3>
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginTop: "0.2rem",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "baseline", gap: "0.5rem" }}>
+        {/* Pricing */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginTop: "0.2rem" }}>
+          <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text-primary)" }}>
+            {formattedPrice}
+          </span>
+          {formattedComparePrice && (
             <span
               style={{
-                fontSize: "0.95rem",
-                fontWeight: 600,
-                color: "var(--text-primary)",
+                fontSize: "0.8rem",
+                color: "var(--text-muted)",
+                textDecoration: "line-through",
               }}
             >
-              {formattedPrice}
+              {formattedComparePrice}
             </span>
-            {formattedComparePrice && (
-              <span
-                style={{
-                  fontSize: "0.8rem",
-                  color: "var(--text-muted)",
-                  textDecoration: "line-through",
-                }}
-              >
-                {formattedComparePrice}
-              </span>
-            )}
-          </div>
-
-          <span
-            style={{
-              fontSize: "0.75rem",
-              color: "var(--text-secondary)",
-              fontStyle: "italic",
-            }}
-          >
-            {product.fabric}
-          </span>
+          )}
         </div>
       </div>
-
-      <style>{`
-        .product-card:hover .product-quick-actions {
-          transform: translateY(0);
-        }
-      `}</style>
-    </div>
+    </article>
   );
 };

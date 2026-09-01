@@ -149,7 +149,7 @@ export const ContactPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                   Message Received.
                 </h3>
                 <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", maxWidth: "380px", margin: "0.5rem auto 1.5rem auto" }}>
-                  Thank you for reaching out to EVARA. Our atelier concierge will review your inquiry and connect with you shortly.
+                  Thank you for reaching out to EVARA VASTRA. Our atelier concierge will review your inquiry and connect with you shortly.
                 </p>
                 <button
                   onClick={() => {

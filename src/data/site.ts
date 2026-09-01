@@ -1,31 +1,46 @@
 export const siteConfig = {
-  name: "EVARA",
-  tagline: "Contemporary Indian Sarees",
+  name: "EVARA VASTRA",
+  tagline: "Contemporary Indian Sarees / Traditional Craft / Modern Luxury",
   slogan: "Rooted in craft. Designed for today.",
-  established: "2024",
-  description:
-    "EVARA celebrates the living heritage of Indian handlooms through contemporary silhouette and modern luxury. Each saree is woven with intention by master artisans.",
+  domain: "evaravastra.com",
   currency: {
     symbol: "₹",
     code: "INR",
-    rate: 1,
+    locale: "en-IN",
   },
   contact: {
-    email: "concierge@evarasarees.com",
+    atelierAddress: "Studio Evara Vastra, 14 Khar Danda Road, Bandra West, Mumbai 400052, India",
     phone: "+91 98201 44520",
+    email: "concierge@evaravastra.com",
     whatsapp: "+91 98201 44520",
-    atelierAddress: "Studio Evara, 14 Khar Danda Road, Bandra West, Mumbai 400052",
-    hours: "Monday – Saturday, 10:30 AM – 7:30 PM IST",
+    hours: "Monday – Saturday: 10:30 AM – 7:30 PM IST",
+  },
+  social: {
+    instagram: "https://instagram.com/evaravastra",
+    pinterest: "https://pinterest.com/evaravastra",
   },
   shipping: {
     freeThreshold: 10000,
-    domesticStandardDays: "3–5 Business Days",
-    domesticExpressDays: "1–2 Business Days",
-    internationalDays: "5–8 Business Days",
+    standardFee: 350,
+    estimatedDaysDomestic: "3–5 Business Days",
+    estimatedDaysInternational: "5–8 Business Days",
   },
-  social: {
-    instagram: "https://instagram.com",
-    pinterest: "https://pinterest.com",
-    facebook: "https://facebook.com",
-  },
+  guarantees: [
+    {
+      title: "100% Certified Pure Handloom",
+      description: "Tested pure silk yarns, Silk Mark certified, and authentic artisan provenance.",
+    },
+    {
+      title: "Complimentary Insured Delivery",
+      description: "Dispatched in bespoke keepsake boxes with door-to-door transit insurance.",
+    },
+    {
+      title: "Unstitched Blouse Piece Included",
+      description: "Every saree includes coordinated 0.8m–1.0m matching/contrasting blouse fabric.",
+    },
+    {
+      title: "7-Day Atelier Return Window",
+      description: "Effortless domestic exchange and returns for unworn sarees in original seal.",
+    },
+  ],
 };

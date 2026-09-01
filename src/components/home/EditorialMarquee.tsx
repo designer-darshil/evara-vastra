@@ -1,14 +1,15 @@
 import React from "react";
 
 export const EditorialMarquee: React.FC = () => {
-  const statements = [
-    "HAND-SPUN MULBERRY SILK",
-    "VARANASI KADWA PIT LOOMS",
-    "100-COUNT BREATHABLE MULMUL",
-    "TESTED METALLIC GOLD ZARI",
-    "NATURAL DYES & ZERO HARSH ACIDS",
-    "MUMBAI ATELIER",
-    "CHANDERI WEAVERS GUILD",
+  const marqueeItems = [
+    "PURE MULBERRY SILK",
+    "KADWA PIT LOOM WEAVE",
+    "TESTED GOLD ZARI",
+    "100-COUNT HANDSPUN MULMUL",
+    "CHANDERE SILK",
+    "ORGANIC LINEN DRAPES",
+    "GENUINE SILK MARK CERTIFIED",
+    "DIRECT FROM WEAVER GUILDS",
   ];
 
   return (
@@ -19,27 +20,34 @@ export const EditorialMarquee: React.FC = () => {
         padding: "0.85rem 0",
         overflow: "hidden",
         whiteSpace: "nowrap",
-        borderTop: "1px solid var(--border-dark)",
-        borderBottom: "1px solid var(--border-dark)",
+        display: "flex",
+        alignItems: "center",
       }}
     >
       <div
         style={{
           display: "inline-flex",
+          animation: "marqueeScroll 35s linear infinite",
           gap: "2.5rem",
           alignItems: "center",
-          animation: "marqueeScroll 35s linear infinite",
-          fontSize: "0.72rem",
-          fontWeight: 600,
-          letterSpacing: "0.22em",
-          textTransform: "uppercase",
         }}
       >
-        {[...statements, ...statements].map((text, i) => (
-          <React.Fragment key={i}>
-            <span>{text}</span>
-            <span style={{ color: "var(--accent-gold)" }}>✦</span>
-          </React.Fragment>
+        {marqueeItems.concat(marqueeItems).map((item, idx) => (
+          <div
+            key={idx}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "2.5rem",
+              fontSize: "0.75rem",
+              fontWeight: 600,
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+            }}
+          >
+            <span>{item}</span>
+            <span style={{ color: "var(--accent-gold)", fontSize: "0.6rem" }}>✦</span>
+          </div>
         ))}
       </div>
 

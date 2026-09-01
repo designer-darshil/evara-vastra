@@ -1,6 +1,7 @@
 import React from "react";
 import { useShop } from "../context/ShopContext";
-import { products, Product } from "../data/products";
+import { useData } from "../context/DataContext";
+import { Product } from "../types";
 import { ProductCard } from "../components/common/ProductCard";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { Heart, ShoppingBag, ArrowRight } from "lucide-react";
@@ -9,8 +10,9 @@ export const WishlistPage: React.FC<{ onNavigate: (href: string) => void }> = ({
   onNavigate,
 }) => {
   const { wishlist, addToCart, showToast } = useShop();
+  const { publishedProducts } = useData();
 
-  const savedProducts = products.filter((p: Product) => wishlist.includes(p.id));
+  const savedProducts = publishedProducts.filter((p: Product) => wishlist.includes(p.id));
 
   const handleMoveAllToBag = () => {
     savedProducts.forEach((p: Product) => addToCart(p, 1));

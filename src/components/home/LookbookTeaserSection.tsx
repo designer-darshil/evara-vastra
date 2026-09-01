@@ -1,17 +1,20 @@
 import React from "react";
-import { lookbookItems } from "../../data/lookbook";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { useData } from "../../context/DataContext";
+import { ArrowRight, MapPin } from "lucide-react";
 
 export const LookbookTeaserSection: React.FC<{
   onNavigate: (href: string) => void;
 }> = ({ onNavigate }) => {
+  const { publishedLookbookItems } = useData();
+
+  const previewLooks = publishedLookbookItems.slice(0, 3);
+
   return (
     <section
       style={{
-        paddingTop: "6rem",
-        paddingBottom: "6rem",
-        backgroundColor: "var(--bg-dark)",
-        color: "var(--text-inverse)",
+        paddingTop: "6.5rem",
+        paddingBottom: "6.5rem",
+        backgroundColor: "var(--bg-primary)",
       }}
     >
       <div className="container">
@@ -20,10 +23,11 @@ export const LookbookTeaserSection: React.FC<{
           style={{
             display: "flex",
             flexWrap: "wrap",
-            alignItems: "flex-end",
             justifyContent: "space-between",
+            alignItems: "flex-end",
             marginBottom: "3.5rem",
-            gap: "1.5rem",
+            borderBottom: "1px solid var(--border-subtle)",
+            paddingBottom: "1.25rem",
           }}
         >
           <div>
@@ -33,20 +37,20 @@ export const LookbookTeaserSection: React.FC<{
                 fontWeight: 600,
                 letterSpacing: "0.2em",
                 textTransform: "uppercase",
-                color: "var(--accent-gold)",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.4rem",
-                marginBottom: "0.4rem",
+                color: "var(--accent-wine)",
+                display: "block",
+                marginBottom: "0.3rem",
               }}
             >
-              <Sparkles size={13} /> EDITORIAL CAMPAIGN
+              EDITORIAL ANTHOLOGY
             </span>
             <h2
               className="font-serif"
               style={{
                 fontSize: "clamp(2rem, 3.5vw, 3rem)",
-                color: "#F8F4EE",
+                color: "var(--text-primary)",
+                lineHeight: 1.15,
+                margin: 0,
               }}
             >
               The Season's Lookbook
@@ -55,123 +59,149 @@ export const LookbookTeaserSection: React.FC<{
 
           <button
             onClick={() => onNavigate("/lookbook")}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              fontSize: "0.8rem",
-              fontWeight: 600,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color: "#F8F4EE",
-              borderBottom: "1px solid #F8F4EE",
-              paddingBottom: "2px",
-            }}
+            className="btn-link"
+            style={{ fontSize: "0.825rem", paddingBottom: "0.25rem" }}
           >
-            View Complete Lookbook <ArrowRight size={14} />
+            Explore Complete Campaign ({publishedLookbookItems.length} Looks) <ArrowRight size={14} />
           </button>
         </div>
 
-        {/* Carousel / Grid of 3 Looks */}
+        {/* 3-Column Editorial Grid */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
             gap: "2rem",
           }}
         >
-          {lookbookItems.slice(0, 3).map((item) => (
+          {previewLooks.map((look) => (
             <div
-              key={item.id}
-              onClick={() => onNavigate(`/product/${item.productSlug}`)}
+              key={look.id}
+              onClick={() => onNavigate(`/product/${look.productSlug}`)}
+              data-cursor="VIEW LOOK"
               style={{
+                backgroundColor: "#FFFFFF",
+                border: "1px solid var(--border-subtle)",
+                overflow: "hidden",
+                boxShadow: "var(--shadow-subtle)",
                 cursor: "pointer",
                 display: "flex",
                 flexDirection: "column",
               }}
-              className="lookbook-teaser-card"
             >
               <div
                 style={{
                   aspectRatio: "3/4",
                   overflow: "hidden",
-                  backgroundColor: "rgba(248, 244, 238, 0.05)",
+                  backgroundColor: "#EDE7DD",
                   position: "relative",
-                  marginBottom: "1.25rem",
                 }}
               >
                 <img
-                  src={item.image}
-                  alt={item.title}
+                  src={look.image}
+                  alt={look.title}
                   loading="lazy"
                   style={{
                     width: "100%",
                     height: "100%",
                     objectFit: "cover",
-                    transition: "transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
+                    transition: "transform 0.8s ease",
                   }}
                 />
 
-                <div
+                <span
                   style={{
                     position: "absolute",
-                    top: "1rem",
-                    left: "1rem",
-                    backgroundColor: "rgba(23, 21, 19, 0.8)",
-                    padding: "0.3rem 0.6rem",
+                    top: "0.75rem",
+                    left: "0.75rem",
                     fontSize: "0.7rem",
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    color: "var(--accent-gold)",
+                    fontWeight: 700,
+                    letterSpacing: "0.15em",
+                    backgroundColor: "rgba(23, 21, 19, 0.85)",
+                    color: "#FFFFFF",
+                    padding: "0.25rem 0.55rem",
                   }}
                 >
-                  LOOK {item.lookNumber}
-                </div>
+                  LOOK {look.lookNumber}
+                </span>
               </div>
 
-              <div>
-                <h4
-                  className="font-serif"
-                  style={{ fontSize: "1.35rem", color: "#F8F4EE", marginBottom: "0.3rem" }}
-                >
-                  {item.title}
-                </h4>
-                <p
-                  style={{
-                    fontSize: "0.8rem",
-                    color: "var(--text-inverse-muted)",
-                    lineHeight: 1.5,
-                    marginBottom: "0.75rem",
-                  }}
-                >
-                  {item.narrative}
-                </p>
+              <div
+                style={{
+                  padding: "1.5rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  flex: 1,
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.3rem",
+                      fontSize: "0.7rem",
+                      color: "var(--text-muted)",
+                      marginBottom: "0.4rem",
+                    }}
+                  >
+                    <MapPin size={11} />
+                    <span>{look.location}</span>
+                  </div>
+
+                  <h3
+                    className="font-serif"
+                    style={{
+                      fontSize: "1.4rem",
+                      color: "var(--text-primary)",
+                      marginBottom: "0.4rem",
+                    }}
+                  >
+                    {look.title}
+                  </h3>
+
+                  <p
+                    style={{
+                      fontSize: "0.825rem",
+                      color: "var(--text-secondary)",
+                      lineHeight: 1.5,
+                      margin: 0,
+                    }}
+                  >
+                    {look.narrative}
+                  </p>
+                </div>
+
                 <div
                   style={{
+                    marginTop: "1.25rem",
+                    paddingTop: "0.75rem",
+                    borderTop: "1px solid var(--border-subtle)",
                     display: "flex",
                     alignItems: "center",
-                    gap: "0.4rem",
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    color: "var(--accent-gold)",
+                    justifyContent: "space-between",
+                    fontSize: "0.78rem",
                   }}
                 >
-                  <span>Shop This Drape ({new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(item.productPrice)})</span>
-                  <ArrowRight size={13} />
+                  <span style={{ color: "var(--text-muted)" }}>{look.productFabric}</span>
+                  <span
+                    style={{
+                      fontWeight: 600,
+                      color: "var(--accent-wine)",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.25rem",
+                    }}
+                  >
+                    Shop Drape <ArrowRight size={13} />
+                  </span>
                 </div>
               </div>
             </div>
           ))}
         </div>
       </div>
-
-      <style>{`
-        .lookbook-teaser-card:hover img {
-          transform: scale(1.04);
-        }
-      `}</style>
     </section>
   );
 };

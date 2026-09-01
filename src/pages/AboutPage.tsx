@@ -9,7 +9,7 @@ export const AboutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
   return (
     <div className="animate-fade-in" style={{ paddingBottom: "7rem", paddingTop: "2.5rem" }}>
       <div className="container">
-        <Breadcrumbs items={[{ label: "About EVARA" }]} onNavigate={onNavigate} />
+        <Breadcrumbs items={[{ label: "About EVARA VASTRA" }]} onNavigate={onNavigate} />
 
         {/* Hero Section */}
         <div style={{ maxWidth: "800px", margin: "1rem 0 4rem 0" }}>
@@ -50,7 +50,7 @@ export const AboutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
               The Vision of Restraint
             </h2>
             <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", lineHeight: 1.7 }}>
-              EVARA was conceived out of a profound admiration for the depth of Indian textile craftsmanship, coupled with a yearning for contemporary architectural restraint. For centuries, our handlooms produced the finest gossamer fabrics the world had ever seen — from the unspun mulmuls of Bengal to the dense Kadwa gold brocades of the ghats of Varanasi.
+              EVARA VASTRA was conceived out of a profound admiration for the depth of Indian textile craftsmanship, coupled with a yearning for contemporary architectural restraint. For centuries, our handlooms produced the finest gossamer fabrics the world had ever seen — from the unspun mulmuls of Bengal to the dense Kadwa gold brocades of the ghats of Varanasi.
             </p>
             <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", lineHeight: 1.7 }}>
               Our work bridges these two worlds. We preserve the rigorous manual discipline of pit loom and shuttle weaving, while curating quiet color palettes, minimalist selvedges, and fluid silhouettes tailored for today’s discerning global woman.
@@ -76,7 +76,7 @@ export const AboutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
               OUR MANIFESTO
             </span>
             <h3 className="font-serif" style={{ fontSize: "2.4rem", color: "var(--text-primary)" }}>
-              Three Pillars of Evara
+              Three Pillars of Evara Vastra
             </h3>
           </div>
 

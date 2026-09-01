@@ -1,37 +1,12 @@
 import React from "react";
-import { media } from "../data/media";
+import { useData } from "../context/DataContext";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { ArrowRight } from "lucide-react";
 
 export const CraftsmanshipPage: React.FC<{ onNavigate: (href: string) => void }> = ({
   onNavigate,
 }) => {
-  const craftSteps = [
-    {
-      step: "01",
-      title: "Hand-Spun Yarn Selection & Reeling",
-      description: "High-twist mulberry silk and wild tussar filaments are degummed and spun by hand onto wooden charkhas, preserving their organic tactile variations.",
-      image: media.craftLoom,
-    },
-    {
-      step: "02",
-      title: "The Kadwa Pit Loom Technique",
-      description: "Unlike Jacquard powerlooms where threads float loosely across the back, Kadwa requires the weaver to engrave and lock each motif with a tiny wooden shuttle. The back is as smooth as the front.",
-      image: media.craftHero,
-    },
-    {
-      step: "03",
-      title: "Tested Antique Gold & Silver Zari",
-      description: "Our metallic threads are formulated from electroplated tested alloys, providing a warm, candlelit antique glow rather than harsh synthetic glitter.",
-      image: media.craftDetail,
-    },
-    {
-      step: "04",
-      title: "Finishing, Tasseling & Cotton Packaging",
-      description: "Every saree is hand-finished with knotted silk tassels along the pallu and placed inside our breathable unbleached cotton keepsake pouch.",
-      image: media.packaging,
-    },
-  ];
+  const { craftsmanshipCMS } = useData();
 
   return (
     <div className="animate-fade-in" style={{ paddingBottom: "7rem", paddingTop: "2.5rem" }}>
@@ -57,16 +32,19 @@ export const CraftsmanshipPage: React.FC<{ onNavigate: (href: string) => void }>
             className="font-serif"
             style={{ fontSize: "clamp(2.5rem, 4.5vw, 4rem)", color: "var(--text-primary)", lineHeight: 1.08 }}
           >
-            The Hand Behind The Loom.
+            {craftsmanshipCMS.heroHeading}
           </h1>
-          <p style={{ fontSize: "1rem", color: "var(--text-secondary)", marginTop: "0.75rem", lineHeight: 1.6 }}>
-            In an era of rapid mechanical reproduction, we honor the deliberate patience of the human hand. It takes between 14 to 28 days of uninterrupted loom work to bring a single EVARA Banarasi saree to life.
+          <p style={{ fontSize: "1.1rem", fontStyle: "italic", color: "var(--accent-gold)", marginTop: "0.5rem" }}>
+            {craftsmanshipCMS.heroSubhead}
+          </p>
+          <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", marginTop: "0.75rem", lineHeight: 1.6 }}>
+            {craftsmanshipCMS.introNarrative}
           </p>
         </div>
 
         {/* 4 Craft Steps */}
         <div style={{ display: "flex", flexDirection: "column", gap: "4.5rem" }}>
-          {craftSteps.map((step, idx) => {
+          {craftsmanshipCMS.steps.map((step, idx) => {
             const isEven = idx % 2 === 0;
             return (
               <div
@@ -139,7 +117,7 @@ export const CraftsmanshipPage: React.FC<{ onNavigate: (href: string) => void }>
             Experience Master Handloom Drape
           </h3>
           <p style={{ fontSize: "0.9rem", color: "var(--text-inverse-muted)", maxWidth: "480px", margin: "0 auto 2rem auto" }}>
-            Each piece arrives with an Artisan Certificate of Lineage and Silk Mark authentication.
+            Each piece arrives with an Artisan Certificate of Provenance and Silk Mark authentication.
           </p>
           <button onClick={() => onNavigate("/shop")} className="btn-wine">
             Shop Handloom Sarees <ArrowRight size={15} />

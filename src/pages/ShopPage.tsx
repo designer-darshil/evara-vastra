@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { products, Product } from "../data/products";
-import { categories } from "../data/categories";
+import { useData } from "../context/DataContext";
+import { Product } from "../types";
 import { fabrics } from "../data/fabrics";
 import { colors, occasions } from "../data/colors";
 import { ProductCard } from "../components/common/ProductCard";
@@ -24,6 +24,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   occasionParam,
   filterParam,
 }) => {
+  const { publishedProducts, activeCategories } = useData();
+
   // Filter States
   const [selectedCategory, setSelectedCategory] = useState<string>(categoryParam || "all");
   const [selectedFabric, setSelectedFabric] = useState<string>(fabricParam || "all");
@@ -46,7 +48,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
   // Filtering Logic
   const filteredProducts = useMemo(() => {
-    return products.filter((p: Product) => {
+    return publishedProducts.filter((p: Product) => {
       // Search param
       if (searchParam) {
         const q = searchParam.toLowerCase();
@@ -91,6 +93,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
       return true;
     });
   }, [
+    publishedProducts,
     searchParam,
     selectedCategory,
     selectedFabric,
@@ -113,7 +116,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     if (sortBy === "newest") {
       return list.sort((a, b) => (b.newArrival ? 1 : 0) - (a.newArrival ? 1 : 0));
     }
-    return list; // featured default
+    return list;
   }, [filteredProducts, sortBy]);
 
   const activeFiltersCount =
@@ -137,7 +140,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
   const getPageTitle = () => {
     if (categoryParam) {
-      const found = categories.find((c) => c.slug === categoryParam);
+      const found = activeCategories.find((c) => c.slug === categoryParam);
       return found ? found.name : "All Sarees";
     }
     if (searchParam) return `Search Results: "${searchParam}"`;
@@ -145,7 +148,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
       const found = occasions.find((o) => o.id === occasionParam);
       return found ? `${found.name} Sarees` : "Occasion Sarees";
     }
-    if (onlyNewArrivals) return "New Arrivals • 2026";
+    if (onlyNewArrivals) return "New Season Arrivals • 2026";
     return "The Contemporary Saree Catalog";
   };
 
@@ -196,7 +199,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
       </div>
 
       <div className="container" style={{ marginTop: "2.5rem" }}>
-        {/* Controls Bar (Filter toggle, Active Filters, Sorting, Grid switch) */}
+        {/* Controls Bar */}
         <div
           style={{
             display: "flex",
@@ -232,13 +235,12 @@ export const ShopPage: React.FC<ShopPageProps> = ({
             </button>
 
             <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-              Showing <strong style={{ color: "var(--text-primary)" }}>{sortedProducts.length}</strong> sarees
+              Showing <strong style={{ color: "var(--text-primary)" }}>{sortedProducts.length}</strong> published sarees
             </span>
           </div>
 
-          {/* Right Controls (Sorting & Grid Columns) */}
+          {/* Right Controls */}
           <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-            {/* Sort Selector */}
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <span
                 style={{
@@ -268,11 +270,10 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                 <option value="featured">Featured Curations</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
-                <option value="newest">Newest Arrivals</option>
+                <option value="newest">Newest Season</option>
               </select>
             </div>
 
-            {/* Desktop Grid Switch */}
             <div
               className="desktop-only"
               style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}
@@ -343,18 +344,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                 <X size={12} style={{ cursor: "pointer" }} onClick={() => setSelectedColor("all")} />
               </span>
             )}
-            {selectedOccasion !== "all" && (
-              <span className="badge-tag" style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
-                Occasion: {selectedOccasion}
-                <X size={12} style={{ cursor: "pointer" }} onClick={() => setSelectedOccasion("all")} />
-              </span>
-            )}
-            {onlyNewArrivals && (
-              <span className="badge-tag badge-tag-wine" style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
-                New Arrivals Only
-                <X size={12} style={{ cursor: "pointer" }} onClick={() => setOnlyNewArrivals(false)} />
-              </span>
-            )}
 
             <button
               onClick={resetAllFilters}
@@ -371,7 +360,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
           </div>
         )}
 
-        {/* Main Content Layout (Left Filters Sidebar + Right Grid) */}
+        {/* Main Content Layout */}
         <div
           style={{
             display: "grid",
@@ -407,9 +396,9 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                     color: selectedCategory === "all" ? "var(--accent-wine)" : "var(--text-secondary)",
                   }}
                 >
-                  All Categories ({products.length})
+                  All Categories ({publishedProducts.length})
                 </button>
-                {categories.map((cat) => (
+                {activeCategories.map((cat) => (
                   <button
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.slug)}
@@ -420,7 +409,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                       color: selectedCategory === cat.slug ? "var(--accent-wine)" : "var(--text-secondary)",
                     }}
                   >
-                    {cat.name} ({cat.itemCount})
+                    {cat.name}
                   </button>
                 ))}
               </div>
@@ -546,7 +535,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                           : "1px solid var(--border-medium)",
                         boxShadow: isSelected ? "0 0 0 2px #FFFFFF" : "none",
                         cursor: "pointer",
-                        transition: "transform 0.2s ease",
                       }}
                     />
                   );
@@ -650,7 +638,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
           style={{
             position: "fixed",
             inset: 0,
-            backgroundColor: "rgba(23,21,19,0.7)",
+            backgroundColor: "rgba(0,0,0,0.6)",
             zIndex: 99999,
             display: "flex",
             justifyContent: "flex-end",
@@ -661,64 +649,46 @@ export const ShopPage: React.FC<ShopPageProps> = ({
             style={{
               backgroundColor: "#FFFFFF",
               width: "85%",
-              maxWidth: "360px",
+              maxWidth: "340px",
               height: "100%",
               overflowY: "auto",
-              padding: "1.5rem",
+              padding: "2rem 1.5rem",
               display: "flex",
               flexDirection: "column",
               gap: "1.5rem",
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                borderBottom: "1px solid var(--border-subtle)",
-                paddingBottom: "1rem",
-              }}
-            >
-              <h3 className="font-serif" style={{ fontSize: "1.3rem" }}>
-                Filter Sarees
-              </h3>
-              <button onClick={() => setIsMobileFilterOpen(false)}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h3 className="font-serif" style={{ fontSize: "1.4rem", margin: 0 }}>Filters</h3>
+              <button onClick={() => setIsMobileFilterOpen(false)} style={{ border: "none", background: "none", cursor: "pointer" }}>
                 <X size={20} />
               </button>
             </div>
 
-            {/* Mobile Category */}
             <div>
-              <h4 style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase" }}>
-                Categories
-              </h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginTop: "0.5rem" }}>
+              <h4 style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", marginBottom: "0.5rem" }}>Categories</h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                 <button
                   onClick={() => setSelectedCategory("all")}
-                  style={{ textAlign: "left", fontSize: "0.85rem", color: selectedCategory === "all" ? "var(--accent-wine)" : "inherit" }}
+                  style={{ textAlign: "left", fontSize: "0.85rem", color: selectedCategory === "all" ? "#7C2430" : "#6F6257", fontWeight: selectedCategory === "all" ? 700 : 400 }}
                 >
-                  All
+                  All Categories
                 </button>
-                {categories.map((cat) => (
+                {activeCategories.map((c) => (
                   <button
-                    key={cat.id}
-                    onClick={() => setSelectedCategory(cat.slug)}
-                    style={{ textAlign: "left", fontSize: "0.85rem", color: selectedCategory === cat.slug ? "var(--accent-wine)" : "inherit" }}
+                    key={c.id}
+                    onClick={() => setSelectedCategory(c.slug)}
+                    style={{ textAlign: "left", fontSize: "0.85rem", color: selectedCategory === c.slug ? "#7C2430" : "#6F6257", fontWeight: selectedCategory === c.slug ? 700 : 400 }}
                   >
-                    {cat.name}
+                    {c.name}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Mobile Apply */}
-            <button
-              onClick={() => setIsMobileFilterOpen(false)}
-              className="btn-wine"
-              style={{ width: "100%", marginTop: "auto" }}
-            >
-              Show {sortedProducts.length} Sarees
+            <button onClick={() => setIsMobileFilterOpen(false)} className="btn-wine" style={{ marginTop: "auto" }}>
+              Apply Filters
             </button>
           </div>
         </div>

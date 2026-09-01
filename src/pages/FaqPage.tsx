@@ -1,11 +1,14 @@
 import React, { useState } from "react";
-import { faqs, FAQItem } from "../data/faqs";
+import { useData } from "../context/DataContext";
+import { FAQItem } from "../types";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { ChevronDown, Search, ArrowRight, HelpCircle } from "lucide-react";
 
 export const FaqPage: React.FC<{ onNavigate: (href: string) => void }> = ({
   onNavigate,
 }) => {
+  const { activeFAQs } = useData();
+
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [openIds, setOpenIds] = useState<string[]>(["faq-1", "faq-3"]);
@@ -16,7 +19,7 @@ export const FaqPage: React.FC<{ onNavigate: (href: string) => void }> = ({
     );
   };
 
-  const filteredFaqs = faqs.filter((faq: FAQItem) => {
+  const filteredFaqs = activeFAQs.filter((faq: FAQItem) => {
     if (selectedCategory !== "all" && faq.category !== selectedCategory) {
       return false;
     }
@@ -53,10 +56,10 @@ export const FaqPage: React.FC<{ onNavigate: (href: string) => void }> = ({
             Frequently Asked Questions
           </h1>
           <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", marginTop: "0.5rem" }}>
-            Everything you need to know about our handloom heritage, delivery times, unstitched blouse pieces, and saree care.
+            Everything you need to know about our handloom heritage, express delivery times, unstitched blouse pieces, and saree care.
           </p>
 
-          {/* FAQ Search Bar */}
+          {/* Search Bar */}
           <div
             style={{
               display: "flex",

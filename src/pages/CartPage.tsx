@@ -1,43 +1,40 @@
 import React, { useState } from "react";
 import { useShop, CartItem } from "../context/ShopContext";
-import { siteConfig } from "../data/site";
+import { useData } from "../context/DataContext";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { Trash2, Heart, Plus, Minus, ArrowRight, ShieldCheck, Gift, Check } from "lucide-react";
 
 export const CartPage: React.FC<{ onNavigate: (href: string) => void }> = ({
   onNavigate,
 }) => {
-  const {
-    cart,
-    updateQuantity,
-    removeFromCart,
-    toggleWishlist,
-    cartSubtotal,
-  } = useShop();
+  const { cart, updateQuantity, removeFromCart, toggleWishlist, cartSubtotal } = useShop();
+  const { siteSettings, validateCoupon } = useData();
 
   const [couponCode, setCouponCode] = useState("");
-  const [discountPercent, setDiscountPercent] = useState<number>(0);
+  const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [couponError, setCouponError] = useState<string | null>(null);
   const [couponSuccess, setCouponSuccess] = useState<string | null>(null);
   const [isGiftWrap, setIsGiftWrap] = useState(false);
 
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
-    const code = couponCode.trim().toUpperCase();
-    if (code === "EVARA10" || code === "ATELIER10" || code === "FIRSTDRAPE") {
-      setDiscountPercent(0.1);
-      setCouponSuccess(`Code ${code} applied: 10% privilege discount.`);
+    if (!couponCode.trim()) return;
+
+    const result = validateCoupon(couponCode, cartSubtotal);
+    if (result.isValid) {
+      setDiscountAmount(result.discountAmount);
+      setCouponSuccess(result.message);
       setCouponError(null);
     } else {
-      setCouponError("Invalid promotion code. Try 'EVARA10'.");
+      setDiscountAmount(0);
+      setCouponError(result.message);
       setCouponSuccess(null);
     }
   };
 
-  const freeThreshold = siteConfig.shipping.freeThreshold;
-  const shippingFee = cartSubtotal >= freeThreshold || cartSubtotal === 0 ? 0 : 350;
+  const freeThreshold = siteSettings.freeShippingThreshold || 10000;
+  const shippingFee = cartSubtotal >= freeThreshold || cartSubtotal === 0 ? 0 : siteSettings.standardShippingFee || 350;
   const giftWrapFee = isGiftWrap ? 250 : 0;
-  const discountAmount = Math.round(cartSubtotal * discountPercent);
   const finalTotal = Math.max(0, cartSubtotal - discountAmount + shippingFee + giftWrapFee);
 
   const formatINR = (amount: number) =>
@@ -153,7 +150,7 @@ export const CartPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                       </p>
                       {item.product.details.blousePiece && (
                         <p style={{ fontSize: "0.75rem", color: "#234E3E", fontWeight: 500, marginTop: "0.2rem" }}>
-                          ✓ Includes 0.8m unstitched matching blouse fabric
+                          ✓ Includes unstitched matching blouse fabric
                         </p>
                       )}
 
@@ -223,7 +220,7 @@ export const CartPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                 ))}
               </div>
 
-              {/* Gift Wrapping Accordion Box */}
+              {/* Keepsake Packaging Option */}
               <div
                 style={{
                   backgroundColor: "#FFFFFF",
@@ -312,7 +309,7 @@ export const CartPage: React.FC<{ onNavigate: (href: string) => void }> = ({
 
                 {discountAmount > 0 && (
                   <div style={{ display: "flex", justifyContent: "space-between", color: "#234E3E" }}>
-                    <span>Privilege Discount (10%)</span>
+                    <span>Privilege Discount</span>
                     <span>- {formatINR(discountAmount)}</span>
                   </div>
                 )}
@@ -357,7 +354,7 @@ export const CartPage: React.FC<{ onNavigate: (href: string) => void }> = ({
 
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.4rem", fontSize: "0.75rem", color: "var(--text-muted)" }}>
                 <ShieldCheck size={14} style={{ color: "var(--accent-gold)" }} />
-                <span>256-Bit Encrypted Secure Checkout Demo</span>
+                <span>256-Bit Encrypted Secure Checkout</span>
               </div>
             </div>
           </div>

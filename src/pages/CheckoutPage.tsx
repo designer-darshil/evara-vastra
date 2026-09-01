@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useShop, CartItem } from "../context/ShopContext";
+import { useData } from "../context/DataContext";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { CheckCircle2, ArrowRight, CreditCard, Smartphone, Building, Truck, Lock } from "lucide-react";
 
@@ -7,6 +8,7 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
   onNavigate,
 }) => {
   const { cart, cartSubtotal, clearCart, showToast } = useShop();
+  const { addOrder } = useData();
 
   // Form State
   const [formData, setFormData] = useState({
@@ -25,7 +27,7 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [confirmedOrderNumber, setConfirmedOrderNumber] = useState<string | null>(null);
+  const [confirmedOrder, setConfirmedOrder] = useState<any | null>(null);
 
   const formatINR = (amount: number) =>
     new Intl.NumberFormat("en-IN", {
@@ -46,17 +48,58 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
 
     setIsSubmitting(true);
     setTimeout(() => {
-      const orderNum = `DEMO-EV-${Math.floor(1000 + Math.random() * 9000)}`;
-      setConfirmedOrderNumber(orderNum);
+      // Create persistent order record in DataContext
+      const orderItems = cart.map((item) => ({
+        id: item.product.id,
+        slug: item.product.slug,
+        title: item.product.title,
+        price: item.product.price,
+        quantity: item.quantity,
+        image: item.product.images[0],
+        fabric: item.product.fabric,
+        blouseOptIn: item.product.details.blousePiece,
+      }));
+
+      const paymentMethodLabel =
+        formData.paymentMethod === "upi"
+          ? "Instant UPI (PhonePe / GPay)"
+          : formData.paymentMethod === "card"
+          ? "Credit/Debit Card (Visa/Mastercard)"
+          : formData.paymentMethod === "netbanking"
+          ? "Net Banking (HDFC/ICICI)"
+          : "Cash on Delivery";
+
+      const createdOrder = addOrder({
+        status: "Confirmed",
+        subtotal: cartSubtotal,
+        shippingFee: shippingCost,
+        discount: 0,
+        total: grandTotal,
+        paymentMethod: paymentMethodLabel,
+        paymentStatus: formData.paymentMethod === "cod" ? "Cash on Delivery" : "Paid",
+        customerName: `${formData.firstName} ${formData.lastName}`,
+        customerEmail: formData.email,
+        customerPhone: formData.phone,
+        shippingAddress: formData.address,
+        city: formData.city,
+        state: formData.state,
+        pincode: formData.pincode,
+        country: formData.country,
+        trackingNumber: `BD-${Math.floor(10000000 + Math.random() * 90000000)}`,
+        carrier: "Blue Dart Express Insured",
+        items: orderItems,
+      });
+
+      setConfirmedOrder(createdOrder);
       clearCart();
       setIsSubmitting(false);
-      showToast(`Order ${orderNum} confirmed successfully (Demo)!`, "info");
+      showToast(`Order ${createdOrder.orderNumber} confirmed successfully!`, "info");
       window.scrollTo(0, 0);
-    }, 900);
+    }, 600);
   };
 
   // Order Confirmed State
-  if (confirmedOrderNumber) {
+  if (confirmedOrder) {
     return (
       <div className="animate-fade-in" style={{ padding: "5rem 0 8rem 0" }}>
         <div className="container" style={{ maxWidth: "680px" }}>
@@ -96,7 +139,7 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                 marginBottom: "0.3rem",
               }}
             >
-              FRONTEND DEMONSTRATION ORDER CONFIRMED
+              ORDER CONFIRMED & REGISTERED IN ATELIER DATABASE
             </span>
 
             <h1 className="font-serif" style={{ fontSize: "2.4rem", color: "var(--text-primary)", marginBottom: "0.5rem" }}>
@@ -104,7 +147,7 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
             </h1>
 
             <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", lineHeight: 1.6 }}>
-              Order Reference: <strong style={{ color: "var(--accent-wine)" }}>{confirmedOrderNumber}</strong>
+              Order Reference: <strong style={{ color: "var(--accent-wine)" }}>{confirmedOrder.orderNumber}</strong>
             </p>
 
             <div
@@ -119,39 +162,25 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
             >
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
                 <span style={{ color: "var(--text-muted)" }}>Recipient</span>
-                <strong>{formData.firstName} {formData.lastName}</strong>
+                <strong>{confirmedOrder.customerName}</strong>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
                 <span style={{ color: "var(--text-muted)" }}>Delivery Address</span>
-                <span>{formData.address}, {formData.city} {formData.pincode}</span>
+                <span>{confirmedOrder.shippingAddress}, {confirmedOrder.city} {confirmedOrder.pincode}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                <span style={{ color: "var(--text-muted)" }}>Estimated Dispatch</span>
-                <strong>3–4 Business Days via Insured Courier</strong>
+                <span style={{ color: "var(--text-muted)" }}>Tracking Courier</span>
+                <strong>{confirmedOrder.carrier} (#{confirmedOrder.trackingNumber})</strong>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <span style={{ color: "var(--text-muted)" }}>Payment Method</span>
-                <span>{formData.paymentMethod.toUpperCase()} (Demo Mode)</span>
+                <span>{confirmedOrder.paymentMethod}</span>
               </div>
-            </div>
-
-            <div
-              style={{
-                backgroundColor: "rgba(177, 138, 82, 0.1)",
-                padding: "0.85rem 1rem",
-                border: "1px solid rgba(177, 138, 82, 0.3)",
-                fontSize: "0.75rem",
-                color: "var(--text-secondary)",
-                marginBottom: "2rem",
-                textAlign: "left",
-              }}
-            >
-              <strong>Demo Notice:</strong> This e-commerce website is operating in interactive demo mode. No payment was charged and no real transaction was performed.
             </div>
 
             <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
               <button onClick={() => onNavigate("/orders")} className="btn-secondary">
-                View Demo Order History
+                View Order History & Timeline
               </button>
               <button onClick={() => onNavigate("/shop")} className="btn-wine">
                 Continue Shopping <ArrowRight size={15} />
@@ -177,7 +206,7 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
             Express Checkout
           </h1>
           <p style={{ fontSize: "0.85rem", color: "var(--accent-wine)", fontWeight: 500, marginTop: "0.2rem" }}>
-            ✦ Interactive Frontend Demo — Safe to test all flows
+            ✦ Instant dynamic registration in Atelier Order Records
           </p>
         </div>
 
@@ -212,13 +241,7 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
               {/* Left Form Inputs */}
               <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
                 {/* 1. Contact Info */}
-                <div
-                  style={{
-                    backgroundColor: "#FFFFFF",
-                    padding: "2rem",
-                    border: "1px solid var(--border-subtle)",
-                  }}
-                >
+                <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid var(--border-subtle)" }}>
                   <h3 className="font-serif" style={{ fontSize: "1.35rem", marginBottom: "1.25rem", color: "var(--text-primary)" }}>
                     1. Contact Information
                   </h3>
@@ -279,13 +302,7 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                 </div>
 
                 {/* 2. Delivery Address */}
-                <div
-                  style={{
-                    backgroundColor: "#FFFFFF",
-                    padding: "2rem",
-                    border: "1px solid var(--border-subtle)",
-                  }}
-                >
+                <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid var(--border-subtle)" }}>
                   <h3 className="font-serif" style={{ fontSize: "1.35rem", marginBottom: "1.25rem", color: "var(--text-primary)" }}>
                     2. Shipping Address
                   </h3>
@@ -345,16 +362,10 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                   </div>
                 </div>
 
-                {/* 3. Payment Method Simulation */}
-                <div
-                  style={{
-                    backgroundColor: "#FFFFFF",
-                    padding: "2rem",
-                    border: "1px solid var(--border-subtle)",
-                  }}
-                >
+                {/* 3. Payment Method */}
+                <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", border: "1px solid var(--border-subtle)" }}>
                   <h3 className="font-serif" style={{ fontSize: "1.35rem", marginBottom: "1.25rem", color: "var(--text-primary)" }}>
-                    3. Payment Preference (Demo UI)
+                    3. Payment Preference
                   </h3>
 
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
@@ -362,7 +373,7 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                       { id: "upi", label: "Instant UPI (GPay / PhonePe / Paytm / BHIM)", icon: Smartphone },
                       { id: "card", label: "Credit or Debit Card (Visa, Mastercard, RuPay, Amex)", icon: CreditCard },
                       { id: "netbanking", label: "Net Banking (All Major Indian Banks)", icon: Building },
-                      { id: "cod", label: "Cash on Delivery (Available up to ₹25,000)", icon: Truck },
+                      { id: "cod", label: "Cash on Delivery (Available across India)", icon: Truck },
                     ].map((p) => {
                       const Icon = p.icon;
                       const isSelected = formData.paymentMethod === p.id;
@@ -465,16 +476,9 @@ export const CheckoutPage: React.FC<{ onNavigate: (href: string) => void }> = ({
                   {isSubmitting ? "Placing Order..." : `Place Order (${formatINR(grandTotal)})`}
                 </button>
 
-                <p
-                  style={{
-                    fontSize: "0.7rem",
-                    color: "var(--text-muted)",
-                    textAlign: "center",
-                    marginTop: "0.75rem",
-                  }}
-                >
+                <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", textAlign: "center", marginTop: "0.75rem" }}>
                   <Lock size={12} style={{ display: "inline", marginRight: "4px" }} />
-                  Encrypted Demo Checkout. No payment charged.
+                  Encrypted Checkout. Order saved to Atelier DB.
                 </p>
               </div>
             </div>
