@@ -111,7 +111,7 @@ export const ShoppableVideosSection: React.FC<{ onNavigate: (href: string) => vo
       {/* Interactive Modal Video Player */}
       {activeModalVideo && (
         <div
-          className="fixed inset-0 bg-black/85 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4 animate-in fade-in duration-200"
           onClick={() => setActiveModalVideo(null)}
         >
           <div
@@ -121,7 +121,7 @@ export const ShoppableVideosSection: React.FC<{ onNavigate: (href: string) => vo
             {/* Close Button */}
             <button
               onClick={() => setActiveModalVideo(null)}
-              className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/60 text-white flex items-center justify-center border border-white/20 hover:bg-black/90 transition-colors z-30"
+              className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/80 text-white flex items-center justify-center border border-white/20 hover:bg-black transition-colors z-30"
               aria-label="Close video player"
             >
               <X className="w-5 h-5" />
@@ -148,7 +148,7 @@ export const ShoppableVideosSection: React.FC<{ onNavigate: (href: string) => vo
                   onClick={toggleModalPlay}
                   className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-pointer z-10"
                 >
-                  <div className="w-16 h-16 rounded-full bg-white/90 text-[#734E06] flex items-center justify-center shadow-xl">
+                  <div className="w-16 h-16 rounded-full bg-white text-[#734E06] flex items-center justify-center shadow-xl">
                     <Play className="w-7 h-7 ml-1 fill-current" />
                   </div>
                 </div>
@@ -157,13 +157,13 @@ export const ShoppableVideosSection: React.FC<{ onNavigate: (href: string) => vo
 
             {/* Top Info Overlay */}
             <div className="absolute top-4 left-4 z-20 pointer-events-none">
-              <span className="px-2.5 py-1 bg-black/60 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider text-white rounded-xs border border-white/10">
+              <span className="px-2.5 py-1 bg-black/85 text-[10px] font-bold uppercase tracking-wider text-white rounded-xs border border-white/20">
                 Live Atelier Preview
               </span>
             </div>
 
             {/* Bottom Controls & Product Drawer */}
-            <div className="relative z-20 bg-gradient-to-t from-black/95 via-black/80 to-transparent p-4 sm:p-5 pt-8 text-white space-y-3">
+            <div className="relative z-20 bg-gradient-to-t from-black via-black/90 to-transparent p-4 sm:p-5 pt-8 text-white space-y-3">
               {/* Scrub / Progress Bar */}
               {videoDuration > 0 && (
                 <div className="flex items-center gap-2">
@@ -187,7 +187,7 @@ export const ShoppableVideosSection: React.FC<{ onNavigate: (href: string) => vo
               )}
 
               {/* Product Information Card */}
-              <div className="bg-white/10 backdrop-blur-md p-3.5 rounded-sm border border-white/15 flex items-center justify-between gap-3">
+              <div className="bg-neutral-900/95 p-3.5 rounded-sm border border-neutral-700 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <img
                     src={activeModalVideo.thumbnailUrl || activeModalVideo.posterUrl}

@@ -8,6 +8,8 @@ import {
   Heart,
   ShoppingBag,
   User,
+  Instagram,
+  Facebook,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 
@@ -244,6 +246,32 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
           <div className="flex items-center gap-2 text-xs text-neutral-600">
             <MapPin className="h-3.5 w-3.5 text-brand shrink-0" />
             <span>Surat, Gujarat, India</span>
+          </div>
+
+          {/* Social Media Links */}
+          <div className="flex items-center gap-3 pt-1">
+            {siteSettings.instagramUrl && (
+              <a
+                href={siteSettings.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="w-7 h-7 rounded-full bg-white border border-neutral-300 flex items-center justify-center text-neutral-700 hover:text-brand"
+              >
+                <Instagram className="w-3.5 h-3.5" />
+              </a>
+            )}
+            {siteSettings.facebookUrl && (
+              <a
+                href={siteSettings.facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="w-7 h-7 rounded-full bg-white border border-neutral-300 flex items-center justify-center text-neutral-700 hover:text-brand"
+              >
+                <Facebook className="w-3.5 h-3.5" />
+              </a>
+            )}
           </div>
 
           <div className="flex flex-wrap gap-2 text-[11px] text-neutral-500 pt-1 border-t border-neutral-200">

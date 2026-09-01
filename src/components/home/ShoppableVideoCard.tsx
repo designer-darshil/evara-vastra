@@ -113,7 +113,7 @@ export const ShoppableVideoCard: React.FC<ShoppableVideoCardProps> = ({
 
       {/* Top Bar (Audio toggle + "Shoppable" Badge) */}
       <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10">
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/60 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider text-white rounded-xs border border-white/10">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/85 text-[10px] font-bold uppercase tracking-wider text-white rounded-xs border border-white/20">
           <span className="w-1.5 h-1.5 rounded-full bg-[#734E06] animate-pulse" />
           Featured Look
         </span>
@@ -121,7 +121,7 @@ export const ShoppableVideoCard: React.FC<ShoppableVideoCardProps> = ({
         {isPlaying && !hasVideoError && (
           <button
             onClick={toggleMute}
-            className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm text-white flex items-center justify-center border border-white/10 hover:bg-black/80 transition-colors"
+            className="w-8 h-8 rounded-full bg-black/85 text-white flex items-center justify-center border border-white/20 hover:bg-black transition-colors"
             title={isMuted ? "Unmute" : "Mute"}
           >
             {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}

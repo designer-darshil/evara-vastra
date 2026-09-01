@@ -178,10 +178,51 @@ export const AdminSettingsPage: React.FC<{ onNavigate?: (href: string) => void }
         </div>
       </div>
 
+      {/* Social Media Profiles Section */}
+      <div className="bg-white p-6 border border-neutral-200 rounded-sm shadow-xs space-y-4">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 m-0 pb-2 border-b border-neutral-100">
+          3. Official Social Media Channels
+        </h3>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+              Instagram Profile URL
+            </label>
+            <input
+              type="url"
+              placeholder="https://instagram.com/evaravastra"
+              value={form.instagramUrl || ""}
+              onChange={(e) => setForm({ ...form, instagramUrl: e.target.value })}
+              className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 focus:bg-white focus:border-brand outline-none"
+            />
+            <span className="text-[10px] text-neutral-400 mt-1 block">
+              Displayed with Instagram icon in footer and mobile menu.
+            </span>
+          </div>
+
+          <div>
+            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+              Facebook Page URL
+            </label>
+            <input
+              type="url"
+              placeholder="https://facebook.com/evaravastra"
+              value={form.facebookUrl || ""}
+              onChange={(e) => setForm({ ...form, facebookUrl: e.target.value })}
+              className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 focus:bg-white focus:border-brand outline-none"
+            />
+            <span className="text-[10px] text-neutral-400 mt-1 block">
+              Displayed with Facebook icon in footer and mobile menu.
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Commerce & Checkout Rules */}
       <div className="bg-white p-6 border border-neutral-200 rounded-sm shadow-xs space-y-4">
         <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 m-0 pb-2 border-b border-neutral-100">
-          3. Commerce & Checkout Rules
+          4. Commerce & Checkout Rules
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">

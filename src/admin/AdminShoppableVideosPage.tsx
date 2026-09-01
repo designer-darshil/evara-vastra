@@ -358,7 +358,7 @@ export const AdminShoppableVideosPage: React.FC<{ onNavigate?: (href: string) =>
       {/* Edit / Create Video Drawer Modal */}
       {editingVideo && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[999] flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center p-4"
           onClick={() => setEditingVideo(null)}
         >
           <div
