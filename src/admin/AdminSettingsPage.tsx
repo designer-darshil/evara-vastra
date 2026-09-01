@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useData } from "../context/DataContext";
 import { SiteSettings, ShippingSettings } from "../types";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
-import { Save, Check, Truck } from "lucide-react";
+import { Save, Check, Truck, KeyRound } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { shippingProvider } from "../lib/shiprocket";
 
@@ -63,6 +63,23 @@ export const AdminSettingsPage: React.FC<{ onNavigate?: (href: string) => void }
           className="flex items-center gap-2 px-4 py-2 bg-brand text-brand-foreground hover:bg-brand-hover text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs self-start sm:self-auto min-h-[44px]"
         >
           <Save className="w-4 h-4" /> Save All Settings
+        </button>
+      </div>
+
+      {/* Security Quick Link Banner */}
+      <div className="bg-amber-50/70 border border-amber-200 p-4 rounded-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2.5">
+          <KeyRound className="w-4 h-4 text-[#734E06] shrink-0" />
+          <span className="text-neutral-800 font-medium">
+            Looking to update your administrator password or review active session credentials?
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => onNavigate && onNavigate("/admin/settings/security")}
+          className="px-3 py-1.5 bg-[#734E06] text-white hover:bg-[#5a3c04] font-bold text-[11px] uppercase tracking-wider rounded-sm transition-colors shrink-0"
+        >
+          Security & Password Management →
         </button>
       </div>
 

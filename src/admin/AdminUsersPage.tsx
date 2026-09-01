@@ -12,6 +12,7 @@ import {
   Phone,
   CheckCircle2,
 } from "lucide-react";
+import { hashPassword } from "../lib/auth/password";
 
 export const AdminUsersPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
   onNavigate,
@@ -26,6 +27,7 @@ export const AdminUsersPage: React.FC<{ onNavigate?: (href: string) => void }> =
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [initialPassword, setInitialPassword] = useState("");
   const [role, setRole] = useState<AdminRole>("admin");
   const [isActive, setIsActive] = useState(true);
 
@@ -35,6 +37,7 @@ export const AdminUsersPage: React.FC<{ onNavigate?: (href: string) => void }> =
     setName("");
     setEmail("");
     setPhone("");
+    setInitialPassword("");
     setRole("admin");
     setIsActive(true);
     setEditingUser(null);
@@ -46,12 +49,13 @@ export const AdminUsersPage: React.FC<{ onNavigate?: (href: string) => void }> =
     setName(user.name);
     setEmail(user.email);
     setPhone(user.phone || "");
+    setInitialPassword("");
     setRole(user.role);
     setIsActive(user.isActive);
     setIsAddModalOpen(true);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (editingUser) {
@@ -63,12 +67,16 @@ export const AdminUsersPage: React.FC<{ onNavigate?: (href: string) => void }> =
         isActive,
       });
     } else {
+      const passwordToHash = initialPassword || "EvaraAdmin@2026Secure!";
+      const hash = await hashPassword(passwordToHash);
+
       addAdminUser({
         name,
         email,
         phone,
         role,
         isActive,
+        passwordHash: hash,
         avatar: `https://images.unsplash.com/photo-${1534528741775 + Math.floor(Math.random() * 1000)}?q=80&w=200&auto=format&fit=crop`,
       });
     }
@@ -333,6 +341,24 @@ export const AdminUsersPage: React.FC<{ onNavigate?: (href: string) => void }> =
                   className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 text-neutral-900 text-xs rounded-sm focus:bg-white focus:border-brand focus:ring-1 focus:ring-brand outline-none"
                 />
               </div>
+
+              {!editingUser && (
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                    Temporary Initial Password (Min 12 Characters)
+                  </label>
+                  <input
+                    type="password"
+                    value={initialPassword}
+                    onChange={(e) => setInitialPassword(e.target.value)}
+                    placeholder="Enter strong temporary password"
+                    className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 text-neutral-900 text-xs rounded-sm focus:bg-white focus:border-brand outline-none"
+                  />
+                  <span className="text-[10px] text-neutral-400 block mt-0.5">
+                    Hashed securely with PBKDF2 before storing.
+                  </span>
+                </div>
+              )}
 
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1">

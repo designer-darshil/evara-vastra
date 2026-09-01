@@ -27,6 +27,7 @@ import {
   BookOpen,
   HelpCircle,
   Lock,
+  KeyRound,
   Truck,
 } from "lucide-react";
 
@@ -46,7 +47,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   const {
     adminUser,
     logoutAdmin,
-    switchAdminRole,
     isAdminAuthenticated,
     notificationBar,
     products,
@@ -146,7 +146,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     { label: "FAQs & Help Center", href: "/admin/faqs", icon: HelpCircle, module: "content" },
     { label: "Media Library", href: "/admin/media", icon: Image, module: "content" },
     
-    { section: "SYSTEM & SETTINGS" },
+    { section: "SYSTEM & SECURITY" },
+    { label: "Security & Password", href: "/admin/settings/security", icon: KeyRound, module: "settings" },
     { label: "Store Settings", href: "/admin/settings", icon: Settings, module: "settings" },
     { label: "Admin Users & RBAC", href: "/admin/users", icon: UserCheck, module: "users" },
     { label: "System Audit Logs", href: "/admin/audit-logs", icon: History, module: "audit_logs" },
@@ -290,22 +291,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
           {/* Right User & Live Store controls */}
           <div className="flex items-center gap-3 sm:gap-4">
-            {/* Quick Role Switcher for Demo / Testing */}
-            <div className="hidden md:flex items-center gap-2 text-xs bg-neutral-50 px-2.5 py-1.5 border border-neutral-200 rounded-sm">
-              <span className="text-neutral-500">Role:</span>
-              <select
-                value={adminUser.role}
-                onChange={(e) => switchAdminRole(e.target.value as AdminRole)}
-                className="bg-transparent font-semibold text-neutral-900 border-none outline-none cursor-pointer text-xs"
-                title="Switch active role for testing permissions"
-              >
-                <option value="superadmin">Super Admin</option>
-                <option value="admin">Store Admin</option>
-                <option value="order_manager">Order Manager</option>
-                <option value="content_manager">Content Lead</option>
-              </select>
-            </div>
-
             {/* Live Store Button */}
             <button
               onClick={() => onNavigate("/")}
@@ -314,8 +299,12 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               <ExternalLink className="w-3.5 h-3.5" /> Live Store
             </button>
 
-            {/* Current User Badge */}
-            <div className="flex items-center gap-2.5 pl-2 sm:border-l sm:border-neutral-200">
+            {/* Current User Badge & Security Link */}
+            <button
+              onClick={() => onNavigate("/admin/settings/security")}
+              className="flex items-center gap-2.5 pl-2 sm:border-l sm:border-neutral-200 text-left hover:opacity-80 transition-opacity"
+              title="Account Security & Settings"
+            >
               <div className="w-8 h-8 rounded-full bg-brand text-brand-foreground flex items-center justify-center font-bold text-xs">
                 {adminUser.name.charAt(0)}
               </div>
@@ -327,7 +316,18 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                   {roleLabelMap[adminUser.role]}
                 </span>
               </div>
-            </div>
+            </button>
+
+            {/* Logout Action Button */}
+            <button
+              onClick={handleLogout}
+              aria-label="Sign out of Admin"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-sm transition-colors"
+              title="Sign Out"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Sign Out</span>
+            </button>
           </div>
         </header>
 
@@ -344,18 +344,12 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               <p className="text-xs text-neutral-600 mb-6 leading-relaxed">
                 Your current role (<strong className="text-neutral-900">{roleLabelMap[adminUser.role]}</strong>) does not have permission to view or modify this module ({currentModule}).
               </p>
-              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+              <div className="flex justify-center">
                 <button
                   onClick={() => onNavigate("/admin")}
                   className="px-4 py-2 bg-brand text-brand-foreground text-xs font-semibold rounded-sm hover:bg-brand-hover transition-colors"
                 >
                   Return to Dashboard
-                </button>
-                <button
-                  onClick={() => switchAdminRole("superadmin")}
-                  className="px-4 py-2 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-sm hover:bg-neutral-50 transition-colors"
-                >
-                  Switch to Super Admin (Demo)
                 </button>
               </div>
             </div>

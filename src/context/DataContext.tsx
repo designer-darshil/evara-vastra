@@ -53,6 +53,8 @@ import {
   initialShippingSettings,
 } from "../data/initialData";
 import { shippingProvider } from "../lib/shiprocket";
+import { hashPassword, verifyPassword, validatePasswordStrength } from "../lib/auth/password";
+import { AdminAuthRateLimiter } from "../lib/auth/adminAuth";
 
 interface DataContextType {
   // Products
@@ -157,7 +159,8 @@ interface DataContextType {
   adminUser: AdminUser | null;
   adminUsers: AdminUser[];
   isAdminAuthenticated: boolean;
-  loginAdmin: (email: string, pass: string) => boolean;
+  loginAdmin: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
+  changeAdminPassword: (userId: string, currentPass: string, newPass: string) => Promise<{ success: boolean; error?: string }>;
   switchAdminRole: (role: AdminRole) => void;
   logoutAdmin: () => void;
   addAdminUser: (user: Omit<AdminUser, "id" | "createdAt">) => AdminUser;
@@ -295,7 +298,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loadStored(STORAGE_KEYS.ADMIN_USERS, initialAdminUsers)
   );
   const [adminUser, setAdminUser] = useState<AdminUser | null>(() =>
-    loadStored(STORAGE_KEYS.AUTH, initialAdminUser)
+    loadStored<AdminUser | null>(STORAGE_KEYS.AUTH, null)
   );
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() =>
     loadStored(STORAGE_KEYS.AUDIT_LOGS, initialAuditLogs)
@@ -855,45 +858,174 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // AUTH
-  const loginAdmin = (email: string, pass: string): boolean => {
+  const loginAdmin = async (
+    email: string,
+    pass: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    const cleanEmail = email.trim().toLowerCase();
+
+    // Check brute-force lockout
+    const lockout = AdminAuthRateLimiter.checkLockout(cleanEmail);
+    if (lockout.isLocked) {
+      addAuditLog(
+        "LOCKED_LOGIN_ATTEMPT",
+        "auth",
+        `Blocked login attempt for locked account '${cleanEmail}' (${lockout.remainingMinutes} min remaining)`,
+        undefined,
+        undefined,
+        "warning"
+      );
+      return {
+        success: false,
+        error: `Account temporarily locked due to excessive failed attempts. Please try again in ${lockout.remainingMinutes} minutes.`,
+      };
+    }
+
     const foundUser = adminUsers.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase() && u.isActive
+      (u) => u.email.toLowerCase() === cleanEmail && u.isActive
     );
 
-    if (
-      foundUser &&
-      (pass === "evara2026" || pass === "admin" || pass === "password")
-    ) {
+    if (!foundUser || !foundUser.passwordHash) {
+      AdminAuthRateLimiter.recordFailedAttempt(cleanEmail);
+      addAuditLog(
+        "FAILED_LOGIN_ATTEMPT",
+        "auth",
+        `Failed login attempt for email '${cleanEmail}'`,
+        undefined,
+        undefined,
+        "warning"
+      );
+      return { success: false, error: "Invalid email or password." };
+    }
+
+    // Cryptographic verification
+    const isPasswordValid = await verifyPassword(pass, foundUser.passwordHash);
+
+    if (isPasswordValid) {
+      AdminAuthRateLimiter.clearAttempts(cleanEmail);
+      const nowIso = new Date().toISOString();
+      const nowDisplay = new Date().toLocaleString("en-IN", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      });
+
       const updatedUser = {
         ...foundUser,
-        lastLogin: new Date().toLocaleString("en-IN", {
-          dateStyle: "medium",
-          timeStyle: "short",
-        }),
+        lastLogin: nowDisplay,
+        lastLoginAt: nowIso,
       };
+
       setAdminUser(updatedUser);
-      updateAdminUser(foundUser.id, { lastLogin: updatedUser.lastLogin });
-      addAuditLog("ADMIN_LOGIN", "auth", `Successful admin login for ${foundUser.name} (${foundUser.role})`, foundUser.id, foundUser.name, "info");
-      return true;
+      updateAdminUser(foundUser.id, {
+        lastLogin: nowDisplay,
+        lastLoginAt: nowIso,
+      });
+
+      addAuditLog(
+        "ADMIN_LOGIN",
+        "auth",
+        `Successful admin login for ${foundUser.name} (${foundUser.role})`,
+        foundUser.id,
+        foundUser.name,
+        "info"
+      );
+      return { success: true };
     }
 
-    if (
-      (email === "admin@evaravastra.com" && pass === "evara2026") ||
-      (email === "evaravastra@gmail.com" && pass === "evara2026") ||
-      (email === "admin" && pass === "admin")
-    ) {
-      setAdminUser(initialAdminUser);
-      addAuditLog("ADMIN_LOGIN", "auth", `Successful admin login for ${initialAdminUser.name}`, initialAdminUser.id, initialAdminUser.name, "info");
-      return true;
+    // Record failure in rate limiter
+    const result = AdminAuthRateLimiter.recordFailedAttempt(cleanEmail);
+    addAuditLog(
+      "FAILED_LOGIN_ATTEMPT",
+      "auth",
+      `Failed password attempt for admin email '${cleanEmail}'`,
+      foundUser.id,
+      foundUser.name,
+      "warning"
+    );
+
+    if (result.isNowLocked) {
+      return {
+        success: false,
+        error: "Account has been temporarily locked for 15 minutes due to 5 consecutive failed attempts.",
+      };
     }
 
-    addAuditLog("FAILED_LOGIN_ATTEMPT", "auth", `Failed login attempt for email '${email}'`, undefined, undefined, "warning");
-    return false;
+    return { success: false, error: "Invalid email or password." };
+  };
+
+  const changeAdminPassword = async (
+    userId: string,
+    currentPass: string,
+    newPass: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    const foundUser = adminUsers.find((u) => u.id === userId);
+    if (!foundUser || !foundUser.passwordHash) {
+      return { success: false, error: "Administrator account not found." };
+    }
+
+    // Verify current password
+    const isCurrentValid = await verifyPassword(currentPass, foundUser.passwordHash);
+    if (!isCurrentValid) {
+      addAuditLog(
+        "PASSWORD_CHANGE_FAILED",
+        "auth",
+        `Failed password change attempt for ${foundUser.email} (incorrect current password)`,
+        foundUser.id,
+        foundUser.name,
+        "warning"
+      );
+      return { success: false, error: "The current password entered is incorrect." };
+    }
+
+    // Validate new password complexity
+    const strength = validatePasswordStrength(newPass);
+    if (!strength.isValid) {
+      return { success: false, error: strength.errors[0] };
+    }
+
+    // Verify not identical to current password
+    const isSame = await verifyPassword(newPass, foundUser.passwordHash);
+    if (isSame) {
+      return {
+        success: false,
+        error: "New password cannot be identical to the current password.",
+      };
+    }
+
+    // Compute new hash and update
+    const newHash = await hashPassword(newPass);
+    const nowIso = new Date().toISOString();
+
+    updateAdminUser(foundUser.id, {
+      passwordHash: newHash,
+      passwordChangedAt: nowIso,
+      updatedAt: nowIso,
+    });
+
+    addAuditLog(
+      "PASSWORD_CHANGED",
+      "auth",
+      `Password successfully changed for administrator ${foundUser.email}`,
+      foundUser.id,
+      foundUser.name,
+      "info"
+    );
+
+    // Invalidate active session to require fresh authentication with the new password
+    setAdminUser(null);
+    return { success: true };
   };
 
   const logoutAdmin = () => {
     if (adminUser) {
-      addAuditLog("ADMIN_LOGOUT", "auth", `Admin signed out: ${adminUser.name}`, adminUser.id, adminUser.name, "info");
+      addAuditLog(
+        "ADMIN_LOGOUT",
+        "auth",
+        `Admin signed out: ${adminUser.name}`,
+        adminUser.id,
+        adminUser.name,
+        "info"
+      );
     }
     setAdminUser(null);
   };
@@ -1165,6 +1297,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         adminUsers,
         isAdminAuthenticated: !!adminUser,
         loginAdmin,
+        changeAdminPassword,
         switchAdminRole,
         logoutAdmin,
         addAdminUser,

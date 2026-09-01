@@ -396,13 +396,17 @@ export type AdminRole = "superadmin" | "admin" | "content_manager" | "order_mana
 export interface AdminUser {
   id: string;
   email: string;
+  passwordHash?: string;
   name: string;
   role: AdminRole;
   avatar?: string;
   phone?: string;
   isActive: boolean;
   lastLogin?: string;
+  lastLoginAt?: string;
+  passwordChangedAt?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export type AuditLogSeverity = "info" | "warning" | "critical";

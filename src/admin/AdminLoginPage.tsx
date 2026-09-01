@@ -1,155 +1,195 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useData } from "../context/DataContext";
-import { Lock, Mail, ArrowRight, ShieldAlert } from "lucide-react";
+import { Lock, Mail, ArrowRight, ShieldAlert, Eye, EyeOff } from "lucide-react";
+import { AdminAuthRateLimiter } from "../lib/auth/adminAuth";
 
 export const AdminLoginPage: React.FC<{ onNavigate: (href: string) => void }> = ({
   onNavigate,
 }) => {
   const { loginAdmin, isAdminAuthenticated } = useData();
-  const [email, setEmail] = useState("admin@evaravastra.com");
-  const [password, setPassword] = useState("evara2026");
+
+  // Explicitly start both fields EMPTY
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [remainingLockoutMin, setRemainingLockoutMin] = useState<number | null>(null);
 
-  if (isAdminAuthenticated) {
-    onNavigate("/admin");
-    return null;
-  }
+  // Extract redirect target if present
+  const getRedirectTarget = (): string => {
+    try {
+      const url = new URL(window.location.href);
+      const redirect = url.searchParams.get("redirect");
+      if (redirect && redirect.startsWith("/admin") && redirect !== "/admin/login") {
+        return redirect;
+      }
+    } catch {
+      // ignore
+    }
+    return "/admin";
+  };
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (isAdminAuthenticated) {
+      onNavigate(getRedirectTarget());
+    }
+  }, [isAdminAuthenticated]);
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setEmail(val);
+    setError(null);
+
+    // Check if entered email is currently locked out
+    if (val.includes("@")) {
+      const lockout = AdminAuthRateLimiter.checkLockout(val);
+      if (lockout.isLocked) {
+        setRemainingLockoutMin(lockout.remainingMinutes);
+      } else {
+        setRemainingLockoutMin(null);
+      }
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email.trim() || !password) return;
+
     setError(null);
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      const success = loginAdmin(email, password);
-      setIsSubmitting(false);
-      if (success) {
-        onNavigate("/admin");
+    try {
+      const result = await loginAdmin(email, password);
+      if (result.success) {
+        onNavigate(getRedirectTarget());
       } else {
-        setError("Authentication failed. Please verify your email and password.");
+        setError(result.error || "Invalid email or password.");
+        const lockout = AdminAuthRateLimiter.checkLockout(email);
+        if (lockout.isLocked) {
+          setRemainingLockoutMin(lockout.remainingMinutes);
+        }
       }
-    }, 200);
-  };
-
-  const handleFillDemo = (demoEmail: string) => {
-    setEmail(demoEmail);
-    setPassword("evara2026");
-    setError(null);
+    } catch {
+      setError("An error occurred during authentication. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#141210] flex items-center justify-center p-4 sm:p-6">
-      <div className="w-full max-w-md bg-white border border-neutral-200 shadow-2xl p-6 sm:p-10 rounded-sm">
-        {/* Brand Header */}
+    <div className="min-h-screen bg-neutral-100 flex items-center justify-center p-4 sm:p-6">
+      <div className="w-full max-w-md bg-white border border-neutral-200 shadow-xl p-6 sm:p-10 rounded-sm">
+        {/* Brand Wordmark & Security Header */}
         <div className="text-center mb-8">
-          <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-brand block mb-1">
-            ATELIER COMMERCE CONTROL
+          <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#734E06] block mb-1">
+            ATELIER COMMERCE SUITE
           </span>
-          <h1 className="font-serif text-2xl sm:text-3xl text-neutral-900 m-0 font-bold">
+          <h1 className="font-serif text-2xl sm:text-3xl text-neutral-900 m-0 font-bold tracking-wider">
             EVARA VASTRA
           </h1>
-          <p className="text-xs text-neutral-500 mt-1.5">
-            Sign in to manage catalog, fulfillment, and storefront content.
+          <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed">
+            Authorized personnel login for catalog, logistics, and storefront operations.
           </p>
         </div>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-xs mb-6 rounded-sm flex items-center gap-2">
-            <ShieldAlert className="w-4 h-4 shrink-0" />
+        {/* Lockout or Error Notice */}
+        {remainingLockoutMin !== null && (
+          <div className="bg-amber-50 border border-amber-300 text-amber-900 px-4 py-3 text-xs mb-5 rounded-sm flex items-start gap-2.5">
+            <ShieldAlert className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+            <div>
+              <strong className="block font-bold">Temporary Account Lockout</strong>
+              <span className="leading-relaxed">
+                Too many failed sign-in attempts. For security, please wait {remainingLockoutMin} minutes before trying again.
+              </span>
+            </div>
+          </div>
+        )}
+
+        {error && remainingLockoutMin === null && (
+          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 text-xs mb-5 rounded-sm flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 text-red-700 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
+        {/* Login Form */}
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold tracking-wider uppercase text-neutral-700 mb-1.5">
+            <label
+              htmlFor="admin-email-input"
+              className="block text-xs font-bold tracking-wider uppercase text-neutral-700 mb-1.5"
+            >
               Admin Email Address
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
+                id="admin-email-input"
                 type="email"
                 required
+                autoComplete="username"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@evaravastra.com"
-                className="w-full pl-10 pr-3.5 py-2.5 bg-neutral-50 border border-neutral-300 text-neutral-900 text-sm rounded-sm focus:bg-white focus:border-brand focus:ring-1 focus:ring-brand outline-none transition-all"
+                onChange={handleEmailChange}
+                placeholder="Enter your administrative email"
+                className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-neutral-300 text-neutral-900 text-sm rounded-sm focus:border-[#734E06] focus:ring-1 focus:ring-[#734E06] outline-none transition-all"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold tracking-wider uppercase text-neutral-700 mb-1.5">
+            <label
+              htmlFor="admin-password-input"
+              className="block text-xs font-bold tracking-wider uppercase text-neutral-700 mb-1.5"
+            >
               Security Password
             </label>
             <div className="relative">
               <Lock className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
-                type="password"
+                id="admin-password-input"
+                type={showPassword ? "text" : "password"}
                 required
+                autoComplete="current-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full pl-10 pr-3.5 py-2.5 bg-neutral-50 border border-neutral-300 text-neutral-900 text-sm rounded-sm focus:bg-white focus:border-brand focus:ring-1 focus:ring-brand outline-none transition-all"
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError(null);
+                }}
+                placeholder="Enter your password"
+                className="w-full pl-10 pr-11 py-2.5 bg-white border border-neutral-300 text-neutral-900 text-sm rounded-sm focus:border-[#734E06] focus:ring-1 focus:ring-[#734E06] outline-none transition-all"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 
           <button
             type="submit"
-            disabled={isSubmitting}
-            className="w-full py-3 bg-brand text-brand-foreground hover:bg-brand-hover text-xs font-bold tracking-wider uppercase rounded-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-50 mt-2 shadow-sm min-h-[44px]"
+            disabled={isSubmitting || remainingLockoutMin !== null}
+            className="w-full py-3 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold tracking-wider uppercase rounded-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-50 mt-3 shadow-xs min-h-[44px]"
           >
-            <span>{isSubmitting ? "Authenticating..." : "Access Control Suite"}</span>
+            <span>{isSubmitting ? "Verifying Credentials..." : "Sign In to Admin Suite"}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        {/* Demo Role Helpers */}
-        <div className="mt-8 pt-6 border-t border-neutral-200">
-          <span className="text-[10px] font-bold tracking-wider uppercase text-neutral-400 block mb-2 text-center">
-            Demo Credentials & Role Pre-fills
-          </span>
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <button
-              type="button"
-              onClick={() => handleFillDemo("admin@evaravastra.com")}
-              className="px-2.5 py-2 border border-neutral-200 hover:border-brand hover:text-brand text-neutral-700 rounded-sm text-left transition-colors"
-            >
-              <strong className="block text-[11px]">Super Admin</strong>
-              <span className="text-[10px] text-neutral-400 truncate block">admin@evaravastra.com</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleFillDemo("store@evaravastra.com")}
-              className="px-2.5 py-2 border border-neutral-200 hover:border-brand hover:text-brand text-neutral-700 rounded-sm text-left transition-colors"
-            >
-              <strong className="block text-[11px]">Store Admin</strong>
-              <span className="text-[10px] text-neutral-400 truncate block">store@evaravastra.com</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleFillDemo("fulfillment@evaravastra.com")}
-              className="px-2.5 py-2 border border-neutral-200 hover:border-brand hover:text-brand text-neutral-700 rounded-sm text-left transition-colors"
-            >
-              <strong className="block text-[11px]">Order Manager</strong>
-              <span className="text-[10px] text-neutral-400 truncate block">fulfillment@evaravastra.com</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleFillDemo("editor@evaravastra.com")}
-              className="px-2.5 py-2 border border-neutral-200 hover:border-brand hover:text-brand text-neutral-700 rounded-sm text-left transition-colors"
-            >
-              <strong className="block text-[11px]">Content Lead</strong>
-              <span className="text-[10px] text-neutral-400 truncate block">editor@evaravastra.com</span>
-            </button>
-          </div>
+        {/* Security Assurance & Storefront Navigation */}
+        <div className="mt-8 pt-6 border-t border-neutral-200 text-center space-y-3">
+          <p className="text-[11px] text-neutral-500 m-0">
+            Encrypted Session Management • PBKDF2 Password Hashing
+          </p>
 
-          <div className="mt-4 text-center">
+          <div>
             <button
               onClick={() => onNavigate("/")}
-              className="text-xs text-neutral-500 hover:text-neutral-900 transition-colors p-2"
+              className="text-xs text-neutral-600 hover:text-[#734E06] transition-colors p-2 font-medium"
             >
               ← Return to Customer Storefront
             </button>

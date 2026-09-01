@@ -58,6 +58,7 @@ import { AdminLookbookPage } from "./admin/AdminLookbookPage";
 import { AdminCouponsPage } from "./admin/AdminCouponsPage";
 import { AdminMediaPage } from "./admin/AdminMediaPage";
 import { AdminSettingsPage } from "./admin/AdminSettingsPage";
+import { AdminSecurityPage } from "./admin/AdminSecurityPage";
 import { AdminAnalyticsPage } from "./admin/AdminAnalyticsPage";
 import { AdminUsersPage } from "./admin/AdminUsersPage";
 import { AdminAuditLogsPage } from "./admin/AdminAuditLogsPage";
@@ -73,7 +74,7 @@ import { AccountProfilePage } from "./pages/AccountProfilePage";
 import { OrderConfirmationPage } from "./pages/OrderConfirmationPage";
 
 const AppContent: React.FC = () => {
-  const { siteSettings } = useData();
+  const { siteSettings, isAdminAuthenticated } = useData();
   const location = useLocation();
   const navigateRouter = useNavigate();
   const currentPath = location.pathname;
@@ -143,6 +144,11 @@ const AppContent: React.FC = () => {
   // Admin Router
   const renderAdminRoute = () => {
     if (currentPath === "/admin/login") {
+      return <AdminLoginPage onNavigate={navigate} />;
+    }
+
+    // Strict route protection: unauthenticated users are directed to login
+    if (!isAdminAuthenticated) {
       return <AdminLoginPage onNavigate={navigate} />;
     }
 
@@ -218,6 +224,9 @@ const AppContent: React.FC = () => {
       }
       if (currentPath === "/admin/media") {
         return <AdminMediaPage onNavigate={navigate} />;
+      }
+      if (currentPath === "/admin/settings/security" || currentPath === "/admin/security") {
+        return <AdminSecurityPage onNavigate={navigate} />;
       }
       if (currentPath === "/admin/settings") {
         return <AdminSettingsPage onNavigate={navigate} />;
