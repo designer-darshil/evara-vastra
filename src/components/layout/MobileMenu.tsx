@@ -1,7 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useData } from "../../context/DataContext";
-import { useShop } from "../../context/ShopContext";
-import { X, Shield, Phone, MapPin, Sun, Moon } from "lucide-react";
+import {
+  X,
+  ChevronDown,
+  Phone,
+  MapPin,
+  Heart,
+  ShoppingBag,
+  User,
+  Sparkles,
+} from "lucide-react";
+import { cn } from "../../lib/utils";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -14,18 +23,29 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
   onClose,
   onNavigate,
 }) => {
-  const { activeCategories, siteSettings, isAdminAuthenticated } = useData();
-  const { theme, toggleTheme } = useShop();
+  const { activeCategories, activeCollections, siteSettings } = useData();
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(true);
+  const [isCollectionsOpen, setIsCollectionsOpen] = useState(false);
 
-  // Close on Escape key
+  // Close on Escape key & manage body scroll lock
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
         onClose();
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", handleKeyDown);
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
@@ -37,295 +57,234 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
 
   return (
     <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.65)",
-        backdropFilter: "blur(4px)",
-        WebkitBackdropFilter: "blur(4px)",
-        zIndex: 99999,
-        display: "flex",
-        justifyContent: "flex-start",
-      }}
+      className="fixed inset-0 z-[99999] flex justify-start bg-black/60 transition-opacity duration-300"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Navigation Menu"
     >
       <div
-        style={{
-          backgroundColor: "var(--bg-surface)",
-          color: "var(--text-primary)",
-          width: "88%",
-          maxWidth: "380px",
-          height: "100%",
-          overflowY: "auto",
-          padding: "1.75rem 1.25rem",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          boxShadow: "var(--shadow-elevated)",
-          transition: "background-color 0.3s ease, color 0.3s ease",
-        }}
+        className="relative w-[85%] max-w-[340px] h-full bg-white text-foreground shadow-2xl flex flex-col justify-between overflow-y-auto animate-in slide-in-from-left duration-300 border-r border-border"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Top Header */}
         <div>
-          {/* Header */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              borderBottom: "1px solid var(--border-subtle)",
-              paddingBottom: "1.25rem",
-              marginBottom: "1.25rem",
-            }}
-          >
-            <div>
-              <span className="font-serif" style={{ fontSize: "1.35rem", fontWeight: 700, letterSpacing: "0.1em", color: "var(--text-primary)" }}>
+          <div className="flex items-center justify-between p-4 border-b border-border">
+            <div className="min-w-0 pr-2">
+              <span className="font-serif text-lg font-bold tracking-[0.14em] text-foreground block truncate">
                 {siteSettings.name || "EVARA VASTRA"}
               </span>
-              <span style={{ fontSize: "0.62rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--accent-gold)", display: "block", marginTop: "0.1rem" }}>
-                CONTEMPORARY INDIAN WOMENSWEAR
+              <span className="text-[8px] tracking-[0.2em] uppercase text-brand font-bold block mt-0.5">
+                CONTEMPORARY LUXURY
               </span>
             </div>
 
             <button
               onClick={onClose}
               aria-label="Close navigation menu"
-              style={{
-                color: "var(--text-primary)",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: "0.5rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                minWidth: "44px",
-                minHeight: "44px",
-              }}
+              className="flex items-center justify-center h-11 w-11 min-h-[44px] min-w-[44px] rounded-sm text-foreground hover:text-brand hover:bg-secondary transition-colors"
             >
-              <X size={24} />
+              <X className="h-6 w-6 stroke-[1.75]" />
             </button>
           </div>
 
-          {/* Quick Category Navigation */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+          {/* Quick Commerce Action Bar */}
+          <div className="grid grid-cols-3 border-b border-border bg-secondary/30 text-center">
+            <button
+              onClick={() => handleLink("/account")}
+              className="flex flex-col items-center justify-center py-3 min-h-[48px] hover:text-brand transition-colors text-xs font-medium border-r border-border"
+            >
+              <User className="h-4 w-4 mb-1" />
+              <span>Account</span>
+            </button>
+            <button
+              onClick={() => handleLink("/wishlist")}
+              className="flex flex-col items-center justify-center py-3 min-h-[48px] hover:text-brand transition-colors text-xs font-medium border-r border-border"
+            >
+              <Heart className="h-4 w-4 mb-1" />
+              <span>Wishlist</span>
+            </button>
+            <button
+              onClick={() => handleLink("/cart")}
+              className="flex flex-col items-center justify-center py-3 min-h-[48px] hover:text-brand transition-colors text-xs font-medium"
+            >
+              <ShoppingBag className="h-4 w-4 mb-1" />
+              <span>Bag</span>
+            </button>
+          </div>
+
+          {/* Primary Navigation List */}
+          <div className="p-3 flex flex-col gap-1">
+            {/* Shop All */}
             <button
               onClick={() => handleLink("/shop")}
-              style={{
-                textAlign: "left",
-                fontSize: "1rem",
-                fontWeight: 700,
-                color: "var(--text-primary)",
-                padding: "0.6rem 0.5rem",
-                minHeight: "44px",
-                display: "flex",
-                alignItems: "center",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
+              className="w-full text-left px-3 py-2.5 min-h-[44px] flex items-center text-sm font-semibold tracking-wider uppercase text-foreground hover:text-brand hover:bg-secondary/50 rounded-sm transition-colors"
             >
-              Shop All Products
+              Shop All Catalog
             </button>
 
-            {/* Individual Categories */}
-            <div style={{ paddingLeft: "0.75rem", display: "flex", flexDirection: "column", gap: "0.15rem", borderLeft: "2px solid var(--accent-wine-subtle)", marginLeft: "0.5rem", marginBottom: "0.75rem" }}>
-              {activeCategories.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => handleLink(`/shop/${cat.slug}`)}
-                  style={{
-                    textAlign: "left",
-                    fontSize: "0.9rem",
-                    color: "var(--text-secondary)",
-                    padding: "0.45rem 0.5rem",
-                    minHeight: "40px",
-                    display: "flex",
-                    alignItems: "center",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  {cat.name}
-                </button>
-              ))}
+            {/* Categories Accordion */}
+            <div className="border-t border-border/60 pt-1">
               <button
-                onClick={() => handleLink("/shop?filter=newArrival")}
-                style={{
-                  textAlign: "left",
-                  fontSize: "0.9rem",
-                  fontWeight: 600,
-                  color: "var(--accent-wine)",
-                  padding: "0.45rem 0.5rem",
-                  minHeight: "40px",
-                  display: "flex",
-                  alignItems: "center",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                }}
+                type="button"
+                onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
+                className="w-full text-left px-3 py-2.5 min-h-[44px] flex items-center justify-between text-sm font-semibold tracking-wider uppercase text-foreground hover:text-brand rounded-sm transition-colors"
               >
-                ★ New Season Drops
+                <span>Silhouettes & Weaves</span>
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 transition-transform duration-200 text-muted-foreground",
+                    isCategoriesOpen && "rotate-180"
+                  )}
+                />
               </button>
+
+              {isCategoriesOpen && (
+                <div className="pl-4 pr-2 py-1 flex flex-col gap-0.5 border-l-2 border-brand/30 ml-3 mb-2">
+                  <button
+                    onClick={() => handleLink("/shop/sarees")}
+                    className="w-full text-left px-2 py-2 min-h-[40px] flex items-center text-xs font-medium text-muted-foreground hover:text-brand transition-colors"
+                  >
+                    Sarees
+                  </button>
+                  <button
+                    onClick={() => handleLink("/shop/coord-sets")}
+                    className="w-full text-left px-2 py-2 min-h-[40px] flex items-center text-xs font-medium text-muted-foreground hover:text-brand transition-colors"
+                  >
+                    Co-ord Sets
+                  </button>
+                  <button
+                    onClick={() => handleLink("/shop/kurta-sets")}
+                    className="w-full text-left px-2 py-2 min-h-[40px] flex items-center text-xs font-medium text-muted-foreground hover:text-brand transition-colors"
+                  >
+                    Kurta Sets
+                  </button>
+                  {activeCategories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => handleLink(`/shop/${cat.slug}`)}
+                      className="w-full text-left px-2 py-2 min-h-[40px] flex items-center text-xs font-medium text-muted-foreground hover:text-brand transition-colors truncate"
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
+            {/* Collections Accordion */}
+            <div className="border-t border-border/60 pt-1">
+              <button
+                type="button"
+                onClick={() => setIsCollectionsOpen(!isCollectionsOpen)}
+                className="w-full text-left px-3 py-2.5 min-h-[44px] flex items-center justify-between text-sm font-semibold tracking-wider uppercase text-foreground hover:text-brand rounded-sm transition-colors"
+              >
+                <span>Curated Collections</span>
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 transition-transform duration-200 text-muted-foreground",
+                    isCollectionsOpen && "rotate-180"
+                  )}
+                />
+              </button>
+
+              {isCollectionsOpen && (
+                <div className="pl-4 pr-2 py-1 flex flex-col gap-0.5 border-l-2 border-brand/30 ml-3 mb-2">
+                  <button
+                    onClick={() => handleLink("/collections")}
+                    className="w-full text-left px-2 py-2 min-h-[40px] flex items-center text-xs font-semibold text-brand hover:underline transition-colors"
+                  >
+                    All Collections →
+                  </button>
+                  {activeCollections.map((col) => (
+                    <button
+                      key={col.id}
+                      onClick={() => handleLink(`/collections/${col.slug}`)}
+                      className="w-full text-left px-2 py-2 min-h-[40px] flex items-center text-xs font-medium text-muted-foreground hover:text-brand transition-colors truncate"
+                    >
+                      {col.title}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Highlights */}
             <button
-              onClick={() => handleLink("/collections")}
-              style={{
-                textAlign: "left",
-                fontSize: "0.95rem",
-                fontWeight: 600,
-                color: "var(--text-primary)",
-                padding: "0.6rem 0.5rem",
-                minHeight: "44px",
-                display: "flex",
-                alignItems: "center",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
+              onClick={() => handleLink("/shop?filter=newArrival")}
+              className="w-full text-left px-3 py-2.5 min-h-[44px] flex items-center gap-2 text-sm font-semibold tracking-wider uppercase text-brand hover:bg-secondary/50 rounded-sm transition-colors border-t border-border/60"
             >
-              Curated Collections
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>New Season Drops</span>
+            </button>
+
+            <button
+              onClick={() => handleLink("/shop?filter=sale")}
+              className="w-full text-left px-3 py-2.5 min-h-[44px] flex items-center text-sm font-semibold tracking-wider uppercase text-evara-orange hover:bg-secondary/50 rounded-sm transition-colors"
+            >
+              Sale & Offers
             </button>
 
             <button
               onClick={() => handleLink("/account/orders")}
-              style={{
-                textAlign: "left",
-                fontSize: "0.95rem",
-                fontWeight: 600,
-                color: "var(--text-primary)",
-                padding: "0.6rem 0.5rem",
-                minHeight: "44px",
-                display: "flex",
-                alignItems: "center",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
+              className="w-full text-left px-3 py-2.5 min-h-[44px] flex items-center text-sm font-medium text-foreground hover:text-brand hover:bg-secondary/50 rounded-sm transition-colors border-t border-border/60"
             >
               Track Your Order
             </button>
 
             <button
               onClick={() => handleLink("/about")}
-              style={{
-                textAlign: "left",
-                fontSize: "0.95rem",
-                fontWeight: 600,
-                color: "var(--text-primary)",
-                padding: "0.6rem 0.5rem",
-                minHeight: "44px",
-                display: "flex",
-                alignItems: "center",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
+              className="w-full text-left px-3 py-2.5 min-h-[44px] flex items-center text-sm font-medium text-foreground hover:text-brand hover:bg-secondary/50 rounded-sm transition-colors"
             >
-              Our Story & Heritage
+              Our Atelier Heritage
             </button>
 
             <button
               onClick={() => handleLink("/contact")}
-              style={{
-                textAlign: "left",
-                fontSize: "0.95rem",
-                fontWeight: 600,
-                color: "var(--text-primary)",
-                padding: "0.6rem 0.5rem",
-                minHeight: "44px",
-                display: "flex",
-                alignItems: "center",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
+              className="w-full text-left px-3 py-2.5 min-h-[44px] flex items-center text-sm font-medium text-foreground hover:text-brand hover:bg-secondary/50 rounded-sm transition-colors"
             >
-              Customer Care & Contact
+              Concierge & Contact
             </button>
           </div>
         </div>
 
-        {/* Bottom Support, Theme Toggle & Admin Link */}
-        <div style={{ borderTop: "1px solid var(--border-subtle)", paddingTop: "1.25rem", marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-          {/* Theme Switcher Button */}
-          <button
-            onClick={toggleTheme}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "0.6rem 0.75rem",
-              backgroundColor: "var(--bg-surface-subtle)",
-              borderRadius: "4px",
-              border: "1px solid var(--border-subtle)",
-              color: "var(--text-primary)",
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              {theme === "light" ? <Moon size={16} /> : <Sun size={16} style={{ color: "var(--accent-gold)" }} />}
-              <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
-            </span>
-            <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", textTransform: "uppercase" }}>
-              {theme === "light" ? "Switch" : "Active"}
-            </span>
-          </button>
-
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8rem", color: "var(--text-secondary)" }}>
-            <Phone size={14} style={{ color: "var(--accent-wine)" }} />
+        {/* Bottom Support Footer */}
+        <div className="p-4 border-t border-border bg-secondary/20 flex flex-col gap-3">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Phone className="h-3.5 w-3.5 text-brand shrink-0" />
             <span>Care: +91-92743 44037</span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8rem", color: "var(--text-secondary)" }}>
-            <MapPin size={14} style={{ color: "var(--accent-wine)" }} />
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <MapPin className="h-3.5 w-3.5 text-brand shrink-0" />
             <span>Surat, Gujarat, India</span>
           </div>
 
-          <div style={{ display: "flex", gap: "1rem", marginTop: "0.25rem", fontSize: "0.75rem", color: "var(--text-muted)" }}>
-            <button onClick={() => handleLink("/shipping-policy")} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 0 }}>
-              Shipping
+          <div className="flex flex-wrap gap-2 text-[11px] text-muted-foreground pt-1 border-t border-border/60">
+            <button
+              onClick={() => handleLink("/shipping-policy")}
+              className="hover:text-brand transition-colors"
+            >
+              Shipping Policy
             </button>
             <span>•</span>
-            <button onClick={() => handleLink("/replacement-exchange-policy")} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 0 }}>
-              Exchange
+            <button
+              onClick={() => handleLink("/replacement-exchange-policy")}
+              className="hover:text-brand transition-colors"
+            >
+              Exchange Policy
             </button>
             <span>•</span>
-            <button onClick={() => handleLink("/privacy")} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 0 }}>
+            <button
+              onClick={() => handleLink("/privacy-policy")}
+              className="hover:text-brand transition-colors"
+            >
               Privacy
             </button>
           </div>
-
-          <button
-            onClick={() => handleLink(isAdminAuthenticated ? "/admin" : "/admin/login")}
-            style={{
-              textAlign: "left",
-              fontSize: "0.8rem",
-              fontWeight: 700,
-              color: "var(--accent-wine)",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.4rem",
-              marginTop: "0.25rem",
-              padding: "0.6rem 0",
-              minHeight: "44px",
-              borderTop: "1px dashed var(--border-subtle)",
-              background: "none",
-              cursor: "pointer",
-            }}
-          >
-            <Shield size={14} />
-            <span>{isAdminAuthenticated ? "Atelier Admin Dashboard" : "Atelier Admin Portal"}</span>
-          </button>
         </div>
       </div>
     </div>
   );
 };
+

@@ -12,7 +12,13 @@ const config = {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: {
+        DEFAULT: "1rem",
+        sm: "1.5rem",
+        md: "2rem",
+        lg: "2.5rem",
+        xl: "3rem",
+      },
       screens: {
         "2xl": "1400px",
       },
@@ -48,6 +54,12 @@ const config = {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        brand: {
+          DEFAULT: "#734E06",
+          foreground: "#FFFFFF",
+          hover: "#5C3E05",
+          light: "#FDF8F0",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -57,13 +69,13 @@ const config = {
           foreground: "hsl(var(--card-foreground))",
         },
         // Evara Accent Colors
-        "evara-purple": {
-          DEFAULT: "#4F46E5",
-          hover: "#4338CA",
+        "evara-gold": {
+          DEFAULT: "#734E06",
+          hover: "#5C3E05",
         },
         "evara-orange": {
-          DEFAULT: "#F97316",
-          hover: "#EA580C",
+          DEFAULT: "#D97706",
+          hover: "#B45309",
         },
       },
       borderRadius: {
