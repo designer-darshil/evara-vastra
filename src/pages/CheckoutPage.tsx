@@ -649,7 +649,8 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
       {/* Fastrr Checkout Popup Modal */}
       {isFastrrModalOpen && activeIntent && (
         <div
-          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/75 z-[99999] flex items-center justify-center p-4"
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/75 z-modal flex items-center justify-center p-4"
+          style={{ zIndex: 70 }}
           onClick={() => {
             if (!isProcessingPayment) setIsFastrrModalOpen(false);
           }}

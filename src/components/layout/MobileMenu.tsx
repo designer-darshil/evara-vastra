@@ -57,7 +57,8 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
 
   return (
     <div
-      className="fixed inset-0 min-h-[100dvh] h-[100dvh] z-[99999] flex justify-start bg-black/60 transition-opacity duration-300"
+      className="fixed inset-0 min-h-[100dvh] h-[100dvh] z-drawer flex justify-start bg-black/60 transition-opacity duration-300"
+      style={{ zIndex: 60 }}
       onClick={onClose}
       role="dialog"
       aria-modal="true"

@@ -463,7 +463,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({
       {/* Mobile Filter Drawer */}
       {isMobileFilterOpen && (
         <div
-          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-[99999] flex justify-end"
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-drawer flex justify-end"
+          style={{ zIndex: 60 }}
           onClick={() => setIsMobileFilterOpen(false)}
         >
           <div

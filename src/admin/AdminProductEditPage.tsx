@@ -1078,7 +1078,10 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
 
       {/* Unsaved Changes Confirmation Modal */}
       {showUnsavedModal && (
-        <div className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-50 flex items-center justify-center p-4">
+        <div
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4"
+          style={{ zIndex: 70 }}
+        >
           <div className="bg-white border border-neutral-200 rounded-sm max-w-sm w-full p-6 shadow-2xl space-y-4">
             <div className="flex items-center gap-2 text-amber-700">
               <AlertTriangle className="w-5 h-5" />

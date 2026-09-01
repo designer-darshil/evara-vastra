@@ -168,7 +168,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       {/* Lightbox Focused Image Viewer Modal */}
       {isLightboxOpen && (
         <div
-          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/95 z-[999999] flex items-center justify-center p-4 sm:p-8"
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/95 z-lightbox flex items-center justify-center p-4 sm:p-8"
+          style={{ zIndex: 80 }}
           onClick={() => setIsLightboxOpen(false)}
         >
           <button

@@ -183,7 +183,7 @@ export const AdminCollectionsPage: React.FC<{ onNavigate: (href: string) => void
             minHeight: "100dvh",
             height: "100dvh",
             backgroundColor: "rgba(0,0,0,0.6)",
-            zIndex: 99999,
+            zIndex: 70,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

@@ -12,7 +12,7 @@ export interface CartItem {
 export interface ToastItem {
   id: string;
   message: string;
-  type?: "cart" | "wishlist" | "info";
+  type?: "cart" | "wishlist" | "info" | "error";
 }
 
 interface ShopContextType {
@@ -55,7 +55,8 @@ interface ShopContextType {
   closeQuickView: () => void;
 
   // Feedback & Interactions
-  showToast: (message: string, type?: "cart" | "wishlist" | "info") => void;
+  showToast: (message: string, type?: "cart" | "wishlist" | "info" | "error") => void;
+  dismissToast: (id: string) => void;
   setCursorLabel: (label: string | null) => void;
   addRecentlyViewed: (productId: string) => void;
 }
@@ -152,12 +153,16 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [wishlist]);
 
   // Toast manager
-  const showToast = (message: string, type: "cart" | "wishlist" | "info" = "info") => {
+  const showToast = (message: string, type: "cart" | "wishlist" | "info" | "error" = "info") => {
     const id = Date.now().toString() + Math.random().toString().slice(2, 5);
     setToasts((prev) => [...prev, { id, message, type }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 3800);
+    }, 3200);
+  };
+
+  const dismissToast = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
   // Cart operations
@@ -182,13 +187,12 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return [...prev, { product, quantity, blouseOptIn, selectedSize: size, selectedColor }];
     });
 
-    showToast(`Added "${product.title}" to shopping bag.`, "cart");
+    // Opening the cart drawer is the primary confirmation
     setIsCartDrawerOpen(true);
   };
 
   const removeFromCart = (productId: string) => {
     setCart((prev) => prev.filter((item) => item.product.id !== productId));
-    showToast("Item removed from bag.", "info");
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
@@ -289,6 +293,7 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
         closeQuickView,
 
         showToast,
+        dismissToast,
         setCursorLabel,
         addRecentlyViewed,
       }}

@@ -362,7 +362,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       {/* Mobile Drawer Navigation */}
       {isMobileNavOpen && (
         <div
-          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-50 lg:hidden flex"
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-drawer lg:hidden flex"
+          style={{ zIndex: 60 }}
           onClick={() => setIsMobileNavOpen(false)}
         >
           <div

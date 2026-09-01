@@ -483,7 +483,10 @@ export const AdminMediaInput: React.FC<AdminMediaInputProps> = ({
 
       {/* Replace Dialog Modal */}
       {replaceTargetIndex !== null && (
-        <div className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-50 flex items-center justify-center p-4">
+        <div
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4"
+          style={{ zIndex: 70 }}
+        >
           <div className="bg-white border border-neutral-200 rounded-sm max-w-md w-full p-6 shadow-2xl space-y-4">
             <h3 className="text-sm font-bold text-neutral-900 m-0">
               Replace Image #{replaceTargetIndex + 1}
@@ -546,7 +549,10 @@ export const AdminMediaInput: React.FC<AdminMediaInputProps> = ({
 
       {/* Edit Alt Modal */}
       {editingAltIndex !== null && (
-        <div className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-50 flex items-center justify-center p-4">
+        <div
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4"
+          style={{ zIndex: 70 }}
+        >
           <div className="bg-white border border-neutral-200 rounded-sm max-w-md w-full p-6 shadow-2xl space-y-4">
             <h3 className="text-sm font-bold text-neutral-900 m-0">
               Edit Accessibility Alt Text

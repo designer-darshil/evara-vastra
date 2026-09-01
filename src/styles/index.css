@@ -54,6 +54,18 @@
     --ring: 40 90% 24%;
 
     --radius: 0.15rem; /* Restrained / Minimal rounding */
+
+    /* Global Semantic Overlay & Layering Hierarchy */
+    --z-base: 0;
+    --z-badge: 10;
+    --z-sticky: 20;
+    --z-header: 30;
+    --z-dropdown: 40;
+    --z-toast: 50;
+    --z-drawer: 60;
+    --z-modal: 70;
+    --z-lightbox: 80;
+    --z-loader: 90;
   }
 
   .dark {

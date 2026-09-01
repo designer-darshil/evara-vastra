@@ -9,7 +9,7 @@ export const AppLoader: React.FC<{ isLoading: boolean }> = ({ isLoading }) => {
         position: "fixed",
         inset: 0,
         backgroundColor: "var(--bg-primary)",
-        zIndex: 9999999,
+        zIndex: 90,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",

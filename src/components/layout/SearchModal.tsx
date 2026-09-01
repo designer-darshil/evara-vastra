@@ -66,7 +66,8 @@ export const SearchModal: React.FC<{ onNavigate: (href: string) => void }> = ({
 
   return (
     <div
-      className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/65 z-[99999] flex flex-col items-center justify-start pt-12 sm:pt-20 px-3 sm:px-6 animate-in fade-in duration-200"
+      className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/65 z-modal flex flex-col items-center justify-start pt-12 sm:pt-20 px-3 sm:px-6 animate-in fade-in duration-200"
+      style={{ zIndex: 70 }}
       onClick={closeSearch}
       role="dialog"
       aria-modal="true"

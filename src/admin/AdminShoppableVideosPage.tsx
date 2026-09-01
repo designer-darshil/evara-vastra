@@ -398,7 +398,8 @@ export const AdminShoppableVideosPage: React.FC<{ onNavigate?: (href: string) =>
       {/* Edit / Create Video Drawer Modal */}
       {editingVideo && (
         <div
-          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-[999] flex items-center justify-center p-4"
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4"
+          style={{ zIndex: 70 }}
           onClick={() => setEditingVideo(null)}
         >
           <div
@@ -746,7 +747,8 @@ export const AdminShoppableVideosPage: React.FC<{ onNavigate?: (href: string) =>
       {/* Delete Confirmation Modal */}
       {deleteConfirmId && (
         <div
-          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-[999] flex items-center justify-center p-4"
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4"
+          style={{ zIndex: 70 }}
           onClick={() => setDeleteConfirmId(null)}
         >
           <div
@@ -784,7 +786,8 @@ export const AdminShoppableVideosPage: React.FC<{ onNavigate?: (href: string) =>
       {/* Live Video Preview Modal */}
       {videoPreviewUrl && (
         <div
-          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/80 z-[9999] flex items-center justify-center p-4"
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/80 z-modal flex items-center justify-center p-4"
+          style={{ zIndex: 70 }}
           onClick={() => setVideoPreviewUrl(null)}
         >
           <div

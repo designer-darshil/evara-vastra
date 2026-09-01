@@ -111,7 +111,8 @@ export const ShoppableVideosSection: React.FC<{ onNavigate: (href: string) => vo
       {/* Interactive Modal Video Player */}
       {activeModalVideo && (
         <div
-          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/90 z-[9999] flex items-center justify-center p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/90 z-modal flex items-center justify-center p-4 animate-in fade-in duration-200"
+          style={{ zIndex: 70 }}
           onClick={() => setActiveModalVideo(null)}
         >
           <div

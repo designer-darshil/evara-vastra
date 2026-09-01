@@ -192,8 +192,10 @@ export const OrdersPage: React.FC<{ onNavigate: (href: string) => void }> = ({
           style={{
             position: "fixed",
             inset: 0,
+            minHeight: "100dvh",
+            height: "100dvh",
             backgroundColor: "rgba(23,21,19,0.7)",
-            zIndex: 99999,
+            zIndex: 70,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

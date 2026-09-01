@@ -564,7 +564,10 @@ export const AdminShipmentsPage: React.FC<{ onNavigate?: (href: string) => void 
 
       {/* TRACKING TIMELINE MODAL */}
       {trackingModalShipment && (
-        <div className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-50 flex items-center justify-center p-4">
+        <div
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4"
+          style={{ zIndex: 70 }}
+        >
           <div className="bg-white max-w-lg w-full rounded-sm border border-neutral-200 shadow-xl overflow-hidden animate-in fade-in zoom-in-95">
             <div className="p-4 border-b border-neutral-200 flex items-center justify-between bg-neutral-50">
               <div>
@@ -656,7 +659,10 @@ export const AdminShipmentsPage: React.FC<{ onNavigate?: (href: string) => void 
 
       {/* CANCEL SHIPMENT MODAL */}
       {cancelModalShipment && (
-        <div className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-50 flex items-center justify-center p-4">
+        <div
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4"
+          style={{ zIndex: 70 }}
+        >
           <div className="bg-white max-w-md w-full rounded-sm border border-neutral-200 shadow-xl overflow-hidden p-6 animate-in fade-in">
             <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4">
               <AlertCircle className="w-6 h-6" />
