@@ -4,6 +4,7 @@ import { ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
 import { MagneticButton } from "../common/MagneticButton";
 import { Button } from "../ui/button";
 import { PageContainer } from "../common/PageContainer";
+import { FullBleedSection } from "../common/FullBleedSection";
 
 interface HeroSectionProps {
   onNavigate?: (href: string) => void;
@@ -16,101 +17,112 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
     if (onNavigate) onNavigate(href);
   };
 
+  const desktopImage =
+    homepageCMS.heroImage ||
+    "https://cdn.shopify.com/s/files/1/0719/5974/0506/files/6073220371323753311.jpg?v=1788176983";
+  const mobileImage =
+    homepageCMS.heroMobileImage ||
+    "https://cdn.shopify.com/s/files/1/0719/5974/0506/files/6073220371323753379.jpg?v=1788176378";
+
   return (
-    <section className="relative min-h-[clamp(auto,70dvh,calc(90dvh-72px))] flex items-center overflow-hidden bg-background pt-8 pb-12 sm:pt-10 sm:pb-16">
-      <PageContainer>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-8 items-center">
-          {/* Left Narrative Column */}
-          <div className="flex flex-col gap-6 z-10">
-            {/* Season Badge */}
-            <div className="inline-flex items-center gap-2">
-              <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-accent flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" /> {homepageCMS.heroBadge || "AUTUMN / WINTER 2026"}
+    <FullBleedSection
+      as="section"
+      aria-label="Featured Collection Hero"
+      className="relative flex items-center min-h-[78dvh] sm:min-h-[85dvh] lg:min-h-[92dvh] max-h-[100dvh] bg-neutral-950 text-white select-none"
+    >
+      {/* ========================================================================= */}
+      {/* 1. HERO MEDIA LAYER (Viewport Edge-to-Edge 100vw, Optimized High-Priority) */}
+      {/* ========================================================================= */}
+      <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden z-0">
+        <picture>
+          <source media="(max-width: 640px)" srcSet={mobileImage} />
+          <img
+            src={desktopImage}
+            alt="Evara Vastra Contemporary Indian Womenswear Collection"
+            fetchPriority="high"
+            loading="eager"
+            decoding="async"
+            className="w-full h-full object-cover object-[center_20%] sm:object-center brightness-[0.92] contrast-[1.03] transform-gpu scale-100 transition-transform duration-1000 ease-out will-change-transform motion-reduce:transform-none"
+          />
+        </picture>
+
+        {/* Restrained Gradient Overlay for Contrast & Typography (No Blur / No Glassmorphism) */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/25 sm:bg-gradient-to-r sm:from-black/80 sm:via-black/45 sm:to-transparent"
+          aria-hidden="true"
+        />
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. HERO CONTENT LAYER (Aligned with Standard Site-Wide Page Container)   */}
+      {/* ========================================================================= */}
+      <div className="relative z-10 w-full py-12 sm:py-16 md:py-20 lg:py-24">
+        <PageContainer>
+          <div className="max-w-xl md:max-w-2xl flex flex-col gap-4 sm:gap-6 animate-in fade-in slide-in-from-bottom-3 duration-700 motion-reduce:animate-none">
+            
+            {/* Eyebrow / Season Badge */}
+            <div className="inline-flex items-center gap-2 w-fit">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-white/10 text-white text-[10px] sm:text-[11px] font-bold tracking-[0.22em] uppercase border border-white/20">
+                <Sparkles className="w-3 h-3 text-[#D4AF37]" />
+                {homepageCMS.heroBadge || "NEW SEASON DROP • 2026"}
               </span>
-              <span className="text-border/80">•</span>
-              <span className="text-[11px] tracking-[0.14em] uppercase text-muted-foreground">
-                100% PURE SILK MARK
+              <span className="text-white/60 text-xs hidden xs:inline">•</span>
+              <span className="text-[10px] sm:text-[11px] font-medium tracking-[0.16em] uppercase text-white/80 hidden xs:inline">
+                HANDCRAFTED IN SURAT
               </span>
             </div>
 
-            {/* Main Headline */}
-            <h1 className="font-serif text-[clamp(2.75rem,5.2vw,4.75rem)] leading-[1.05] text-foreground font-medium tracking-tight m-0">
-              {homepageCMS.heroHeading}{" "}
-              <span className="italic text-accent font-normal">
-                {homepageCMS.heroAccentWord}
+            {/* Main Editorial Headline */}
+            <h1 className="font-serif text-[clamp(2.4rem,5.5vw,4.5rem)] leading-[1.08] text-white font-normal tracking-tight m-0 drop-shadow-sm text-balance">
+              {homepageCMS.heroHeading || "Contemporary Indian"}{" "}
+              <span className="italic font-normal text-[#F4D06F] block sm:inline">
+                {homepageCMS.heroAccentWord || "Womenswear"}
               </span>
             </h1>
 
-            {/* Editorial Lead Paragraph */}
-            <p className="text-[clamp(0.95rem,1.2vw,1.125rem)] leading-relaxed text-muted-foreground max-w-[520px] font-normal m-0">
-              {homepageCMS.heroSubheading}
+            {/* Supporting Editorial Narrative */}
+            <p className="text-sm sm:text-base md:text-[17px] leading-relaxed text-white/90 max-w-lg font-normal m-0 drop-shadow-xs">
+              {homepageCMS.heroSubheading ||
+                "Discover handcrafted sarees, designer co-ord sets, and festive kurta ensembles curated for effortless elegance."}
             </p>
 
             {/* Call To Actions */}
-            <div className="flex flex-wrap items-center gap-4 sm:gap-5 mt-2">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-2">
               <MagneticButton>
                 <Button
-                  onClick={() => handleNav(homepageCMS.primaryCtaLink || "/shop")}
-                  className="px-7 sm:px-8 py-5 sm:py-6 text-xs sm:text-sm font-semibold rounded-sm bg-brand text-brand-foreground hover:bg-brand-hover tracking-wider uppercase"
+                  onClick={() => handleNav(homepageCMS.primaryCtaLink || "/shop?filter=newArrival")}
+                  className="px-6 sm:px-8 py-5 sm:py-6 text-xs sm:text-sm font-semibold rounded-sm bg-brand text-brand-foreground hover:bg-brand-hover tracking-wider uppercase shadow-md transition-all duration-200 min-h-[44px]"
+                  style={{ backgroundColor: "#734E06", color: "#FFFFFF" }}
                 >
-                  {homepageCMS.primaryCtaText || "Shop The Collection"}
+                  {homepageCMS.primaryCtaText || "Shop New Arrivals"}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </MagneticButton>
 
               <Button
-                variant="link"
-                onClick={() => handleNav(homepageCMS.secondaryCtaLink || "/craftsmanship")}
-                className="text-xs sm:text-sm px-0 h-auto font-semibold text-foreground hover:text-brand transition-colors tracking-wider uppercase"
+                variant="outline"
+                onClick={() => handleNav(homepageCMS.secondaryCtaLink || "/shop/sarees")}
+                className="px-5 sm:px-7 py-5 sm:py-6 text-xs sm:text-sm font-semibold rounded-sm bg-white/10 hover:bg-white/20 text-white border-white/40 hover:border-white tracking-wider uppercase transition-colors min-h-[44px]"
               >
-                {homepageCMS.secondaryCtaText || "Explore The Craft"}
-                <ArrowRight className="w-4 h-4 ml-1" />
+                {homepageCMS.secondaryCtaText || "Explore Sarees"}
               </Button>
             </div>
 
-            {/* Trust Assurances */}
-            <div className="flex flex-wrap items-center gap-6 sm:gap-7 mt-4 sm:mt-6 pt-5 sm:pt-6 border-t border-border">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-brand" />
-                <span className="text-xs text-muted-foreground">
-                  Pure Silk Mark Certified
-                </span>
+            {/* Trust Badges */}
+            <div className="flex flex-wrap items-center gap-5 sm:gap-7 pt-4 sm:pt-6 border-t border-white/20 text-white/85 text-xs sm:text-[13px]">
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
+                <span>100% Authentic Handloom & Silks</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-brand text-sm">✦</span>
-                <span className="text-xs text-muted-foreground">
-                  Kadwa Pit Loom Weave
-                </span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[#D4AF37]">✦</span>
+                <span>Free Express Delivery Pan-India</span>
               </div>
             </div>
-          </div>
 
-          {/* Right Visual Image */}
-          <div className="relative flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-[460px] aspect-[3/4] border border-border overflow-hidden bg-secondary rounded-sm">
-              <img
-                src={homepageCMS.heroImage}
-                alt="Evara Vastra Saree"
-                fetchPriority="high"
-                className="w-full h-full object-cover transition-transform duration-1000 ease-out hover:scale-105"
-              />
-
-              {/* Floating Craftsmanship Badge */}
-              <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6 bg-white p-4 sm:p-5 border border-border shadow-md rounded-sm">
-                <span className="text-[10px] font-bold tracking-[0.18em] uppercase text-brand block mb-1">
-                  FEATURED DRAPE
-                </span>
-                <p className="font-serif text-base sm:text-[17px] text-foreground m-0 leading-snug">
-                  Raga Katan Silk in Deep Wine
-                </p>
-                <span className="text-[11px] text-muted-foreground block mt-1">
-                  18 days on handloom • Antique gold Kadwa zari
-                </span>
-              </div>
-            </div>
           </div>
-        </div>
-      </PageContainer>
-    </section>
+        </PageContainer>
+      </div>
+    </FullBleedSection>
   );
 };

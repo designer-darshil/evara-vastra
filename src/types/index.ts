@@ -243,6 +243,7 @@ export interface HomepageCMS {
   secondaryCtaText?: string;
   secondaryCtaLink?: string;
   heroImage: string;
+  heroMobileImage?: string;
   featuredCategoryIds: string[];
   featuredProductIds: string[];
   newArrivalProductIds: string[];

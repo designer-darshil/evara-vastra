@@ -2,7 +2,9 @@ import React from "react";
 import { useData } from "../context/DataContext";
 import { ProductCard } from "../components/common/ProductCard";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, RotateCcw } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { resolveCategoryOrCollection, matchesCategoryOrCollection } from "../lib/categoryUtils";
 
 export const CollectionDetailPage: React.FC<{
   collectionSlug: string;
@@ -10,232 +12,158 @@ export const CollectionDetailPage: React.FC<{
 }> = ({ collectionSlug, onNavigate }) => {
   const { collections, publishedProducts } = useData();
 
-  const collection =
-    collections.find((c) => c.slug === collectionSlug && c.isPublished) ||
-    collections.find((c) => c.isPublished) ||
-    collections[0];
+  const resolution = resolveCategoryOrCollection(collectionSlug);
 
-  if (!collection) {
-    return (
-      <div className="container" style={{ padding: "6rem 0", textAlign: "center" }}>
-        <h2>Collection Not Found</h2>
-        <button onClick={() => onNavigate("/collections")} className="btn-wine" style={{ marginTop: "1rem" }}>
-          View Collections
-        </button>
-      </div>
-    );
-  }
+  const matchedCollection = collections.find(
+    (c) => c.slug === collectionSlug || c.slug === resolution.canonicalCollection
+  );
 
   const collectionProducts = publishedProducts.filter((p) => {
-    if (collection.productIds && collection.productIds.length > 0 && collection.productIds.includes(p.id)) {
-      return true;
-    }
-    if (p.collections && Array.isArray(p.collections) && p.collections.includes(collection.slug)) {
-      return true;
-    }
-    if (p.collection === collection.slug) {
-      return true;
-    }
-    if (collection.slug === "premium-collection-saree" && p.category === "sarees") {
-      return true;
-    }
-    if (collection.slug === "aurelia-saree" && (p.title.toLowerCase().includes("aurelia") || p.title.toLowerCase().includes("fendy") || p.title.toLowerCase().includes("tissue") || p.title.toLowerCase().includes("saree"))) {
-      return true;
-    }
-    if (collection.slug === "everyday-elegance" && (p.category === "coord-sets" || p.category === "everyday-elegance" || p.category === "dresses")) {
-      return true;
-    }
-    if (collection.slug === "new-arrivals" && p.newArrival) {
-      return true;
-    }
-    if (collection.slug === "bestsellers" && p.bestseller) {
-      return true;
-    }
-    return false;
+    return matchesCategoryOrCollection(p, resolution);
   });
 
+  const heroImage =
+    matchedCollection?.heroImage ||
+    "https://cdn.shopify.com/s/files/1/0719/5974/0506/files/6073220371323753311.jpg?v=1788176983";
+
+  const title = matchedCollection?.title || resolution.title;
+  const subtitle = matchedCollection?.subtitle || resolution.subtitle || "Curated Atelier Edit";
+  const season = matchedCollection?.season || "Autumn / Festive 2026";
+  const editorialStatement =
+    matchedCollection?.editorialStatement ||
+    "Handcrafted with reverence to Indian heritage, designed for modern silhouettes.";
+  const story =
+    matchedCollection?.story ||
+    resolution.description ||
+    "Discover the artisanal beauty of Evara Vastra's curated collection.";
+
   const relatedCollections = collections
-    .filter((c) => c.id !== collection.id && c.isPublished)
+    .filter((c) => c.slug !== collectionSlug && c.isPublished)
     .slice(0, 2);
 
   return (
-    <div className="animate-fade-in" style={{ paddingBottom: "7rem" }}>
+    <div className="animate-in fade-in duration-500 pb-28">
       {/* Editorial Hero Banner */}
-      <div
-        style={{
-          position: "relative",
-          minHeight: "55dvh",
-          backgroundColor: "var(--bg-dark)",
-          color: "var(--text-inverse)",
-          display: "flex",
-          alignItems: "center",
-          overflow: "hidden",
-        }}
-      >
+      <div className="relative min-h-[50dvh] sm:min-h-[55dvh] bg-neutral-950 text-white flex items-center overflow-hidden">
         <img
-          src={collection.heroImage}
-          alt={collection.title}
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            opacity: 0.35,
-          }}
+          src={heroImage}
+          alt={title}
+          fetchPriority="high"
+          loading="eager"
+          className="absolute inset-0 w-full h-full object-cover object-center opacity-35"
         />
 
-        <div className="container" style={{ position: "relative", zIndex: 2, padding: "4rem 0" }}>
-          <div style={{ maxWidth: "680px" }}>
-            <span
-              style={{
-                fontSize: "0.72rem",
-                fontWeight: 600,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "var(--accent-gold)",
-                display: "block",
-                marginBottom: "0.5rem",
-              }}
-            >
-              {collection.season} • SIGNATURE EDIT
+        <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/40 to-transparent" />
+
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 sm:py-20">
+          <div className="max-w-2xl">
+            <span className="text-xs font-bold tracking-[0.2em] uppercase text-[#D4AF37] block mb-2">
+              {season} • SIGNATURE EDIT
             </span>
 
-            <h1
-              className="font-serif"
-              style={{
-                fontSize: "clamp(2.5rem, 4.5vw, 4.2rem)",
-                color: "#F8F4EE",
-                lineHeight: 1.1,
-                marginBottom: "1rem",
-              }}
-            >
-              {collection.title}
+            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] text-white leading-tight mb-3">
+              {title}
             </h1>
 
-            <p
-              className="font-serif"
-              style={{
-                fontSize: "1.3rem",
-                fontStyle: "italic",
-                color: "var(--accent-gold)",
-                marginBottom: "1rem",
-              }}
-            >
-              "{collection.editorialStatement}"
+            <p className="font-serif text-base sm:text-xl italic text-[#D4AF37] mb-3">
+              "{editorialStatement}"
             </p>
 
-            <p style={{ fontSize: "0.95rem", color: "var(--text-inverse-muted)", lineHeight: 1.6 }}>
-              {collection.story}
+            <p className="text-sm sm:text-base text-white/80 leading-relaxed max-w-xl m-0">
+              {story}
             </p>
           </div>
         </div>
       </div>
 
-      <div className="container" style={{ paddingTop: "3rem" }}>
+      <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10">
         <Breadcrumbs
           items={[
+            { label: "Home", href: "/" },
             { label: "Collections", href: "/collections" },
-            { label: collection.title },
+            { label: title },
           ]}
           onNavigate={onNavigate}
         />
 
         {/* Collection Products Grid */}
-        <div style={{ marginTop: "2rem" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "2.5rem",
-              borderBottom: "1px solid var(--border-subtle)",
-              paddingBottom: "1rem",
-            }}
-          >
-            <h2 className="font-serif" style={{ fontSize: "2rem", color: "var(--text-primary)" }}>
-              The Saree Archive ({collectionProducts.length})
-            </h2>
-            <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>
+        <div className="mt-8 sm:mt-10">
+          <div className="flex flex-wrap justify-between items-end mb-8 pb-4 border-b border-border gap-4">
+            <div>
+              <h2 className="font-serif text-2xl sm:text-3xl text-foreground m-0">
+                {title} ({collectionProducts.length})
+              </h2>
+              <span className="text-xs sm:text-sm text-muted-foreground mt-1 block">
+                {subtitle}
+              </span>
+            </div>
+
+            <span className="text-xs font-semibold uppercase tracking-widest text-brand">
               Warp & Weft Curations
             </span>
           </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-              gap: "2.5rem 1.75rem",
-            }}
-            className="mobile-product-grid"
-          >
-            {collectionProducts.map((p, idx) => (
-              <ProductCard key={p.id} product={p} index={idx} onNavigate={onNavigate} />
-            ))}
-          </div>
+          {collectionProducts.length === 0 ? (
+            <div className="py-20 px-6 text-center bg-secondary/30 border border-border rounded-sm">
+              <h3 className="font-serif text-2xl sm:text-3xl text-foreground m-0">
+                No Products Available in this Collection
+              </h3>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto mt-3 mb-6">
+                This curation is currently being refreshed by our atelier. Explore our complete catalog.
+              </p>
+              <Button onClick={() => onNavigate("/shop")} className="bg-brand hover:bg-brand-hover text-white">
+                <RotateCcw className="w-4 h-4 mr-2" /> View All Products
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+              {collectionProducts.map((p, idx) => (
+                <ProductCard key={p.id} product={p} index={idx} onNavigate={onNavigate} />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Related Collections */}
         {relatedCollections.length > 0 && (
-          <div style={{ marginTop: "6rem", borderTop: "1px solid var(--border-subtle)", paddingTop: "4rem" }}>
-            <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-              <span
-                style={{
-                  fontSize: "0.72rem",
-                  fontWeight: 600,
-                  letterSpacing: "0.2em",
-                  textTransform: "uppercase",
-                  color: "var(--accent-wine)",
-                  display: "block",
-                  marginBottom: "0.3rem",
-                }}
-              >
+          <div className="mt-20 sm:mt-24 border-t border-border pt-12 sm:pt-16">
+            <div className="text-center mb-10">
+              <span className="text-xs font-bold tracking-[0.2em] uppercase text-brand block mb-1">
                 EXPLORE OTHER EDITS
               </span>
-              <h3 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--text-primary)" }}>
+              <h3 className="font-serif text-2xl sm:text-3xl text-foreground">
                 More Atelier Collections
               </h3>
             </div>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-                gap: "2rem",
-              }}
-            >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
               {relatedCollections.map((col) => (
                 <div
                   key={col.id}
                   onClick={() => onNavigate(`/collections/${col.slug}`)}
-                  style={{
-                    cursor: "pointer",
-                    backgroundColor: "var(--bg-surface)",
-                    border: "1px solid var(--border-subtle)",
-                    overflow: "hidden",
-                    borderRadius: "3px",
-                  }}
+                  className="group cursor-pointer bg-card border border-border overflow-hidden rounded-sm hover:shadow-md transition-shadow"
                 >
-                  <div style={{ aspectRatio: "16/9", overflow: "hidden", backgroundColor: "var(--bg-surface-subtle)" }}>
+                  <div className="aspect-[16/9] overflow-hidden bg-muted">
                     <img
                       src={col.heroImage}
                       alt={col.title}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                   </div>
-                  <div style={{ padding: "1.5rem" }}>
-                    <span style={{ fontSize: "0.7rem", color: "var(--accent-gold)", fontWeight: 600, textTransform: "uppercase" }}>
+                  <div className="p-5 sm:p-6">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-brand block mb-1">
                       {col.season}
                     </span>
-                    <h4 className="font-serif" style={{ fontSize: "1.4rem", color: "var(--text-primary)", margin: "0.3rem 0" }}>
+                    <h4 className="font-serif text-xl text-foreground group-hover:text-brand transition-colors mb-1">
                       {col.title}
                     </h4>
-                    <p style={{ fontSize: "0.825rem", color: "var(--text-secondary)", lineHeight: 1.5 }}>
-                      {col.subtitle}
+                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
+                      {col.subtitle || col.story}
                     </p>
-                    <div style={{ marginTop: "1rem", display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.75rem", fontWeight: 600, textTransform: "uppercase" }}>
-                      <span>Discover</span>
-                      <ArrowRight size={13} style={{ color: "var(--accent-wine)" }} />
+                    <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-brand">
+                      <span>Discover Edit</span>
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                     </div>
                   </div>
                 </div>

@@ -257,6 +257,8 @@ const AppContent: React.FC = () => {
     const fabricParam = url.searchParams.get("fabric") || undefined;
     const occasionParam = url.searchParams.get("occasion") || undefined;
     const filterParam = url.searchParams.get("filter") || undefined;
+    const categoryQueryParam = url.searchParams.get("category") || undefined;
+    const collectionQueryParam = url.searchParams.get("collection") || undefined;
 
     // Normalize path by stripping trailing slashes (e.g. '/colors/celestial-cobalt/' -> '/colors/celestial-cobalt')
     const cleanPath = currentPath.length > 1 && currentPath.endsWith("/")
@@ -275,6 +277,8 @@ const AppContent: React.FC = () => {
       return (
         <ShopPage
           onNavigate={navigate}
+          categoryParam={categoryQueryParam}
+          collectionParam={collectionQueryParam}
           searchParam={searchParam}
           fabricParam={fabricParam}
           occasionParam={occasionParam}
@@ -288,8 +292,28 @@ const AppContent: React.FC = () => {
       return (
         <ShopPage
           categoryParam={categoryParam}
+          collectionParam={collectionQueryParam}
           onNavigate={navigate}
           searchParam={searchParam}
+          fabricParam={fabricParam}
+          occasionParam={occasionParam}
+          filterParam={filterParam}
+        />
+      );
+    }
+
+    // Direct /category/ and /categories/ routes
+    if (cleanPath.startsWith("/category/") || cleanPath.startsWith("/categories/")) {
+      const categoryParam = cleanPath.replace(/^\/(category|categories)\//, "");
+      return (
+        <ShopPage
+          categoryParam={categoryParam}
+          collectionParam={collectionQueryParam}
+          onNavigate={navigate}
+          searchParam={searchParam}
+          fabricParam={fabricParam}
+          occasionParam={occasionParam}
+          filterParam={filterParam}
         />
       );
     }
