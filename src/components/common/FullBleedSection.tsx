@@ -8,8 +8,8 @@ interface FullBleedSectionProps extends React.HTMLAttributes<HTMLElement> {
 }
 
 /**
- * FullBleedSection spans the complete viewport width from left edge to right edge (100vw),
- * breaking out of any parent container restrictions while maintaining zero horizontal overflow.
+ * FullBleedSection spans the complete viewport width from left edge to right edge (100%),
+ * without relying on 100vw or negative margins that cause vertical scrollbar horizontal overflow.
  */
 export const FullBleedSection: React.FC<FullBleedSectionProps> = ({
   children,
@@ -20,7 +20,7 @@ export const FullBleedSection: React.FC<FullBleedSectionProps> = ({
   return (
     <Component
       className={cn(
-        "relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] max-w-none overflow-hidden",
+        "relative w-full max-w-full overflow-hidden",
         className
       )}
       {...props}
