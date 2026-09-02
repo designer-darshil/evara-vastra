@@ -35,19 +35,13 @@
 
 ---
 
-## 🔐 Administrator Access
+## 🔐 Administrative Access & Security
 
-The default administrator credentials configured for local development and testing:
+The administrative suite is accessible at `/admin`. Authentication is secured with cryptographic PBKDF2 / SHA-256 password hashing and role-based access control (RBAC).
 
-| Field | Production Value |
-| :--- | :--- |
-| **Login URL** | `/admin/login` |
-| **Email Address** | `admin@evaravastra.com` |
-| **Password** | `Qaz!112233` |
-| **Role** | Super Admin (`superadmin`) |
-| **Hash Algorithm** | PBKDF2 (SHA-256, 100,000 iterations, 16-byte salt) |
-
-> 💡 *Note: To update the admin password, sign in and navigate to `/admin/settings/security`.*
+- **Admin Login Route**: `/admin/login`
+- **Security Management**: Change password and manage session credentials via `/admin/settings/security`.
+- **Role Hierarchy**: Super Admin, Store Admin, Order Manager, and Content Lead.
 
 ---
 
@@ -94,9 +88,9 @@ npm run build
 npm run preview
 ```
 
-### 5. Validate Admin Credentials
+### 5. Validate Admin Cryptographic Suite
 ```bash
-# Run standalone cryptographic authentication check
+# Run standalone authentication verification diagnostic
 node scripts/validate-admin.cjs
 ```
 
