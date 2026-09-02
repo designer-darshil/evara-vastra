@@ -2,8 +2,13 @@ import React, { useState } from "react";
 import { useData } from "../context/DataContext";
 import { LookbookItem } from "../types";
 import { Plus, Edit2, Trash2 } from "lucide-react";
+import { AdminPageHeader } from "../components/admin/ui/AdminPageHeader";
+import { AdminCard } from "../components/admin/ui/AdminCard";
+import { AdminBadge } from "../components/admin/ui/AdminBadge";
+import { AdminField } from "../components/admin/ui/AdminField";
+import { AdminInput, AdminSelect, AdminTextarea } from "../components/admin/ui/AdminInputs";
 
-export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }> = () => {
+export const AdminLookbookPage: React.FC<{ onNavigate?: (href: string) => void }> = () => {
   const { lookbookItems, addLookbookItem, updateLookbookItem, deleteLookbookItem, products } = useData();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -74,238 +79,173 @@ export const AdminLookbookPage: React.FC<{ onNavigate: (href: string) => void }>
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-      {/* Header */}
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
-        <div>
-          <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7C2430", display: "block" }}>
-            CAMPAIGN LOOKS
-          </span>
-          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: "0.2rem 0 0 0" }}>
-            Lookbook Anthology ({lookbookItems.length})
-          </h1>
-        </div>
-
-        <button onClick={() => handleOpenModal()} className="btn-wine" style={{ padding: "0.75rem 1.35rem", fontSize: "0.825rem" }}>
-          <Plus size={16} /> Create Campaign Look
-        </button>
-      </div>
-
-      {/* Grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1.5rem" }}>
-        {lookbookItems.map((look) => (
-          <div
-            key={look.id}
-            style={{
-              backgroundColor: "var(--admin-surface)",
-              border: "1px solid var(--admin-border)",
-              overflow: "hidden",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
-              display: "flex",
-              flexDirection: "column",
-            }}
+    <div className="space-y-6">
+      {/* 1. Page Header */}
+      <AdminPageHeader
+        title="Editorial Lookbook Anthology"
+        description="High-fashion styled editorials, occasion aesthetics, and shoppable bridal campaigns."
+        badge={
+          <AdminBadge variant="brand" size="md">
+            {lookbookItems.length} Looks
+          </AdminBadge>
+        }
+        actions={
+          <button
+            onClick={() => handleOpenModal()}
+            className="flex items-center gap-2 h-10 px-4 sm:px-5 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs min-h-[40px]"
           >
-            <div style={{ aspectRatio: "3/4", overflow: "hidden", backgroundColor: "#EDE7DD", position: "relative" }}>
-              <img src={look.image} alt={look.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              <span
-                style={{
-                  position: "absolute",
-                  top: "0.5rem",
-                  left: "0.5rem",
-                  backgroundColor: "#7C2430",
-                  color: "#FFFFFF",
-                  fontSize: "0.65rem",
-                  fontWeight: 700,
-                  padding: "0.2rem 0.5rem",
-                }}
-              >
-                LOOK {look.lookNumber}
-              </span>
-            </div>
+            <Plus className="w-4 h-4" /> Create Campaign Look
+          </button>
+        }
+      />
 
-            <div style={{ padding: "1.25rem", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-              <div>
-                <span style={{ fontSize: "0.68rem", color: "#B18A52", fontWeight: 700, textTransform: "uppercase" }}>
-                  {look.location} • {look.season}
-                </span>
-                <h3 className="font-serif" style={{ fontSize: "1.35rem", color: "var(--admin-text)", margin: "0.2rem 0 0.4rem 0" }}>
-                  {look.title}
-                </h3>
-                <p style={{ fontSize: "0.825rem", color: "var(--admin-text-secondary)", lineHeight: 1.4, marginBottom: "0.75rem" }}>
-                  {look.narrative}
-                </p>
-                <div style={{ backgroundColor: "var(--admin-surface-subtle)", padding: "0.6rem 0.75rem", border: "1px solid #EBE5DB", fontSize: "0.75rem" }}>
-                  <span style={{ color: "#8E8276", display: "block" }}>Linked Saree:</span>
-                  <strong>{look.productTitle}</strong> {look.productPrice ? `(₹${look.productPrice.toLocaleString("en-IN")})` : ""}
+      {/* 2. Responsive Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+        {lookbookItems.map((look) => (
+          <AdminCard key={look.id} noPadding className="flex flex-col justify-between">
+            <div>
+              <div className="aspect-[4/5] overflow-hidden bg-neutral-100 relative">
+                <img
+                  src={look.image}
+                  alt={look.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-2.5 left-2.5 bg-black/75 text-white font-mono text-xs font-bold px-2 py-0.5 rounded-xs">
+                  LOOK {look.lookNumber}
+                </div>
+                <div className="absolute bottom-2.5 left-2.5 right-2.5 bg-white/95 p-3 rounded-xs border border-neutral-200 text-xs shadow-md">
+                  <span className="text-[10px] uppercase font-bold text-neutral-500 block">Featured Saree:</span>
+                  <strong className="text-neutral-900 truncate block">{look.productTitle}</strong>
+                  <span className="text-[#734E06] font-bold block mt-0.5">
+                    ₹{look.productPrice?.toLocaleString("en-IN")}
+                  </span>
                 </div>
               </div>
 
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem", marginTop: "1rem", paddingTop: "0.75rem", borderTop: "1px solid #F0EAE1" }}>
-                <button
-                  onClick={() => handleOpenModal(look)}
-                  style={{
-                    padding: "0.4rem 0.75rem",
-                    fontSize: "0.75rem",
-                    border: "1px solid #D9D2C7",
-                    backgroundColor: "var(--admin-surface-subtle)",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.3rem",
-                  }}
-                >
-                  <Edit2 size={12} /> Edit
-                </button>
-                <button
-                  onClick={() => deleteLookbookItem(look.id)}
-                  style={{
-                    padding: "0.4rem",
-                    color: "#7C2430",
-                    border: "1px solid #E8C8C8",
-                    backgroundColor: "var(--admin-surface-subtle)",
-                    cursor: "pointer",
-                  }}
-                >
-                  <Trash2 size={13} />
-                </button>
+              <div className="p-4 sm:p-5">
+                <span className="text-xs text-[#734E06] font-semibold block mb-1">
+                  {look.season} • {look.location}
+                </span>
+                <h3 className="font-serif text-lg font-bold text-neutral-900 m-0 mb-2">
+                  {look.title}
+                </h3>
+                <p className="text-xs text-neutral-600 leading-relaxed m-0 line-clamp-3">
+                  {look.narrative}
+                </p>
               </div>
             </div>
-          </div>
+
+            <div className="px-4 sm:px-5 py-3 border-t border-neutral-100 bg-neutral-50/50 flex items-center justify-end gap-2">
+              <button
+                onClick={() => handleOpenModal(look)}
+                className="h-8 px-3 text-xs font-semibold bg-white border border-neutral-300 hover:border-[#734E06] hover:text-[#734E06] rounded-sm text-neutral-800 flex items-center gap-1.5 transition-colors"
+              >
+                <Edit2 className="w-3.5 h-3.5" /> Edit
+              </button>
+              <button
+                onClick={() => {
+                  if (confirm(`Are you sure you want to delete "${look.title}"?`)) {
+                    deleteLookbookItem(look.id);
+                  }
+                }}
+                className="h-8 w-8 flex items-center justify-center text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 rounded-sm transition-colors"
+                title="Delete Look"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </AdminCard>
         ))}
       </div>
 
-      {/* Modal */}
+      {/* 3. Modal */}
       {isModalOpen && (
         <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            minHeight: "100dvh",
-            height: "100dvh",
-            backgroundColor: "rgba(0,0,0,0.6)",
-            zIndex: 70,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "1rem",
-          }}
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4 animate-in fade-in duration-150"
+          style={{ zIndex: 70 }}
           onClick={() => setIsModalOpen(false)}
         >
           <div
-            style={{
-              backgroundColor: "var(--admin-surface)",
-              padding: "2rem",
-              maxWidth: "520px",
-              width: "100%",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-              maxHeight: "90dvh",
-              overflowY: "auto",
-            }}
+            className="bg-white border border-neutral-200 rounded-sm max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-4 max-h-[90dvh] overflow-y-auto animate-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-serif" style={{ fontSize: "1.5rem", margin: "0 0 1.25rem 0" }}>
-              {editingLook ? "Edit Campaign Look" : "Create Campaign Look"}
+            <h3 className="font-serif text-lg font-bold text-neutral-900 m-0 pb-2 border-b border-neutral-100">
+              {editingLook ? "Edit Campaign Look" : "Create New Campaign Look"}
             </h3>
 
-            <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "1rem" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                    Look #
-                  </label>
-                  <input
-                    type="text"
+            <form onSubmit={handleSave} className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <AdminField label="Look Number" required>
+                  <AdminInput
+                    required
                     value={form.lookNumber}
                     onChange={(e) => setForm({ ...form, lookNumber: e.target.value })}
-                    style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7" }}
+                    placeholder="01"
                   />
-                </div>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                    Look Title *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={form.title}
-                    onChange={(e) => setForm({ ...form, title: e.target.value })}
-                    style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7" }}
-                  />
-                </div>
-              </div>
+                </AdminField>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                    Location
-                  </label>
-                  <input
-                    type="text"
-                    value={form.location}
-                    onChange={(e) => setForm({ ...form, location: e.target.value })}
-                    style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7" }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                    Season
-                  </label>
-                  <input
-                    type="text"
+                <AdminField label="Season / Edition">
+                  <AdminInput
                     value={form.season}
                     onChange={(e) => setForm({ ...form, season: e.target.value })}
-                    style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7" }}
+                    placeholder="Autumn / Winter 2026"
                   />
-                </div>
+                </AdminField>
               </div>
 
-              <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  Image URL *
-                </label>
-                <input
-                  type="url"
+              <AdminField label="Look Title" required>
+                <AdminInput
                   required
-                  value={form.image}
-                  onChange={(e) => setForm({ ...form, image: e.target.value })}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7" }}
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  placeholder="e.g. The Imperial Kadwa Drape"
                 />
-              </div>
+              </AdminField>
 
-              <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  Assign Saree for "Shop This Drape"
-                </label>
-                <select
+              <AdminField label="Link Saree Product" required>
+                <AdminSelect
                   value={form.productSlug}
                   onChange={(e) => handleSelectProduct(e.target.value)}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface)" }}
                 >
                   {products.map((p) => (
                     <option key={p.id} value={p.slug}>
                       {p.title} (₹{p.price.toLocaleString("en-IN")})
                     </option>
                   ))}
-                </select>
-              </div>
+                </AdminSelect>
+              </AdminField>
 
-              <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  Editorial Narrative
-                </label>
-                <textarea
+              <AdminField label="High-Resolution Look Image URL" required>
+                <AdminInput
+                  type="url"
+                  required
+                  value={form.image}
+                  onChange={(e) => setForm({ ...form, image: e.target.value })}
+                  placeholder="https://..."
+                />
+              </AdminField>
+
+              <AdminField label="Styling Narrative">
+                <AdminTextarea
                   rows={3}
                   value={form.narrative}
                   onChange={(e) => setForm({ ...form, narrative: e.target.value })}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7" }}
+                  placeholder="Artisan styling guidance, pleat draping instructions..."
                 />
-              </div>
+              </AdminField>
 
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1rem" }}>
-                <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary" style={{ padding: "0.6rem 1rem" }}>
+              <div className="flex items-center justify-end gap-3 pt-2 border-t border-neutral-100">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="h-10 px-4 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-sm hover:bg-neutral-50"
+                >
                   Cancel
                 </button>
-                <button type="submit" className="btn-wine" style={{ padding: "0.6rem 1.25rem" }}>
+                <button
+                  type="submit"
+                  className="h-10 px-5 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm"
+                >
                   Save Look
                 </button>
               </div>

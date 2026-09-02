@@ -2,9 +2,13 @@ import React, { useState } from "react";
 import { useData } from "../context/DataContext";
 import { SiteSettings, ShippingSettings } from "../types";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
-import { Save, Check, Truck, KeyRound } from "lucide-react";
-import { Button } from "../components/ui/button";
+import { Save, Check, KeyRound } from "lucide-react";
 import { shippingProvider } from "../lib/shiprocket";
+import { AdminPageHeader } from "../components/admin/ui/AdminPageHeader";
+import { AdminCard } from "../components/admin/ui/AdminCard";
+import { AdminField } from "../components/admin/ui/AdminField";
+import { AdminInput, AdminSelect } from "../components/admin/ui/AdminInputs";
+import { AdminBadge } from "../components/admin/ui/AdminBadge";
 
 export const AdminSettingsPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
   onNavigate,
@@ -42,298 +46,195 @@ export const AdminSettingsPage: React.FC<{ onNavigate?: (href: string) => void }
   };
 
   return (
-    <form onSubmit={handleSave} className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
+    <form onSubmit={handleSave} className="space-y-6 max-w-5xl">
+      {/* 1. Page Header */}
+      <AdminPageHeader
+        title="Store & Commerce Settings"
+        description="Configure brand identity, atelier customer support channels, Shiprocket API dispatch parameters, and checkout rules."
+        breadcrumbs={
           <Breadcrumbs
             items={[{ label: "Admin", href: "/admin" }, { label: "Store Settings" }]}
             onNavigate={onNavigate}
           />
-          <h1 className="text-xl sm:text-2xl font-serif font-bold text-neutral-900 mt-1.5 m-0">
-            Global Atelier & Commerce Settings
-          </h1>
-          <p className="text-xs text-neutral-500 mt-0.5">
-            Configure brand metadata, commerce policies, and contact information.
-          </p>
-        </div>
-
-        <button
-          type="submit"
-          className="flex items-center gap-2 px-4 py-2 bg-brand text-brand-foreground hover:bg-brand-hover text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs self-start sm:self-auto min-h-[44px]"
-        >
-          <Save className="w-4 h-4" /> Save All Settings
-        </button>
-      </div>
+        }
+        actions={
+          <button
+            type="submit"
+            className="flex items-center gap-2 h-10 px-5 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs min-h-[40px]"
+          >
+            <Save className="w-4 h-4" /> Save All Settings
+          </button>
+        }
+      />
 
       {/* Security Quick Link Banner */}
-      <div className="bg-amber-50/70 border border-amber-200 p-4 rounded-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+      <div className="bg-amber-50/80 border border-amber-200 p-4 rounded-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2.5">
           <KeyRound className="w-4 h-4 text-[#734E06] shrink-0" />
           <span className="text-neutral-800 font-medium">
-            Looking to update your administrator password or review active session credentials?
+            Looking to change your administrator password or inspect active authentication status?
           </span>
         </div>
         <button
           type="button"
           onClick={() => onNavigate && onNavigate("/admin/settings/security")}
-          className="px-3 py-1.5 bg-[#734E06] text-white hover:bg-[#5a3c04] font-bold text-[11px] uppercase tracking-wider rounded-sm transition-colors shrink-0"
+          className="h-8 px-3 bg-[#734E06] hover:bg-[#5a3c04] text-white font-bold text-[11px] uppercase tracking-wider rounded-sm transition-colors shrink-0 flex items-center gap-1"
         >
-          Security & Password Management →
+          Security & Password →
         </button>
       </div>
 
       {saveSuccess && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-3.5 rounded-sm flex items-center gap-2 text-xs font-semibold">
-          <Check className="w-4 h-4 text-emerald-700" />
-          Settings updated successfully and synced across storefront and checkout engines!
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 p-4 rounded-sm flex items-center gap-2.5 text-sm font-semibold">
+          <Check className="w-5 h-5 text-emerald-700 shrink-0" />
+          <span>Settings updated successfully and synced across storefront and checkout engines!</span>
         </div>
       )}
 
-      {/* Brand Identity Section */}
-      <div className="bg-white p-6 border border-neutral-200 rounded-sm shadow-xs space-y-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 m-0 pb-2 border-b border-neutral-100">
-          1. Brand Identity & Positioning
-        </h3>
+      {/* 1. Brand Identity */}
+      <AdminCard title="1. Brand Identity & Positioning">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <AdminField label="Official Storefront Name" required>
+              <AdminInput
+                required
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="EVARA VASTRA"
+              />
+            </AdminField>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-          <div>
-            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-              Official Storefront Name
-            </label>
-            <input
-              type="text"
-              required
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm font-bold text-neutral-900 focus:bg-white focus:border-brand outline-none"
-            />
+            <AdminField label="Brand Tagline">
+              <AdminInput
+                value={form.tagline}
+                onChange={(e) => setForm({ ...form, tagline: e.target.value })}
+                placeholder="Where Elegance Meets Heritage"
+              />
+            </AdminField>
           </div>
 
-          <div>
-            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-              Brand Tagline
-            </label>
-            <input
-              type="text"
-              value={form.tagline}
-              onChange={(e) => setForm({ ...form, tagline: e.target.value })}
-              className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 focus:bg-white focus:border-brand outline-none"
-            />
-          </div>
-
-          <div className="sm:col-span-2">
-            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-              Brand Slogan / Statement
-            </label>
-            <input
-              type="text"
+          <AdminField label="Brand Slogan / Manifesto">
+            <AdminInput
               value={form.slogan}
               onChange={(e) => setForm({ ...form, slogan: e.target.value })}
-              className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 focus:bg-white focus:border-brand outline-none"
+              placeholder="Handcrafted Surat Sarees for Modern Royalties"
             />
-          </div>
+          </AdminField>
         </div>
-      </div>
+      </AdminCard>
 
-      {/* Atelier Contact Details */}
-      <div className="bg-white p-6 border border-neutral-200 rounded-sm shadow-xs space-y-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 m-0 pb-2 border-b border-neutral-100">
-          2. Atelier Contact & Customer Support
-        </h3>
+      {/* 2. Atelier Support & Location */}
+      <AdminCard title="2. Atelier Contact & Support Channels">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <AdminField label="Customer Support Email" required>
+              <AdminInput
+                type="email"
+                required
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
+            </AdminField>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-          <div>
-            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-              Customer Support Email
-            </label>
-            <input
-              type="email"
-              required
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 focus:bg-white focus:border-brand outline-none"
-            />
+            <AdminField label="Support Phone Hotline" required>
+              <AdminInput
+                type="text"
+                required
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              />
+            </AdminField>
+
+            <AdminField label="WhatsApp Concierge">
+              <AdminInput
+                type="text"
+                value={form.whatsapp}
+                onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+              />
+            </AdminField>
           </div>
 
-          <div>
-            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-              Support Phone Hotline
-            </label>
-            <input
-              type="text"
-              required
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 focus:bg-white focus:border-brand outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-              WhatsApp Concierge
-            </label>
-            <input
-              type="text"
-              value={form.whatsapp}
-              onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
-              className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 focus:bg-white focus:border-brand outline-none"
-            />
-          </div>
-
-          <div className="sm:col-span-3">
-            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-              Surat Atelier Physical Address
-            </label>
-            <input
+          <AdminField label="Surat Atelier Physical Address">
+            <AdminInput
               type="text"
               value={form.atelierAddress}
               onChange={(e) => setForm({ ...form, atelierAddress: e.target.value })}
-              className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 focus:bg-white focus:border-brand outline-none"
             />
-          </div>
+          </AdminField>
         </div>
-      </div>
+      </AdminCard>
 
-      {/* Social Media Profiles Section */}
-      <div className="bg-white p-6 border border-neutral-200 rounded-sm shadow-xs space-y-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 m-0 pb-2 border-b border-neutral-100">
-          3. Official Social Media Channels
-        </h3>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-          <div>
-            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-              Instagram Profile URL
-            </label>
-            <input
+      {/* 3. Official Social Channels */}
+      <AdminCard title="3. Official Social Media Channels">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <AdminField label="Instagram Profile URL">
+            <AdminInput
               type="url"
               placeholder="https://instagram.com/evaravastra"
               value={form.instagramUrl || ""}
               onChange={(e) => setForm({ ...form, instagramUrl: e.target.value })}
-              className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 focus:bg-white focus:border-brand outline-none"
             />
-            <span className="text-[10px] text-neutral-400 mt-1 block">
-              Displayed with Instagram icon in footer and mobile menu.
-            </span>
-          </div>
+          </AdminField>
 
-          <div>
-            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-              Facebook Page URL
-            </label>
-            <input
+          <AdminField label="Facebook Page URL">
+            <AdminInput
               type="url"
               placeholder="https://facebook.com/evaravastra"
               value={form.facebookUrl || ""}
               onChange={(e) => setForm({ ...form, facebookUrl: e.target.value })}
-              className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 focus:bg-white focus:border-brand outline-none"
             />
-            <span className="text-[10px] text-neutral-400 mt-1 block">
-              Displayed with Facebook icon in footer and mobile menu.
-            </span>
-          </div>
+          </AdminField>
         </div>
-      </div>
+      </AdminCard>
 
-      {/* Commerce & Checkout Rules */}
-      <div className="bg-white p-6 border border-neutral-200 rounded-sm shadow-xs space-y-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 m-0 pb-2 border-b border-neutral-100">
-          4. Commerce & Checkout Rules
-        </h3>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-          <div>
-            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-              Prepaid Discount (%)
-            </label>
-            <input
+      {/* 4. Commerce & Checkout Rules */}
+      <AdminCard title="4. Commerce & Checkout Rules">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <AdminField label="Prepaid UPI/Card Discount (%)">
+            <AdminInput
               type="number"
               min="0"
               max="50"
               value={form.prepaidDiscountPercentage}
               onChange={(e) => setForm({ ...form, prepaidDiscountPercentage: parseInt(e.target.value) || 0 })}
-              className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 focus:bg-white focus:border-brand outline-none"
             />
-          </div>
+          </AdminField>
 
-          <div>
-            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-              Exchange Window (Days)
-            </label>
-            <input
+          <AdminField label="Exchange Window (Days)">
+            <AdminInput
               type="number"
               min="0"
               value={form.returnWindowDays}
               onChange={(e) => setForm({ ...form, returnWindowDays: parseInt(e.target.value) || 0 })}
-              className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 focus:bg-white focus:border-brand outline-none"
             />
-          </div>
+          </AdminField>
 
-          <div className="flex items-center gap-2 pt-6">
+          <div className="flex items-center gap-2.5 pt-6 sm:pt-7">
             <input
               type="checkbox"
               id="codActive"
               checked={form.codAvailable}
               onChange={(e) => setForm({ ...form, codAvailable: e.target.checked })}
-              className="w-4 h-4 text-brand rounded-xs"
+              className="w-4 h-4 text-[#734E06] rounded-xs"
             />
-            <label htmlFor="codActive" className="text-neutral-900 font-bold uppercase tracking-wider text-[11px] cursor-pointer">
+            <label htmlFor="codActive" className="text-neutral-900 font-bold uppercase tracking-wider text-xs cursor-pointer select-none">
               Cash on Delivery (COD) Enabled
             </label>
           </div>
         </div>
-      </div>
+      </AdminCard>
 
-      {/* SEO Defaults */}
-      <div className="bg-white p-6 border border-neutral-200 rounded-sm shadow-xs space-y-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 m-0 pb-2 border-b border-neutral-100">
-          4. SEO Defaults & Metadata
-        </h3>
-
-        <div className="space-y-3 text-xs">
-          <div>
-            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-              Default Browser Title Tag
-            </label>
-            <input
-              type="text"
-              value={form.seoDefaultTitle}
-              onChange={(e) => setForm({ ...form, seoDefaultTitle: e.target.value })}
-              className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 focus:bg-white focus:border-brand outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-              Default Meta Description
-            </label>
-            <textarea
-              rows={2}
-              value={form.seoDefaultDescription}
-              onChange={(e) => setForm({ ...form, seoDefaultDescription: e.target.value })}
-              className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 focus:bg-white focus:border-brand outline-none"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* 5. Shiprocket Logistics & Warehouse Configuration */}
-      <div className="bg-white p-6 border border-neutral-200 rounded-sm shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-neutral-100 gap-2">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 m-0 flex items-center gap-2">
-            <Truck className="w-4 h-4 text-[#734E06]" />
-            5. Shiprocket Logistics & Warehouse
-          </h3>
+      {/* 5. Shiprocket Logistics & Warehouse */}
+      <AdminCard
+        title="5. Shiprocket Logistics & Default Warehouse"
+        action={
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <AdminBadge variant="success" size="sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1" />
               API Connected
-            </span>
-            <Button
+            </AdminBadge>
+            <button
               type="button"
-              variant="outline"
-              size="sm"
               disabled={isTestingApi}
               onClick={async () => {
                 setIsTestingApi(true);
@@ -346,169 +247,139 @@ export const AdminSettingsPage: React.FC<{ onNavigate?: (href: string) => void }
                   setIsTestingApi(false);
                 }
               }}
-              className="text-xs h-7"
+              className="h-7 px-2.5 text-xs font-semibold border border-neutral-300 rounded-sm hover:bg-neutral-50"
             >
               Test API Link
-            </Button>
+            </button>
           </div>
-        </div>
+        }
+      >
+        <div className="space-y-4">
+          {testApiMessage && (
+            <div className="p-3 bg-neutral-50 border border-neutral-200 text-xs font-mono rounded-sm text-neutral-800">
+              {testApiMessage}
+            </div>
+          )}
 
-        {testApiMessage && (
-          <div className="p-3 bg-neutral-50 border border-neutral-200 text-xs font-mono rounded-sm text-neutral-800">
-            {testApiMessage}
-          </div>
-        )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <AdminField label="Default Dispatch Warehouse">
+              <AdminSelect
+                value={shippingForm.defaultPickupLocationId}
+                onChange={(e) => setShippingForm({ ...shippingForm, defaultPickupLocationId: e.target.value })}
+              >
+                {pickupLocations.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} ({p.pincode} — {p.city}) {p.isDefault ? "[Default]" : ""}
+                  </option>
+                ))}
+              </AdminSelect>
+            </AdminField>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-          <div>
-            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-              Default Dispatch Warehouse / Pickup Location
-            </label>
-            <select
-              value={shippingForm.defaultPickupLocationId}
-              onChange={(e) => setShippingForm({ ...shippingForm, defaultPickupLocationId: e.target.value })}
-              className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 focus:bg-white focus:border-brand outline-none cursor-pointer"
-            >
-              {pickupLocations.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} ({p.pincode} — {p.city}) {p.isDefault ? "[Default]" : ""}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-              Default Package Weight (kg)
-            </label>
-            <input
-              type="number"
-              step="0.05"
-              min="0.5"
-              value={shippingForm.defaultWeightKg}
-              onChange={(e) => setShippingForm({ ...shippingForm, defaultWeightKg: parseFloat(e.target.value) || 0.5 })}
-              className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 focus:bg-white focus:border-brand outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-              Package Dimensions (L × W × H cm)
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              <input
+            <AdminField label="Default Package Weight (kg)">
+              <AdminInput
                 type="number"
-                placeholder="L (cm)"
-                value={shippingForm.defaultDimensionsCm.length}
-                onChange={(e) =>
-                  setShippingForm({
-                    ...shippingForm,
-                    defaultDimensionsCm: {
-                      ...shippingForm.defaultDimensionsCm,
-                      length: parseInt(e.target.value) || 30,
-                    },
-                  })
-                }
-                className="w-full px-2 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 text-center"
+                step="0.05"
+                min="0.5"
+                value={shippingForm.defaultWeightKg}
+                onChange={(e) => setShippingForm({ ...shippingForm, defaultWeightKg: parseFloat(e.target.value) || 0.5 })}
               />
-              <input
-                type="number"
-                placeholder="W (cm)"
-                value={shippingForm.defaultDimensionsCm.width}
-                onChange={(e) =>
-                  setShippingForm({
-                    ...shippingForm,
-                    defaultDimensionsCm: {
-                      ...shippingForm.defaultDimensionsCm,
-                      width: parseInt(e.target.value) || 22,
-                    },
-                  })
-                }
-                className="w-full px-2 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 text-center"
-              />
-              <input
-                type="number"
-                placeholder="H (cm)"
-                value={shippingForm.defaultDimensionsCm.height}
-                onChange={(e) =>
-                  setShippingForm({
-                    ...shippingForm,
-                    defaultDimensionsCm: {
-                      ...shippingForm.defaultDimensionsCm,
-                      height: parseInt(e.target.value) || 5,
-                    },
-                  })
-                }
-                className="w-full px-2 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 text-center"
-              />
+            </AdminField>
+
+            <div className="sm:col-span-2">
+              <AdminField label="Package Dimensions (L × W × H cm)">
+                <div className="grid grid-cols-3 gap-3">
+                  <AdminInput
+                    type="number"
+                    placeholder="L (cm)"
+                    value={shippingForm.defaultDimensionsCm.length}
+                    onChange={(e) =>
+                      setShippingForm({
+                        ...shippingForm,
+                        defaultDimensionsCm: {
+                          ...shippingForm.defaultDimensionsCm,
+                          length: parseInt(e.target.value) || 30,
+                        },
+                      })
+                    }
+                    className="text-center"
+                  />
+                  <AdminInput
+                    type="number"
+                    placeholder="W (cm)"
+                    value={shippingForm.defaultDimensionsCm.width}
+                    onChange={(e) =>
+                      setShippingForm({
+                        ...shippingForm,
+                        defaultDimensionsCm: {
+                          ...shippingForm.defaultDimensionsCm,
+                          width: parseInt(e.target.value) || 22,
+                        },
+                      })
+                    }
+                    className="text-center"
+                  />
+                  <AdminInput
+                    type="number"
+                    placeholder="H (cm)"
+                    value={shippingForm.defaultDimensionsCm.height}
+                    onChange={(e) =>
+                      setShippingForm({
+                        ...shippingForm,
+                        defaultDimensionsCm: {
+                          ...shippingForm.defaultDimensionsCm,
+                          height: parseInt(e.target.value) || 5,
+                        },
+                      })
+                    }
+                    className="text-center"
+                  />
+                </div>
+              </AdminField>
             </div>
           </div>
+        </div>
+      </AdminCard>
 
-          <div className="space-y-2 pt-2">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={shippingForm.autoAssignCourier}
-                onChange={(e) => setShippingForm({ ...shippingForm, autoAssignCourier: e.target.checked })}
-                className="w-4 h-4 text-[#734E06] rounded-xs"
-              />
-              <span className="font-bold text-neutral-900 text-[11px] uppercase tracking-wider">
-                Automated Courier Assignment
-              </span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={shippingForm.autoGenerateAwb}
-                onChange={(e) => setShippingForm({ ...shippingForm, autoGenerateAwb: e.target.checked })}
-                className="w-4 h-4 text-[#734E06] rounded-xs"
-              />
-              <span className="font-bold text-neutral-900 text-[11px] uppercase tracking-wider">
-                Auto-generate AWB upon Order Placement
-              </span>
-            </label>
+      {/* 6. Database Reset */}
+      <AdminCard title="Database Maintenance & Seeding" className="border-red-200 bg-red-50/30">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <strong className="text-xs font-bold text-red-900 block">
+              Reset Demo Database to Initial State
+            </strong>
+            <span className="text-xs text-red-700 block mt-0.5">
+              Clears all locally stored modifications, restoring original catalog records, authentic orders, and default settings.
+            </span>
           </div>
-        </div>
-      </div>
 
-      {/* Dangerous Reset Box */}
-      <div className="bg-red-50/70 p-5 border border-red-200 rounded-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <strong className="text-xs font-bold text-red-900 block">
-            Reset Demo Database to Initial State
-          </strong>
-          <span className="text-[11px] text-red-700 block mt-0.5">
-            Clears all locally stored mutations, restores default sarees, orders, and configuration.
-          </span>
-        </div>
-
-        {!resetConfirm ? (
-          <button
-            type="button"
-            onClick={() => setResetConfirm(true)}
-            className="px-3.5 py-2 bg-white border border-red-300 text-red-700 text-xs font-semibold rounded-sm hover:bg-red-50 transition-colors shrink-0"
-          >
-            Reset Store Database
-          </button>
-        ) : (
-          <div className="flex items-center gap-2 shrink-0">
+          {!resetConfirm ? (
             <button
               type="button"
-              onClick={() => setResetConfirm(false)}
-              className="px-3 py-1.5 border border-neutral-300 text-neutral-700 text-xs rounded-sm bg-white"
+              onClick={() => setResetConfirm(true)}
+              className="h-10 px-4 bg-white border border-red-300 text-red-700 text-xs font-semibold rounded-sm hover:bg-red-50 transition-colors shrink-0"
             >
-              Cancel
+              Reset Store Database
             </button>
-            <button
-              type="button"
-              onClick={handleResetData}
-              className="px-3 py-1.5 bg-red-700 text-white text-xs font-bold rounded-sm uppercase tracking-wider hover:bg-red-800"
-            >
-              Confirm Reset
-            </button>
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => setResetConfirm(false)}
+                className="h-10 px-3.5 border border-neutral-300 text-neutral-700 text-xs rounded-sm bg-white"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleResetData}
+                className="h-10 px-4 bg-red-700 hover:bg-red-800 text-white text-xs font-bold rounded-sm uppercase tracking-wider transition-colors"
+              >
+                Confirm Reset
+              </button>
+            </div>
+          )}
+        </div>
+      </AdminCard>
     </form>
   );
 };

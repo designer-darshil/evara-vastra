@@ -2,12 +2,12 @@ import React, { useState, useMemo } from "react";
 import { useData } from "../context/DataContext";
 import { Order, OrderStatus } from "../types";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
-import {
-  Search,
-  ShoppingBag,
-  Edit2,
-  X,
-} from "lucide-react";
+import { ShoppingBag, X, Eye } from "lucide-react";
+import { AdminPageHeader } from "../components/admin/ui/AdminPageHeader";
+import { AdminCard } from "../components/admin/ui/AdminCard";
+import { AdminToolbar } from "../components/admin/ui/AdminToolbar";
+import { AdminBadge } from "../components/admin/ui/AdminBadge";
+import { AdminEmptyState } from "../components/admin/ui/AdminEmptyState";
 
 export const AdminOrdersPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
   onNavigate,
@@ -58,248 +58,234 @@ export const AdminOrdersPage: React.FC<{ onNavigate?: (href: string) => void }> 
     setStatusModalOrder(null);
   };
 
+  const getStatusBadgeVariant = (status: OrderStatus) => {
+    switch (status) {
+      case "Delivered":
+        return "success";
+      case "Shipped":
+      case "Processing":
+        return "info";
+      case "Pending":
+      case "Confirmed":
+        return "warning";
+      case "Cancelled":
+      case "Returned":
+        return "danger";
+      default:
+        return "neutral";
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
+      {/* 1. Page Header */}
+      <AdminPageHeader
+        title="Order Management"
+        description="Fulfillment tracking, invoice history, and delivery lifecycles for patron orders."
+        breadcrumbs={
           <Breadcrumbs
-            items={[{ label: "Admin", href: "/admin" }, { label: "Order Management" }]}
+            items={[{ label: "Admin", href: "/admin" }, { label: "Orders" }]}
             onNavigate={onNavigate}
           />
-          <h1 className="text-xl sm:text-2xl font-serif font-bold text-neutral-900 mt-1.5 m-0">
-            Order Fulfillment & Transactions ({orders.length})
-          </h1>
-        </div>
-      </div>
+        }
+        badge={
+          <AdminBadge variant="brand" size="md">
+            {orders.length} Total Orders
+          </AdminBadge>
+        }
+      />
 
-      {/* Orders Table Container */}
-      <div className="bg-white border border-neutral-200 rounded-sm shadow-xs overflow-hidden">
-        {/* Search & Filter Bar */}
-        <div className="p-4 border-b border-neutral-200 flex flex-col md:flex-row gap-3 justify-between items-stretch md:items-center">
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by order #, customer, email, city..."
-              className="w-full pl-9 pr-3 py-2 text-xs bg-neutral-50 border border-neutral-300 rounded-sm focus:bg-white focus:border-brand focus:ring-1 focus:ring-brand outline-none"
-            />
-          </div>
-
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs text-neutral-500 font-medium">Status:</span>
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-2.5 py-1.5 text-xs bg-white border border-neutral-300 rounded-sm text-neutral-700 outline-none cursor-pointer"
-            >
-              <option value="all">All Statuses ({orders.length})</option>
-              <option value="Pending">Pending</option>
-              <option value="Confirmed">Confirmed</option>
-              <option value="Processing">Processing</option>
-              <option value="Shipped">Shipped</option>
-              <option value="Delivered">Delivered</option>
-              <option value="Cancelled">Cancelled</option>
-              <option value="Returned">Returned</option>
-            </select>
-          </div>
+      {/* 2. Main Orders Card */}
+      <AdminCard noPadding>
+        {/* Toolbar: Search + Status */}
+        <div className="p-4 sm:p-5 border-b border-neutral-200">
+          <AdminToolbar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder="Search by order #, customer, email, or city..."
+            filters={
+              <div className="flex items-center gap-2.5 flex-wrap w-full sm:w-auto">
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="h-10 px-3 bg-white border border-neutral-300 rounded-sm text-xs sm:text-sm font-medium text-neutral-800 outline-none focus:border-[#734E06] focus:ring-1 focus:ring-[#734E06] min-h-[40px] flex-1 sm:flex-initial"
+                >
+                  <option value="all">All Statuses ({orders.length})</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Processing">Processing</option>
+                  <option value="Shipped">Shipped</option>
+                  <option value="Out for Delivery">Out for Delivery</option>
+                  <option value="Delivered">Delivered</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+            }
+          />
         </div>
 
-        {/* Mobile View: Stacked Cards (Visible on <640px) */}
-        <div className="sm:hidden divide-y divide-neutral-200">
-          {filteredOrders.map((order) => {
-            const totalQty = order.items.reduce((s, i) => s + i.quantity, 0);
-            return (
-              <div key={order.id} className="p-4 space-y-2.5 bg-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-mono font-bold text-neutral-900 text-xs block">
-                      {order.orderNumber}
-                    </span>
-                    <span className="text-[10px] text-neutral-500 font-mono">{order.date}</span>
-                  </div>
-                  <button
-                    onClick={() => handleOpenStatusModal(order)}
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider border ${
-                      order.status === "Delivered"
-                        ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                        : order.status === "Shipped"
-                        ? "bg-blue-50 text-blue-800 border-blue-200"
-                        : order.status === "Cancelled" || order.status === "Returned"
-                        ? "bg-red-50 text-red-800 border-red-200"
-                        : "bg-amber-50 text-amber-800 border-amber-200"
-                    }`}
-                  >
-                    {order.status}
-                  </button>
-                </div>
-
-                <div className="flex justify-between text-xs">
-                  <div>
-                    <span className="font-semibold text-neutral-900 block">{order.customerName}</span>
-                    <span className="text-[11px] text-neutral-500">{order.city}, {order.state}</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-bold text-neutral-900 block">{formatINR(order.total)}</span>
-                    <span className="text-[10px] text-neutral-500">{totalQty} item{totalQty > 1 ? "s" : ""}</span>
-                  </div>
-                </div>
-
-                <div className="pt-2 border-t border-neutral-100 flex items-center justify-between gap-2">
-                  <span className="text-[10px] text-neutral-500">
-                    {order.paymentMethod} • {order.paymentStatus}
+        {/* 3. Mobile View: Responsive Order Cards (< 768px) */}
+        <div className="md:hidden divide-y divide-neutral-100">
+          {filteredOrders.map((o) => (
+            <div key={o.id} className="p-4 sm:p-5 space-y-3.5 bg-white">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <span className="font-serif font-bold text-neutral-900 text-sm block">
+                    {o.orderNumber}
                   </span>
-                  <div className="flex items-center gap-1.5">
-                    {onNavigate && (
-                      <button
-                        onClick={() => onNavigate(`/admin/orders/${order.id}`)}
-                        className="px-2.5 py-1 text-xs font-semibold border border-neutral-300 rounded-sm text-neutral-800"
-                      >
-                        View Order
-                      </button>
-                    )}
+                  <span className="text-xs text-neutral-500 block mt-0.5">
+                    {o.date} • {o.customerName}
+                  </span>
+                </div>
+                <AdminBadge variant={getStatusBadgeVariant(o.status)} size="sm">
+                  {o.status}
+                </AdminBadge>
+              </div>
+
+              <div className="flex items-center justify-between text-xs text-neutral-600 bg-neutral-50 p-2.5 rounded-xs border border-neutral-100">
+                <span>{o.items.length} {o.items.length === 1 ? "item" : "items"} ({o.city}, {o.state})</span>
+                <span className="font-bold text-[#734E06] text-sm">{formatINR(o.total)}</span>
+              </div>
+
+              <div className="pt-2 border-t border-neutral-100 flex items-center justify-between gap-2">
+                <span className="text-[11px] font-mono text-neutral-500 uppercase">
+                  {o.paymentMethod}
+                </span>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleOpenStatusModal(o)}
+                    className="h-9 px-3 text-xs font-semibold bg-white border border-neutral-300 hover:border-[#734E06] hover:text-[#734E06] rounded-sm text-neutral-800 transition-colors"
+                  >
+                    Update
+                  </button>
+                  {onNavigate && (
                     <button
-                      onClick={() => handleOpenStatusModal(order)}
-                      className="p-1 text-neutral-600 hover:text-[#734E06] border border-neutral-200 rounded-sm"
-                      title="Update Status"
+                      onClick={() => onNavigate(`/admin/orders/${o.id}`)}
+                      className="h-9 px-3 text-xs font-semibold bg-[#734E06] hover:bg-[#5a3c04] text-white rounded-sm transition-colors flex items-center gap-1.5"
                     >
-                      <Edit2 className="w-3.5 h-3.5" />
+                      <Eye className="w-3.5 h-3.5" /> Details
                     </button>
-                  </div>
+                  )}
                 </div>
               </div>
-            );
-          })}
-          {filteredOrders.length === 0 && (
-            <div className="p-8 text-center text-neutral-500 text-xs">
-              No orders match the filter criteria.
             </div>
+          ))}
+
+          {filteredOrders.length === 0 && (
+            <AdminEmptyState
+              icon={<ShoppingBag className="w-8 h-8 text-neutral-400" />}
+              title="No Orders Found"
+              description="No orders match your search query or status filter."
+            />
           )}
         </div>
 
-        {/* Desktop View: Full Data Table (Visible on >=640px) */}
-        <div className="hidden sm:block overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[720px]">
+        {/* 4. Desktop View: Proportional Data Table (>= 768px) */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[760px]">
             <thead>
-              <tr className="bg-neutral-50 text-[11px] font-bold text-neutral-500 uppercase tracking-wider border-b border-neutral-200">
-                <th className="py-3 px-4">Order # & Date</th>
-                <th className="py-3 px-4">Customer & City</th>
-                <th className="py-3 px-4">Items / Qty</th>
-                <th className="py-3 px-4">Total & Payment</th>
-                <th className="py-3 px-4 text-center">Fulfillment Status</th>
-                <th className="py-3 px-4 text-right">Actions</th>
+              <tr className="bg-neutral-50/80 text-xs font-bold text-neutral-600 uppercase tracking-wider border-b border-neutral-200">
+                <th className="py-3.5 px-5">Order #</th>
+                <th className="py-3.5 px-4">Customer & City</th>
+                <th className="py-3.5 px-4">Date</th>
+                <th className="py-3.5 px-4">Amount</th>
+                <th className="py-3.5 px-4 text-center">Status</th>
+                <th className="py-3.5 px-5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100 text-xs">
-              {filteredOrders.map((order) => {
-                const totalQty = order.items.reduce((s, i) => s + i.quantity, 0);
+            <tbody className="divide-y divide-neutral-100 text-sm">
+              {filteredOrders.map((o) => (
+                <tr key={o.id} className="hover:bg-neutral-50/70 transition-colors">
+                  <td className="py-3.5 px-5">
+                    <span className="font-serif font-bold text-neutral-900 block">
+                      {o.orderNumber}
+                    </span>
+                    <span className="text-xs text-neutral-500 block font-mono">
+                      {o.items.length} {o.items.length === 1 ? "item" : "items"}
+                    </span>
+                  </td>
 
-                return (
-                  <tr key={order.id} className="hover:bg-neutral-50/80 transition-colors">
-                    <td className="py-3 px-4">
-                      <span className="font-mono font-bold text-neutral-900 block">
-                        {order.orderNumber}
-                      </span>
-                      <span className="text-[11px] text-neutral-500 font-mono">
-                        {order.date}
-                      </span>
-                    </td>
+                  <td className="py-3.5 px-4">
+                    <span className="font-medium text-neutral-900 block">
+                      {o.customerName}
+                    </span>
+                    <span className="text-xs text-neutral-500 block">
+                      {o.city}, {o.state}
+                    </span>
+                  </td>
 
-                    <td className="py-3 px-4">
-                      <span className="font-semibold text-neutral-900 block">{order.customerName}</span>
-                      <span className="text-[11px] text-neutral-500">{order.city}, {order.state}</span>
-                    </td>
+                  <td className="py-3.5 px-4 text-xs text-neutral-600">
+                    {o.date}
+                  </td>
 
-                    <td className="py-3 px-4">
-                      <span className="font-semibold text-neutral-800 block">
-                        {totalQty} item{totalQty > 1 ? "s" : ""}
-                      </span>
-                      <span className="text-[11px] text-neutral-500 truncate block max-w-xs" title={order.items.map(i => i.title).join(", ")}>
-                        {order.items[0]?.title} {order.items.length > 1 ? `+${order.items.length - 1} more` : ""}
-                      </span>
-                    </td>
+                  <td className="py-3.5 px-4">
+                    <span className="font-bold text-neutral-900 block">
+                      {formatINR(o.total)}
+                    </span>
+                    <span className="text-[11px] font-mono text-neutral-500 uppercase">
+                      {o.paymentMethod}
+                    </span>
+                  </td>
 
-                    <td className="py-3 px-4 font-mono">
-                      <span className="font-bold text-neutral-900 block">
-                        {formatINR(order.total)}
-                      </span>
-                      <span className="text-[10px] text-neutral-500 block">
-                        {order.paymentMethod} • {order.paymentStatus}
-                      </span>
-                    </td>
+                  <td className="py-3.5 px-4 text-center">
+                    <AdminBadge variant={getStatusBadgeVariant(o.status)} size="sm">
+                      {o.status}
+                    </AdminBadge>
+                  </td>
 
-                    <td className="py-3 px-4 text-center">
+                  <td className="py-3.5 px-5 text-right">
+                    <div className="flex items-center justify-end gap-2">
                       <button
-                        onClick={() => handleOpenStatusModal(order)}
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider border cursor-pointer ${
-                          order.status === "Delivered"
-                            ? "bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100"
-                            : order.status === "Shipped"
-                            ? "bg-blue-50 text-blue-800 border-blue-200 hover:bg-blue-100"
-                            : order.status === "Cancelled" || order.status === "Returned"
-                            ? "bg-red-50 text-red-800 border-red-200 hover:bg-red-100"
-                            : "bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100"
-                        }`}
-                        title="Click to shift order status"
+                        onClick={() => handleOpenStatusModal(o)}
+                        className="px-2.5 py-1.5 text-xs font-semibold bg-white border border-neutral-300 hover:border-[#734E06] hover:text-[#734E06] rounded-sm text-neutral-800 transition-colors"
                       >
-                        {order.status}
+                        Status
                       </button>
-                    </td>
-
-                    <td className="py-3 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        {onNavigate && (
-                          <button
-                            onClick={() => onNavigate(`/admin/orders/${order.id}`)}
-                            className="px-2.5 py-1 text-xs font-semibold border border-neutral-300 hover:border-brand hover:text-brand bg-white rounded-sm transition-colors"
-                          >
-                            Details
-                          </button>
-                        )}
+                      {onNavigate && (
                         <button
-                          onClick={() => handleOpenStatusModal(order)}
-                          className="p-1.5 text-neutral-600 hover:text-brand hover:bg-neutral-100 rounded-sm transition-colors"
-                          title="Update Status"
+                          onClick={() => onNavigate(`/admin/orders/${o.id}`)}
+                          className="px-3 py-1.5 text-xs font-semibold bg-[#734E06] hover:bg-[#5a3c04] text-white rounded-sm transition-colors flex items-center gap-1"
                         >
-                          <Edit2 className="w-3.5 h-3.5" />
+                          <Eye className="w-3.5 h-3.5" /> View
                         </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
 
               {filteredOrders.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-neutral-500">
-                    No orders match the filter criteria.
+                  <td colSpan={6}>
+                    <AdminEmptyState
+                      icon={<ShoppingBag className="w-8 h-8 text-neutral-400" />}
+                      title="No Orders Found"
+                      description="No orders match your search query or status filter."
+                    />
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-      </div>
+      </AdminCard>
 
-      {/* Status Shift Modal */}
+      {/* 5. Update Status Modal */}
       {statusModalOrder && (
         <div
-          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4"
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4 animate-in fade-in duration-200"
           style={{ zIndex: 70 }}
+          onClick={() => setStatusModalOrder(null)}
         >
           <div
-            className="bg-white border border-neutral-200 rounded-sm max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150"
+            className="bg-white border border-neutral-200 rounded-sm max-w-md w-full p-6 sm:p-7 shadow-2xl space-y-4 animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
-              <div className="flex items-center gap-2">
-                <ShoppingBag className="w-5 h-5 text-brand" />
-                <h3 className="font-bold text-neutral-900 text-base m-0">
-                  Update Order Status: {statusModalOrder.orderNumber}
-                </h3>
-              </div>
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-200">
+              <h3 className="font-serif text-lg font-bold text-neutral-900 m-0">
+                Update Status • {statusModalOrder.orderNumber}
+              </h3>
               <button
                 onClick={() => setStatusModalOrder(null)}
                 className="text-neutral-400 hover:text-neutral-700 p-1"
@@ -308,52 +294,52 @@ export const AdminOrdersPage: React.FC<{ onNavigate?: (href: string) => void }> 
               </button>
             </div>
 
-            <form onSubmit={handleUpdateStatus} className="space-y-4 text-xs">
+            <form onSubmit={handleUpdateStatus} className="space-y-4">
               <div>
-                <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                  Target Status Transition
+                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
+                  Fulfillment Status
                 </label>
                 <select
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value as OrderStatus)}
-                  className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 text-neutral-900 text-xs rounded-sm focus:bg-white focus:border-brand outline-none font-semibold cursor-pointer"
+                  className="w-full h-11 px-3 bg-white border border-neutral-300 rounded-sm text-sm text-neutral-900 outline-none focus:border-[#734E06] focus:ring-1 focus:ring-[#734E06]"
                 >
-                  <option value="Pending">Pending (Awaiting Confirmation)</option>
-                  <option value="Confirmed">Confirmed (Prepaid / COD Verified)</option>
-                  <option value="Processing">Processing (Atelier Packing)</option>
-                  <option value="Shipped">Shipped (Handed to Courier)</option>
-                  <option value="Delivered">Delivered (Customer Handover Complete)</option>
-                  <option value="Cancelled">Cancelled (Order Voided)</option>
-                  <option value="Returned">Returned (Reverse Logistic Received)</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Processing">Processing</option>
+                  <option value="Shipped">Shipped</option>
+                  <option value="Out for Delivery">Out for Delivery</option>
+                  <option value="Delivered">Delivered</option>
+                  <option value="Cancelled">Cancelled</option>
+                  <option value="Refunded">Refunded</option>
                 </select>
               </div>
 
               <div>
-                <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                  Timeline Event Note / Waybill #
+                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
+                  Internal Timeline Note (Optional)
                 </label>
-                <input
-                  type="text"
+                <textarea
                   value={statusNote}
                   onChange={(e) => setStatusNote(e.target.value)}
-                  placeholder="e.g. Dispatched via BlueDart AWB #99882201"
-                  className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 text-neutral-900 text-xs rounded-sm focus:bg-white focus:border-brand outline-none"
+                  placeholder="e.g. Package dispatched via Bluedart courier."
+                  className="w-full min-h-[80px] p-3 bg-white border border-neutral-300 rounded-sm text-sm text-neutral-900 outline-none focus:border-[#734E06] focus:ring-1 focus:ring-[#734E06]"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-200">
+              <div className="flex items-center justify-end gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setStatusModalOrder(null)}
-                  className="px-4 py-2 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-sm hover:bg-neutral-50 transition-colors"
+                  className="h-11 px-4 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-sm hover:bg-neutral-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-brand text-brand-foreground text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-brand-hover transition-colors"
+                  className="h-11 px-5 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm transition-colors"
                 >
-                  Confirm Status Change
+                  Save Status
                 </button>
               </div>
             </form>

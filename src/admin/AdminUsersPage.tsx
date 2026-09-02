@@ -3,16 +3,17 @@ import { useData } from "../context/DataContext";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { AdminRole, AdminUser } from "../types";
 import {
-  UserCheck,
   UserPlus,
   Trash2,
   Edit2,
   X,
-  Mail,
-  Phone,
-  CheckCircle2,
 } from "lucide-react";
 import { hashPassword } from "../lib/auth/password";
+import { AdminPageHeader } from "../components/admin/ui/AdminPageHeader";
+import { AdminCard } from "../components/admin/ui/AdminCard";
+import { AdminBadge } from "../components/admin/ui/AdminBadge";
+import { AdminField } from "../components/admin/ui/AdminField";
+import { AdminInput, AdminSelect } from "../components/admin/ui/AdminInputs";
 
 export const AdminUsersPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
   onNavigate,
@@ -98,316 +99,186 @@ export const AdminUsersPage: React.FC<{ onNavigate?: (href: string) => void }> =
     content_manager: "Content Lead",
   };
 
-  const roleDescMap: Record<AdminRole, string> = {
-    superadmin: "Unrestricted access to all modules, admin users, settings, and logs.",
-    admin: "Full control over products, inventory, orders, coupons, reviews, and CMS.",
-    order_manager: "Scoped access to order processing, customer records, and inventory.",
-    content_manager: "Scoped access to homepage CMS, notification bar, reviews, and lookbook.",
-  };
-
-  const roleBadgeColors: Record<AdminRole, string> = {
-    superadmin: "bg-amber-100 text-amber-900 border-amber-300",
-    admin: "bg-blue-100 text-blue-900 border-blue-300",
-    order_manager: "bg-emerald-100 text-emerald-900 border-emerald-300",
-    content_manager: "bg-purple-100 text-purple-900 border-purple-300",
-  };
-
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
+      {/* 1. Page Header */}
+      <AdminPageHeader
+        title="Admin Staff & RBAC Roles"
+        description="Manage authenticated staff accounts, role-based module access rights, and security permissions."
+        breadcrumbs={
           <Breadcrumbs
-            items={[{ label: "Admin", href: "/admin" }, { label: "Admin Users & RBAC" }]}
+            items={[{ label: "Admin", href: "/admin" }, { label: "User Management" }]}
             onNavigate={onNavigate}
           />
-          <h1 className="text-xl sm:text-2xl font-serif font-bold text-neutral-900 mt-1.5 m-0">
-            Admin User Management & Role Permissions
-          </h1>
-        </div>
+        }
+        badge={
+          <AdminBadge variant="brand" size="md">
+            {adminUsers.length} Staff Accounts
+          </AdminBadge>
+        }
+        actions={
+          isSuperAdmin ? (
+            <button
+              onClick={handleOpenAdd}
+              className="flex items-center gap-2 h-10 px-4 sm:px-5 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs min-h-[40px]"
+            >
+              <UserPlus className="w-4 h-4" /> Add Admin User
+            </button>
+          ) : undefined
+        }
+      />
 
-        {isSuperAdmin && (
-          <button
-            onClick={handleOpenAdd}
-            className="flex items-center gap-2 px-4 py-2.5 bg-brand text-brand-foreground hover:bg-brand-hover text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs self-start sm:self-auto min-h-[44px]"
-          >
-            <UserPlus className="w-4 h-4" /> Add Admin User
-          </button>
-        )}
-      </div>
+      {/* 2. Responsive Grid of Admin Users */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+        {adminUsers.map((u) => (
+          <AdminCard key={u.id} noPadding className="flex flex-col justify-between">
+            <div className="p-5 space-y-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full bg-[#734E06]/10 text-[#734E06] flex items-center justify-center font-bold text-base border border-[#734E06]/20 shrink-0">
+                    {u.name.charAt(0)}
+                  </div>
+                  <div>
+                    <strong className="text-sm font-bold text-neutral-900 block">{u.name}</strong>
+                    <span className="text-xs text-neutral-500 block">{u.email}</span>
+                  </div>
+                </div>
 
-      {/* Role Summary Guide */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {(["superadmin", "admin", "order_manager", "content_manager"] as AdminRole[]).map((r) => (
-          <div key={r} className="bg-white p-4 border border-neutral-200 rounded-sm shadow-xs flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm border ${roleBadgeColors[r]}`}>
-                  {roleLabelMap[r]}
-                </span>
-                <span className="text-xs font-bold text-neutral-500">
-                  {adminUsers.filter((u) => u.role === r).length} users
-                </span>
+                <AdminBadge variant={u.isActive ? "success" : "neutral"} size="sm">
+                  {u.isActive ? "Active" : "Disabled"}
+                </AdminBadge>
               </div>
-              <p className="text-xs text-neutral-600 leading-relaxed m-0">
-                {roleDescMap[r]}
-              </p>
+
+              <div className="p-3 bg-neutral-50 rounded-xs space-y-1.5 text-xs text-neutral-700">
+                <div className="flex justify-between items-center">
+                  <span className="text-neutral-500">Assigned Role:</span>
+                  <AdminBadge variant="brand" size="sm">
+                    {roleLabelMap[u.role] || u.role}
+                  </AdminBadge>
+                </div>
+                {u.phone && (
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">Hotline:</span>
+                    <span className="font-mono text-neutral-800">{u.phone}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">Last Sign In:</span>
+                  <span className="font-mono text-neutral-800">
+                    {u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : "Never"}
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
+
+            {isSuperAdmin && (
+              <div className="px-5 py-3 border-t border-neutral-100 bg-neutral-50/50 flex items-center justify-end gap-2">
+                <button
+                  onClick={() => handleOpenEdit(u)}
+                  className="h-8 px-3 text-xs font-semibold bg-white border border-neutral-300 hover:border-[#734E06] hover:text-[#734E06] rounded-sm text-neutral-800 flex items-center gap-1.5 transition-colors"
+                >
+                  <Edit2 className="w-3.5 h-3.5" /> Edit
+                </button>
+                {u.id !== adminUser?.id && (
+                  <button
+                    onClick={() => setUserToDelete(u)}
+                    className="h-8 w-8 flex items-center justify-center text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 rounded-sm transition-colors"
+                    title="Delete User"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            )}
+          </AdminCard>
         ))}
       </div>
 
-      {/* Users Table */}
-      <div className="bg-white border border-neutral-200 rounded-sm shadow-xs overflow-hidden">
-        <div className="p-4 border-b border-neutral-200 flex justify-between items-center">
-          <div>
-            <h3 className="text-sm font-bold text-neutral-900 m-0">
-              Active Administrative Team ({adminUsers.length})
-            </h3>
-            <p className="text-xs text-neutral-500 m-0 mt-0.5">
-              Verified operators with permission scopes and session access.
-            </p>
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[700px]">
-            <thead>
-              <tr className="bg-neutral-50 text-[11px] font-bold text-neutral-500 uppercase tracking-wider border-b border-neutral-200">
-                <th className="py-3 px-4">Operator Name</th>
-                <th className="py-3 px-4">Role & Scope</th>
-                <th className="py-3 px-4">Contact Info</th>
-                <th className="py-3 px-4 text-center">Status</th>
-                <th className="py-3 px-4">Last Activity</th>
-                <th className="py-3 px-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-100 text-xs">
-              {adminUsers.map((user) => {
-                const isCurrent = user.id === adminUser?.id;
-
-                return (
-                  <tr key={user.id} className="hover:bg-neutral-50/80 transition-colors">
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-neutral-200 border border-neutral-300 flex items-center justify-center font-bold text-neutral-700 text-xs shrink-0">
-                          {user.name.charAt(0)}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-semibold text-neutral-900">
-                              {user.name}
-                            </span>
-                            {isCurrent && (
-                              <span className="text-[9px] bg-brand text-brand-foreground px-1.5 py-0.2 rounded-xs uppercase font-bold">
-                                You
-                              </span>
-                            )}
-                          </div>
-                          <span className="text-[11px] text-neutral-500 block">
-                            ID: {user.id} • Created: {user.createdAt}
-                          </span>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td className="py-3 px-4">
-                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm border inline-block ${roleBadgeColors[user.role]}`}>
-                        {roleLabelMap[user.role]}
-                      </span>
-                    </td>
-
-                    <td className="py-3 px-4">
-                      <div className="flex flex-col gap-0.5 text-[11px]">
-                        <span className="text-neutral-900 flex items-center gap-1">
-                          <Mail className="w-3 h-3 text-neutral-400" /> {user.email}
-                        </span>
-                        {user.phone && (
-                          <span className="text-neutral-500 flex items-center gap-1">
-                            <Phone className="w-3 h-3 text-neutral-400" /> {user.phone}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-
-                    <td className="py-3 px-4 text-center">
-                      {user.isActive ? (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-sm">
-                          <CheckCircle2 className="w-3 h-3" /> Active
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-neutral-500 bg-neutral-100 border border-neutral-200 px-2 py-0.5 rounded-sm">
-                          Inactive
-                        </span>
-                      )}
-                    </td>
-
-                    <td className="py-3 px-4 text-neutral-500 text-[11px]">
-                      {user.lastLogin || "No recorded login"}
-                    </td>
-
-                    <td className="py-3 px-4 text-right">
-                      {isSuperAdmin ? (
-                        <div className="flex items-center justify-end gap-1.5">
-                          <button
-                            onClick={() => handleOpenEdit(user)}
-                            className="p-1.5 text-neutral-600 hover:text-brand hover:bg-neutral-100 rounded-sm transition-colors"
-                            title="Edit User Role / Details"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </button>
-                          {!isCurrent && (
-                            <button
-                              onClick={() => setUserToDelete(user)}
-                              className="p-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-sm transition-colors"
-                              title="Delete Admin Account"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-neutral-400 text-[11px] italic">View Only</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Add/Edit Modal */}
+      {/* 3. Add/Edit Modal */}
       {isAddModalOpen && (
         <div
-          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4"
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4 animate-in fade-in duration-150"
           style={{ zIndex: 70 }}
+          onClick={() => setIsAddModalOpen(false)}
         >
           <div
-            className="bg-white border border-neutral-200 rounded-sm max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150"
+            className="bg-white border border-neutral-200 rounded-sm max-w-md w-full p-6 sm:p-7 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
-              <div className="flex items-center gap-2">
-                <UserCheck className="w-5 h-5 text-brand" />
-                <h3 className="font-bold text-neutral-900 text-base m-0">
-                  {editingUser ? "Edit Admin User Details" : "Create New Admin User"}
-                </h3>
-              </div>
-              <button
-                onClick={() => setIsAddModalOpen(false)}
-                className="text-neutral-400 hover:text-neutral-700 p-1"
-              >
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+              <h3 className="font-serif text-lg font-bold text-neutral-900 m-0">
+                {editingUser ? `Edit ${editingUser.name}` : "Create Staff Account"}
+              </h3>
+              <button onClick={() => setIsAddModalOpen(false)} className="text-neutral-400 hover:text-neutral-700 p-1">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="space-y-3.5">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                  Full Operator Name
-                </label>
-                <input
-                  type="text"
+            <form onSubmit={handleSave} className="space-y-4">
+              <AdminField label="Full Name" required>
+                <AdminInput
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Meera Kapadia"
-                  className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 text-neutral-900 text-xs rounded-sm focus:bg-white focus:border-brand focus:ring-1 focus:ring-brand outline-none"
+                  placeholder="e.g. Darshil Tailor"
                 />
-              </div>
+              </AdminField>
 
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                  Email Address
-                </label>
-                <input
+              <AdminField label="Corporate Email" required>
+                <AdminInput
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@evaravastra.com"
-                  className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 text-neutral-900 text-xs rounded-sm focus:bg-white focus:border-brand focus:ring-1 focus:ring-brand outline-none"
+                  placeholder="staff@evaravastra.com"
                 />
-              </div>
+              </AdminField>
 
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                  Contact Phone Number
-                </label>
-                <input
+              <AdminField label="Phone Hotline">
+                <AdminInput
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+91 98765 43210"
-                  className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 text-neutral-900 text-xs rounded-sm focus:bg-white focus:border-brand focus:ring-1 focus:ring-brand outline-none"
                 />
-              </div>
+              </AdminField>
 
               {!editingUser && (
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                    Temporary Initial Password (Min 12 Characters)
-                  </label>
-                  <input
+                <AdminField label="Initial Password" hint="Default: EvaraAdmin@2026Secure!">
+                  <AdminInput
                     type="password"
                     value={initialPassword}
                     onChange={(e) => setInitialPassword(e.target.value)}
-                    placeholder="Enter strong temporary password"
-                    className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 text-neutral-900 text-xs rounded-sm focus:bg-white focus:border-brand outline-none"
+                    placeholder="Set temporary login password"
                   />
-                  <span className="text-[10px] text-neutral-400 block mt-0.5">
-                    Hashed securely with PBKDF2 before storing.
-                  </span>
-                </div>
+                </AdminField>
               )}
 
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                  Security Role & Permission Scope
-                </label>
-                <select
+              <AdminField label="Role & Access Scope" required>
+                <AdminSelect
                   value={role}
                   onChange={(e) => setRole(e.target.value as AdminRole)}
-                  className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 text-neutral-900 text-xs rounded-sm focus:bg-white focus:border-brand outline-none font-semibold cursor-pointer"
                 >
-                  <option value="superadmin">Super Admin (Full Platform Access)</option>
-                  <option value="admin">Store Admin (Catalog, Orders, Marketing, Content)</option>
-                  <option value="order_manager">Order Manager (Fulfillment, Orders, Customers)</option>
-                  <option value="content_manager">Content Lead (CMS, Notification Bar, Lookbook)</option>
-                </select>
-                <span className="text-[11px] text-neutral-500 block mt-1">
-                  {roleDescMap[role]}
-                </span>
-              </div>
+                  <option value="superadmin">Super Admin (Full Root Permissions)</option>
+                  <option value="admin">Store Admin (Catalog, Orders, Inventory)</option>
+                  <option value="order_manager">Order Manager (Orders & Shiprocket)</option>
+                  <option value="content_manager">Content Lead (CMS & Lookbooks)</option>
+                </AdminSelect>
+              </AdminField>
 
-              <div className="flex items-center gap-2 pt-2">
-                <input
-                  type="checkbox"
-                  id="isActiveToggle"
-                  checked={isActive}
-                  onChange={(e) => setIsActive(e.target.checked)}
-                  className="w-4 h-4 text-brand rounded-xs"
-                />
-                <label htmlFor="isActiveToggle" className="text-xs text-neutral-700 font-medium cursor-pointer">
-                  Account is Active & Permitted to Sign In
-                </label>
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-neutral-200">
+              <div className="pt-2 flex items-center justify-end gap-3 border-t border-neutral-100">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-sm hover:bg-neutral-50 transition-colors"
+                  className="h-10 px-4 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-sm hover:bg-neutral-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-brand text-brand-foreground text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-brand-hover transition-colors"
+                  className="h-10 px-5 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm shadow-xs"
                 >
-                  {editingUser ? "Save Changes" : "Create Admin User"}
+                  {editingUser ? "Update Staff" : "Create Account"}
                 </button>
               </div>
             </form>
@@ -415,40 +286,42 @@ export const AdminUsersPage: React.FC<{ onNavigate?: (href: string) => void }> =
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* 4. Delete Confirm Modal */}
       {userToDelete && (
         <div
           className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4"
           style={{ zIndex: 70 }}
+          onClick={() => setUserToDelete(null)}
         >
           <div
-            className="bg-white border border-red-200 rounded-sm max-w-sm w-full p-6 shadow-2xl space-y-4"
+            className="bg-white border border-neutral-200 rounded-sm max-w-md w-full p-6 space-y-4 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-12 h-12 bg-red-50 text-red-700 rounded-full flex items-center justify-center mx-auto border border-red-200">
+            <div className="w-12 h-12 rounded-full bg-red-50 text-red-700 flex items-center justify-center mx-auto border border-red-200">
               <Trash2 className="w-6 h-6" />
             </div>
             <div className="text-center">
-              <h3 className="text-base font-bold text-neutral-900 mb-1">
-                Delete Admin User?
+              <h3 className="font-serif text-lg font-bold text-neutral-900 m-0 mb-1.5">
+                Revoke Staff Account?
               </h3>
-              <p className="text-xs text-neutral-600 leading-relaxed">
-                Are you sure you want to revoke access and delete the account for{" "}
-                <strong>{userToDelete.name}</strong> ({userToDelete.email})? This action cannot be undone.
+              <p className="text-xs sm:text-sm text-neutral-600 m-0">
+                Are you sure you want to permanently revoke credentials for <strong>{userToDelete.name}</strong> ({userToDelete.email})?
               </p>
             </div>
-            <div className="flex items-center justify-center gap-2 pt-2">
+            <div className="flex items-center justify-end gap-3 pt-2">
               <button
+                type="button"
                 onClick={() => setUserToDelete(null)}
-                className="px-4 py-2 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-sm hover:bg-neutral-50 transition-colors flex-1"
+                className="h-10 px-4 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-sm hover:bg-neutral-50 flex-1"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleConfirmDelete}
-                className="px-4 py-2 bg-red-700 text-white text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-red-800 transition-colors flex-1"
+                className="h-10 px-4 bg-red-700 hover:bg-red-800 text-white text-xs font-bold uppercase tracking-wider rounded-sm flex-1"
               >
-                Delete Account
+                Revoke Account
               </button>
             </div>
           </div>

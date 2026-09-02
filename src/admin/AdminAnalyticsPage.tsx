@@ -1,8 +1,13 @@
 import React from "react";
 import { useData } from "../context/DataContext";
+import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { AlertCircle } from "lucide-react";
+import { AdminPageHeader } from "../components/admin/ui/AdminPageHeader";
+import { AdminCard } from "../components/admin/ui/AdminCard";
 
-export const AdminAnalyticsPage: React.FC<{ onNavigate: (href: string) => void }> = () => {
+export const AdminAnalyticsPage: React.FC<{ onNavigate: (href: string) => void }> = ({
+  onNavigate,
+}) => {
   const { orders, products, categories, customers } = useData();
 
   const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
@@ -25,132 +30,116 @@ export const AdminAnalyticsPage: React.FC<{ onNavigate: (href: string) => void }
   }, {});
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-      {/* Header */}
-      <div>
-        <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7C2430", display: "block" }}>
-          TRANSPARENT COMMERCE METRICS
-        </span>
-        <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: "0.2rem 0 0 0" }}>
-          Store Performance & Intelligence
-        </h1>
-      </div>
+    <div className="space-y-6">
+      {/* 1. Page Header */}
+      <AdminPageHeader
+        title="Store Performance & Intelligence"
+        description="Transparent real-time commerce metrics computed directly from active database orders, items sold, and customer lifetime value."
+        breadcrumbs={
+          <Breadcrumbs
+            items={[{ label: "Admin", href: "/admin" }, { label: "Analytics & Intelligence" }]}
+            onNavigate={onNavigate}
+          />
+        }
+      />
 
-      {/* Honest Integration Notice */}
-      <div
-        style={{
-          backgroundColor: "var(--admin-surface-subtle)",
-          padding: "1rem 1.25rem",
-          border: "1px solid var(--admin-border)",
-          display: "flex",
-          alignItems: "center",
-          gap: "0.75rem",
-          fontSize: "0.8rem",
-          color: "var(--admin-text-secondary)",
-        }}
-      >
-        <AlertCircle size={18} style={{ color: "#B18A52", flexShrink: 0 }} />
+      {/* Notice */}
+      <div className="p-4 bg-amber-50/70 border border-amber-200 rounded-sm flex items-center gap-3 text-xs sm:text-sm text-neutral-800">
+        <AlertCircle className="w-5 h-5 text-[#734E06] shrink-0" />
         <span>
-          <strong>Data Note:</strong> The figures below represent real transaction metrics computed directly from your local demo orders and catalog records. External third-party Google Analytics / Meta Pixel integrations are currently disconnected.
+          <strong>Data Note:</strong> The figures below represent real transaction metrics computed directly from your active orders and catalog records.
         </span>
       </div>
 
-      {/* KPI Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.25rem" }}>
-        <div style={{ backgroundColor: "var(--admin-surface)", padding: "1.5rem", border: "1px solid var(--admin-border)" }}>
-          <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)" }}>
+      {/* 2. KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+        <AdminCard className="p-5">
+          <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 block mb-1">
             Total Store Revenue
           </span>
-          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "var(--admin-text)", marginTop: "0.25rem" }}>
+          <div className="text-2xl sm:text-3xl font-serif font-bold text-neutral-900">
             {formatINR(totalRevenue)}
           </div>
-          <span style={{ fontSize: "0.72rem", color: "#234E3E" }}>From {totalOrders} total completed orders</span>
-        </div>
+          <span className="text-xs text-emerald-700 font-semibold block mt-1">From {totalOrders} total completed orders</span>
+        </AdminCard>
 
-        <div style={{ backgroundColor: "var(--admin-surface)", padding: "1.5rem", border: "1px solid var(--admin-border)" }}>
-          <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)" }}>
+        <AdminCard className="p-5">
+          <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 block mb-1">
             Average Order Value (AOV)
           </span>
-          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "var(--admin-text)", marginTop: "0.25rem" }}>
+          <div className="text-2xl sm:text-3xl font-serif font-bold text-neutral-900">
             {formatINR(avgOrderValue)}
           </div>
-          <span style={{ fontSize: "0.72rem", color: "var(--admin-text-secondary)" }}>Per transaction basket</span>
-        </div>
+          <span className="text-xs text-neutral-500 block mt-1">Per transaction basket</span>
+        </AdminCard>
 
-        <div style={{ backgroundColor: "var(--admin-surface)", padding: "1.5rem", border: "1px solid var(--admin-border)" }}>
-          <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)" }}>
-            Total Sarees Sold
+        <AdminCard className="p-5">
+          <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 block mb-1">
+            Total Pieces Sold
           </span>
-          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "var(--admin-text)", marginTop: "0.25rem" }}>
+          <div className="text-2xl sm:text-3xl font-serif font-bold text-neutral-900">
             {totalItemsSold} units
           </div>
-          <span style={{ fontSize: "0.72rem", color: "var(--admin-text-secondary)" }}>Across all handloom fabrics</span>
-        </div>
+          <span className="text-xs text-neutral-500 block mt-1">Across all handloom fabrics</span>
+        </AdminCard>
 
-        <div style={{ backgroundColor: "var(--admin-surface)", padding: "1.5rem", border: "1px solid var(--admin-border)" }}>
-          <span style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)" }}>
-            Active Registered Patrons
+        <AdminCard className="p-5">
+          <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 block mb-1">
+            Active Patrons
           </span>
-          <div style={{ fontSize: "1.65rem", fontWeight: 700, color: "var(--admin-text)", marginTop: "0.25rem" }}>
+          <div className="text-2xl sm:text-3xl font-serif font-bold text-neutral-900">
             {customers.length}
           </div>
-          <span style={{ fontSize: "0.72rem", color: "var(--admin-text-secondary)" }}>Client directory profiles</span>
-        </div>
+          <span className="text-xs text-neutral-500 block mt-1">Client directory profiles</span>
+        </AdminCard>
       </div>
 
-      {/* Breakdown Section */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }} className="admin-analytics-grid">
-        {/* Payment Channels */}
-        <div style={{ backgroundColor: "var(--admin-surface)", padding: "1.75rem", border: "1px solid var(--admin-border)" }}>
-          <h3 className="font-serif" style={{ fontSize: "1.3rem", margin: "0 0 1rem 0" }}>
-            Revenue by Payment Method
-          </h3>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-            {Object.entries(paymentBreakdown).map(([method, amt]) => {
-              const pct = totalRevenue > 0 ? Math.round((amt / totalRevenue) * 100) : 0;
+      {/* 3. Detailed Breakdown */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+        <AdminCard title="Payment Channel Distribution">
+          <div className="space-y-3">
+            {Object.entries(paymentBreakdown).map(([method, amount]) => {
+              const percentage = totalRevenue > 0 ? Math.round((amount / totalRevenue) * 100) : 0;
               return (
-                <div key={method} style={{ padding: "0.75rem", backgroundColor: "var(--admin-surface-subtle)", border: "1px solid #EBE5DB" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.25rem", fontSize: "0.85rem" }}>
-                    <strong>{method}</strong>
-                    <span>{formatINR(amt)} ({pct}%)</span>
+                <div key={method} className="space-y-1">
+                  <div className="flex justify-between text-xs sm:text-sm">
+                    <span className="font-semibold text-neutral-900">{method}</span>
+                    <span className="font-bold text-[#734E06]">{formatINR(amount)} ({percentage}%)</span>
                   </div>
-                  <div style={{ width: "100%", height: "4px", backgroundColor: "#E5DFD5" }}>
-                    <div style={{ width: `${pct}%`, height: "100%", backgroundColor: "#7C2430" }} />
+                  <div className="w-full h-2 bg-neutral-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-[#734E06]" style={{ width: `${percentage}%` }} />
                   </div>
                 </div>
               );
             })}
           </div>
-        </div>
+        </AdminCard>
 
-        {/* Category Coverage */}
-        <div style={{ backgroundColor: "var(--admin-surface)", padding: "1.75rem", border: "1px solid var(--admin-border)" }}>
-          <h3 className="font-serif" style={{ fontSize: "1.3rem", margin: "0 0 1rem 0" }}>
-            Catalog Distribution by Fabric
-          </h3>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-            {categories.map((cat) => {
-              const count = products.filter((p) => p.category === cat.slug).length;
-              return (
-                <div key={cat.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.6rem 0.75rem", backgroundColor: "var(--admin-surface-subtle)", border: "1px solid #EBE5DB", fontSize: "0.85rem" }}>
-                  <span>{cat.name}</span>
-                  <strong style={{ color: "#7C2430" }}>{count} saree(s)</strong>
-                </div>
-              );
-            })}
+        <AdminCard title="Catalog Readiness Metrics">
+          <div className="space-y-3 text-xs sm:text-sm">
+            <div className="flex justify-between py-2 border-b border-neutral-100">
+              <span className="text-neutral-600">Total Catalog Items:</span>
+              <strong className="text-neutral-900">{products.length} SKUs</strong>
+            </div>
+            <div className="flex justify-between py-2 border-b border-neutral-100">
+              <span className="text-neutral-600">Active Taxonomies:</span>
+              <strong className="text-neutral-900">{categories.length} Categories</strong>
+            </div>
+            <div className="flex justify-between py-2 border-b border-neutral-100">
+              <span className="text-neutral-600">Average Price Per Saree:</span>
+              <strong className="text-neutral-900">
+                {formatINR(products.length > 0 ? Math.round(products.reduce((s, p) => s + p.price, 0) / products.length) : 0)}
+              </strong>
+            </div>
+            <div className="flex justify-between py-2">
+              <span className="text-neutral-600">Total Stock Value:</span>
+              <strong className="text-[#734E06]">
+                {formatINR(products.reduce((s, p) => s + p.price * (p.inventoryCount ?? p.inventory ?? 0), 0))}
+              </strong>
+            </div>
           </div>
-        </div>
+        </AdminCard>
       </div>
-
-      <style>{`
-        @media (max-width: 860px) {
-          .admin-analytics-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };

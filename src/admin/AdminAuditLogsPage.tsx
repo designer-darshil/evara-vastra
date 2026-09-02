@@ -4,11 +4,15 @@ import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { AuditLog, AuditLogSeverity } from "../types";
 import {
   History,
-  Search,
   FileSpreadsheet,
   Eye,
   X,
 } from "lucide-react";
+import { AdminPageHeader } from "../components/admin/ui/AdminPageHeader";
+import { AdminCard } from "../components/admin/ui/AdminCard";
+import { AdminToolbar } from "../components/admin/ui/AdminToolbar";
+import { AdminBadge } from "../components/admin/ui/AdminBadge";
+import { AdminEmptyState } from "../components/admin/ui/AdminEmptyState";
 
 export const AdminAuditLogsPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
   onNavigate,
@@ -36,10 +40,16 @@ export const AdminAuditLogsPage: React.FC<{ onNavigate?: (href: string) => void 
     return true;
   });
 
-  const severityBadgeColors: Record<AuditLogSeverity, string> = {
-    info: "bg-blue-50 text-blue-800 border-blue-200",
-    warning: "bg-amber-50 text-amber-800 border-amber-200",
-    critical: "bg-red-50 text-red-800 border-red-200",
+  const getSeverityBadgeVariant = (severity: AuditLogSeverity) => {
+    switch (severity) {
+      case "critical":
+        return "danger";
+      case "warning":
+        return "warning";
+      case "info":
+      default:
+        return "info";
+    }
   };
 
   const handleExportCSV = () => {
@@ -64,169 +74,197 @@ export const AdminAuditLogsPage: React.FC<{ onNavigate?: (href: string) => void 
     document.body.removeChild(link);
   };
 
+  const infoCount = auditLogs.filter((l) => l.severity === "info").length;
+  const warningCount = auditLogs.filter((l) => l.severity === "warning").length;
+  const criticalCount = auditLogs.filter((l) => l.severity === "critical").length;
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
+      {/* 1. Page Header */}
+      <AdminPageHeader
+        title="System Mutation & Audit Logs"
+        description="Immutable real-time audit trail of product edits, inventory adjustments, status mutations, and security authentications."
+        breadcrumbs={
           <Breadcrumbs
             items={[{ label: "Admin", href: "/admin" }, { label: "System Audit Logs" }]}
             onNavigate={onNavigate}
           />
-          <h1 className="text-xl sm:text-2xl font-serif font-bold text-neutral-900 mt-1.5 m-0">
-            System Mutation & Audit Logs
-          </h1>
-        </div>
+        }
+        badge={
+          <AdminBadge variant="brand" size="md">
+            {auditLogs.length} Logged Events
+          </AdminBadge>
+        }
+        actions={
+          <button
+            onClick={handleExportCSV}
+            className="flex items-center gap-2 h-10 px-4 bg-white border border-neutral-300 hover:border-[#734E06] hover:text-[#734E06] text-neutral-700 text-xs font-semibold rounded-sm transition-colors shadow-2xs min-h-[40px]"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-emerald-700" /> Export CSV Log
+          </button>
+        }
+      />
 
-        <button
-          onClick={handleExportCSV}
-          className="flex items-center gap-2 px-4 py-2 bg-white border border-neutral-300 hover:border-brand hover:text-brand text-neutral-700 text-xs font-semibold rounded-sm transition-colors shadow-2xs self-start sm:self-auto min-h-[44px]"
-        >
-          <FileSpreadsheet className="w-4 h-4 text-emerald-700" /> Export CSV Log
-        </button>
-      </div>
-
-      {/* KPI Stream Overview */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white p-4 border border-neutral-200 rounded-sm shadow-xs">
-          <span className="text-[11px] font-bold tracking-wider uppercase text-neutral-500 block mb-1">
+      {/* 2. KPI Stream Overview */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+        <AdminCard className="p-4 sm:p-5">
+          <span className="text-xs font-bold tracking-wider uppercase text-neutral-500 block mb-1">
             Total Logged Events
           </span>
-          <span className="text-2xl font-bold text-neutral-900">{auditLogs.length}</span>
-          <span className="text-[11px] text-neutral-400 block mt-1">Immutable trace history</span>
-        </div>
+          <span className="text-2xl sm:text-3xl font-bold text-neutral-900 font-serif">{auditLogs.length}</span>
+          <span className="text-xs text-neutral-400 block mt-1">Immutable trace history</span>
+        </AdminCard>
 
-        <div className="bg-white p-4 border border-neutral-200 rounded-sm shadow-xs">
-          <span className="text-[11px] font-bold tracking-wider uppercase text-neutral-500 block mb-1">
-            Inventory Changes
+        <AdminCard className="p-4 sm:p-5">
+          <span className="text-xs font-bold tracking-wider uppercase text-blue-600 block mb-1">
+            Informational Ops
           </span>
-          <span className="text-2xl font-bold text-brand">
-            {auditLogs.filter((l) => l.entity === "inventory").length}
-          </span>
-          <span className="text-[11px] text-neutral-400 block mt-1">Stock adjustments</span>
-        </div>
+          <span className="text-2xl sm:text-3xl font-bold text-blue-700 font-serif">{infoCount}</span>
+          <span className="text-xs text-neutral-400 block mt-1">Routine catalog & order events</span>
+        </AdminCard>
 
-        <div className="bg-white p-4 border border-neutral-200 rounded-sm shadow-xs">
-          <span className="text-[11px] font-bold tracking-wider uppercase text-neutral-500 block mb-1">
-            Orders & Commerce
+        <AdminCard className="p-4 sm:p-5">
+          <span className="text-xs font-bold tracking-wider uppercase text-amber-600 block mb-1">
+            Warnings / Rate Limits
           </span>
-          <span className="text-2xl font-bold text-emerald-700">
-            {auditLogs.filter((l) => l.entity === "order" || l.entity === "coupon").length}
-          </span>
-          <span className="text-[11px] text-neutral-400 block mt-1">Order transitions & codes</span>
-        </div>
+          <span className="text-2xl sm:text-3xl font-bold text-amber-700 font-serif">{warningCount}</span>
+          <span className="text-xs text-neutral-400 block mt-1">Stock overrides & auth checks</span>
+        </AdminCard>
 
-        <div className="bg-white p-4 border border-neutral-200 rounded-sm shadow-xs">
-          <span className="text-[11px] font-bold tracking-wider uppercase text-neutral-500 block mb-1">
-            Security & Users
+        <AdminCard className="p-4 sm:p-5">
+          <span className="text-xs font-bold tracking-wider uppercase text-red-600 block mb-1">
+            Critical Mutations
           </span>
-          <span className="text-2xl font-bold text-neutral-800">
-            {auditLogs.filter((l) => l.entity === "user" || l.entity === "auth" || l.entity === "settings").length}
-          </span>
-          <span className="text-[11px] text-neutral-400 block mt-1">Access & config changes</span>
-        </div>
+          <span className="text-2xl sm:text-3xl font-bold text-red-700 font-serif">{criticalCount}</span>
+          <span className="text-xs text-neutral-400 block mt-1">Deletions & credential resets</span>
+        </AdminCard>
       </div>
 
-      {/* Logs Table */}
-      <div className="bg-white border border-neutral-200 rounded-sm shadow-xs">
-        {/* Filters */}
-        <div className="p-4 border-b border-neutral-200 flex flex-col md:flex-row gap-3 justify-between items-stretch md:items-center">
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search audit trail by operator, action, details..."
-              className="w-full pl-9 pr-3 py-2 text-xs bg-neutral-50 border border-neutral-300 rounded-sm focus:bg-white focus:border-brand focus:ring-1 focus:ring-brand outline-none"
-            />
-          </div>
+      {/* 3. Main Logs Container */}
+      <AdminCard noPadding>
+        {/* Toolbar */}
+        <div className="p-4 sm:p-5 border-b border-neutral-200">
+          <AdminToolbar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder="Search audit trail by actor, action, details..."
+            filters={
+              <div className="flex items-center gap-2.5 flex-wrap w-full sm:w-auto">
+                <select
+                  value={entityFilter}
+                  onChange={(e) => setEntityFilter(e.target.value)}
+                  className="h-10 px-3 bg-white border border-neutral-300 rounded-sm text-xs sm:text-sm font-medium text-neutral-800 outline-none focus:border-[#734E06] focus:ring-1 focus:ring-[#734E06] min-h-[40px] flex-1 sm:flex-initial"
+                >
+                  <option value="all">All Modules</option>
+                  <option value="product">Products</option>
+                  <option value="inventory">Inventory</option>
+                  <option value="order">Orders</option>
+                  <option value="auth">Authentication</option>
+                  <option value="settings">Settings</option>
+                </select>
 
-          <div className="flex items-center gap-2 flex-wrap">
-            <select
-              value={entityFilter}
-              onChange={(e) => setEntityFilter(e.target.value)}
-              className="px-2.5 py-1.5 text-xs bg-white border border-neutral-300 rounded-sm text-neutral-700 outline-none cursor-pointer"
-            >
-              <option value="all">All Entities</option>
-              <option value="inventory">Inventory</option>
-              <option value="product">Products</option>
-              <option value="order">Orders</option>
-              <option value="coupon">Coupons</option>
-              <option value="review">Reviews</option>
-              <option value="cms">CMS & Content</option>
-              <option value="notification">Notification Bar</option>
-              <option value="user">Admin Users</option>
-              <option value="settings">Store Settings</option>
-              <option value="auth">Authentication</option>
-            </select>
-
-            <select
-              value={severityFilter}
-              onChange={(e) => setSeverityFilter(e.target.value)}
-              className="px-2.5 py-1.5 text-xs bg-white border border-neutral-300 rounded-sm text-neutral-700 outline-none cursor-pointer"
-            >
-              <option value="all">All Severities</option>
-              <option value="info">Info</option>
-              <option value="warning">Warning</option>
-              <option value="critical">Critical</option>
-            </select>
-          </div>
+                <select
+                  value={severityFilter}
+                  onChange={(e) => setSeverityFilter(e.target.value)}
+                  className="h-10 px-3 bg-white border border-neutral-300 rounded-sm text-xs sm:text-sm font-medium text-neutral-800 outline-none focus:border-[#734E06] focus:ring-1 focus:ring-[#734E06] min-h-[40px] flex-1 sm:flex-initial"
+                >
+                  <option value="all">All Severities</option>
+                  <option value="info">Info</option>
+                  <option value="warning">Warning</option>
+                  <option value="critical">Critical</option>
+                </select>
+              </div>
+            }
+          />
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[800px]">
+        {/* Mobile View: Cards (< 768px) */}
+        <div className="md:hidden divide-y divide-neutral-100">
+          {filteredLogs.map((log) => (
+            <div key={log.id} className="p-4 sm:p-5 space-y-2.5 bg-white">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <span className="font-mono text-xs font-bold text-neutral-900 block">
+                    {log.action}
+                  </span>
+                  <span className="text-xs text-neutral-500 font-mono block mt-0.5">
+                    {log.timestamp} • By {log.actorName}
+                  </span>
+                </div>
+                <AdminBadge variant={getSeverityBadgeVariant(log.severity)} size="sm">
+                  {log.severity}
+                </AdminBadge>
+              </div>
+
+              <p className="text-xs text-neutral-700 bg-neutral-50 p-3 rounded-xs m-0 leading-relaxed font-mono">
+                {log.details}
+              </p>
+
+              <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500">
+                <span className="capitalize">Module: {log.entity}</span>
+                <button
+                  onClick={() => setSelectedLog(log)}
+                  className="text-xs font-semibold text-[#734E06] hover:underline"
+                >
+                  Inspect Payload →
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {filteredLogs.length === 0 && (
+            <AdminEmptyState
+              icon={<History className="w-8 h-8 text-neutral-400" />}
+              title="No Audit Logs Found"
+              description="No logs match your filter criteria."
+            />
+          )}
+        </div>
+
+        {/* Desktop View: Full Table (>= 768px) */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[780px]">
             <thead>
-              <tr className="bg-neutral-50 text-[11px] font-bold text-neutral-500 uppercase tracking-wider border-b border-neutral-200">
-                <th className="py-3 px-4">Timestamp</th>
-                <th className="py-3 px-4">Operator</th>
-                <th className="py-3 px-4">Action Event</th>
-                <th className="py-3 px-4">Entity</th>
-                <th className="py-3 px-4">Details Summary</th>
-                <th className="py-3 px-4 text-center">Severity</th>
-                <th className="py-3 px-4 text-right">Inspect</th>
+              <tr className="bg-neutral-50/80 text-xs font-bold text-neutral-600 uppercase tracking-wider border-b border-neutral-200">
+                <th className="py-3.5 px-5 w-2/12">Timestamp</th>
+                <th className="py-3.5 px-4 w-2/12">Actor & Role</th>
+                <th className="py-3.5 px-4 w-2/12">Action</th>
+                <th className="py-3.5 px-4 w-4/12">Details & Scope</th>
+                <th className="py-3.5 px-4 text-center w-1/12">Severity</th>
+                <th className="py-3.5 px-5 text-right w-1/12">Inspect</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100 text-xs">
+            <tbody className="divide-y divide-neutral-100 text-sm">
               {filteredLogs.map((log) => (
-                <tr key={log.id} className="hover:bg-neutral-50/80 transition-colors">
-                  <td className="py-3 px-4 text-neutral-500 font-mono text-[11px] whitespace-nowrap">
+                <tr key={log.id} className="hover:bg-neutral-50/70 transition-colors">
+                  <td className="py-3.5 px-5 font-mono text-xs text-neutral-500">
                     {log.timestamp}
                   </td>
-                  <td className="py-3 px-4">
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-neutral-900 text-xs">
-                        {log.actorName}
-                      </span>
-                      <span className="text-[10px] text-neutral-400 font-mono">
-                        {log.actorEmail}
-                      </span>
-                    </div>
+
+                  <td className="py-3.5 px-4">
+                    <span className="font-semibold text-neutral-900 block">{log.actorName}</span>
+                    <span className="text-xs text-neutral-400 uppercase tracking-wider">{log.actorRole}</span>
                   </td>
-                  <td className="py-3 px-4 font-mono font-bold text-[11px] text-neutral-800">
+
+                  <td className="py-3.5 px-4 font-mono text-xs text-[#734E06] font-semibold">
                     {log.action}
                   </td>
-                  <td className="py-3 px-4 uppercase text-[10px] font-semibold text-neutral-600">
-                    <span className="px-2 py-0.5 bg-neutral-100 border border-neutral-200 rounded-sm">
-                      {log.entity}
-                    </span>
+
+                  <td className="py-3.5 px-4 text-xs text-neutral-700">
+                    <span className="line-clamp-2 leading-relaxed">{log.details}</span>
                   </td>
-                  <td className="py-3 px-4 text-neutral-700 max-w-sm truncate" title={log.details}>
-                    {log.details}
-                  </td>
-                  <td className="py-3 px-4 text-center">
-                    <span
-                      className={`inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm border ${severityBadgeColors[log.severity]}`}
-                    >
+
+                  <td className="py-3.5 px-4 text-center">
+                    <AdminBadge variant={getSeverityBadgeVariant(log.severity)} size="sm">
                       {log.severity}
-                    </span>
+                    </AdminBadge>
                   </td>
-                  <td className="py-3 px-4 text-right">
+
+                  <td className="py-3.5 px-5 text-right">
                     <button
                       onClick={() => setSelectedLog(log)}
-                      className="p-1.5 text-neutral-500 hover:text-brand hover:bg-neutral-100 rounded-sm transition-colors"
-                      title="Inspect Event Payload"
+                      className="p-1.5 text-neutral-500 hover:text-[#734E06] hover:bg-neutral-100 rounded-sm transition-colors"
+                      title="View Details"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
@@ -236,95 +274,77 @@ export const AdminAuditLogsPage: React.FC<{ onNavigate?: (href: string) => void 
 
               {filteredLogs.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-neutral-500">
-                    No audit records match the selected criteria.
+                  <td colSpan={6}>
+                    <AdminEmptyState
+                      icon={<History className="w-8 h-8 text-neutral-400" />}
+                      title="No Audit Logs Found"
+                      description="No logs match your filter criteria."
+                    />
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-      </div>
+      </AdminCard>
 
-      {/* Inspect Event Modal */}
+      {/* 4. Log Inspection Modal */}
       {selectedLog && (
         <div
-          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4"
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4 animate-in fade-in duration-150"
           style={{ zIndex: 70 }}
+          onClick={() => setSelectedLog(null)}
         >
           <div
-            className="bg-white border border-neutral-200 rounded-sm max-w-lg w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150"
+            className="bg-white border border-neutral-200 rounded-sm max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
-              <div className="flex items-center gap-2">
-                <History className="w-5 h-5 text-brand" />
-                <h3 className="font-bold text-neutral-900 text-base m-0">
-                  Audit Log Details
-                </h3>
-              </div>
-              <button
-                onClick={() => setSelectedLog(null)}
-                className="text-neutral-400 hover:text-neutral-700 p-1"
-              >
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+              <h3 className="font-serif text-lg font-bold text-neutral-900 m-0">
+                Audit Event Inspection
+              </h3>
+              <button onClick={() => setSelectedLog(null)} className="text-neutral-400 hover:text-neutral-700 p-1">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-3 text-xs">
-              <div className="grid grid-cols-2 gap-2 bg-neutral-50 p-3 rounded-sm border border-neutral-200">
-                <div>
-                  <span className="text-neutral-400 block text-[10px] uppercase font-bold">Event ID</span>
-                  <span className="font-mono text-neutral-800">{selectedLog.id}</span>
-                </div>
-                <div>
-                  <span className="text-neutral-400 block text-[10px] uppercase font-bold">Timestamp</span>
-                  <span className="text-neutral-800">{selectedLog.timestamp}</span>
-                </div>
-                <div>
-                  <span className="text-neutral-400 block text-[10px] uppercase font-bold">Operator</span>
-                  <span className="font-semibold text-neutral-900">{selectedLog.actorName} ({selectedLog.actorRole})</span>
-                </div>
-                <div>
-                  <span className="text-neutral-400 block text-[10px] uppercase font-bold">Action Code</span>
-                  <span className="font-mono font-bold text-brand">{selectedLog.action}</span>
-                </div>
+            <div className="space-y-3 text-xs sm:text-sm">
+              <div className="flex justify-between py-1 border-b border-neutral-100">
+                <span className="text-neutral-500">Event ID:</span>
+                <span className="font-mono text-neutral-800">{selectedLog.id}</span>
               </div>
-
-              <div>
-                <span className="text-neutral-400 block text-[10px] uppercase font-bold mb-1">Details Summary</span>
-                <p className="p-3 bg-neutral-50 rounded-sm border border-neutral-200 text-neutral-800 leading-relaxed m-0">
+              <div className="flex justify-between py-1 border-b border-neutral-100">
+                <span className="text-neutral-500">Timestamp:</span>
+                <span className="font-mono text-neutral-800">{selectedLog.timestamp}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-neutral-100">
+                <span className="text-neutral-500">Actor:</span>
+                <span className="font-semibold text-neutral-900">{selectedLog.actorName} ({selectedLog.actorRole})</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-neutral-100">
+                <span className="text-neutral-500">Action:</span>
+                <span className="font-mono font-bold text-[#734E06]">{selectedLog.action}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-neutral-100">
+                <span className="text-neutral-500">Module:</span>
+                <span className="capitalize">{selectedLog.entity}</span>
+              </div>
+              <div className="pt-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 block mb-1">
+                  Mutation Details Payload:
+                </span>
+                <div className="p-3 bg-neutral-50 rounded-xs border border-neutral-200 text-xs font-mono text-neutral-800 whitespace-pre-wrap leading-relaxed">
                   {selectedLog.details}
-                </p>
-              </div>
-
-              {(selectedLog.previousState || selectedLog.newState) && (
-                <div>
-                  <span className="text-neutral-400 block text-[10px] uppercase font-bold mb-1">State Mutation Diff</span>
-                  <div className="bg-neutral-900 text-neutral-200 p-3 rounded-sm font-mono text-[11px] overflow-x-auto max-h-48">
-                    {selectedLog.previousState && (
-                      <div className="mb-2">
-                        <span className="text-red-400 block">// Previous State:</span>
-                        <pre className="m-0">{JSON.stringify(selectedLog.previousState, null, 2)}</pre>
-                      </div>
-                    )}
-                    {selectedLog.newState && (
-                      <div>
-                        <span className="text-emerald-400 block">// New State:</span>
-                        <pre className="m-0">{JSON.stringify(selectedLog.newState, null, 2)}</pre>
-                      </div>
-                    )}
-                  </div>
                 </div>
-              )}
+              </div>
             </div>
 
-            <div className="pt-2 border-t border-neutral-200 flex justify-end">
+            <div className="flex justify-end pt-2 border-t border-neutral-100">
               <button
                 onClick={() => setSelectedLog(null)}
-                className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-semibold rounded-sm transition-colors"
+                className="h-10 px-5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider rounded-sm"
               >
-                Close
+                Dismiss
               </button>
             </div>
           </div>

@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import { useData } from "../context/DataContext";
 import { Plus, Trash2, Copy, Check } from "lucide-react";
+import { AdminPageHeader } from "../components/admin/ui/AdminPageHeader";
+import { AdminCard } from "../components/admin/ui/AdminCard";
+import { AdminBadge } from "../components/admin/ui/AdminBadge";
+import { AdminField } from "../components/admin/ui/AdminField";
+import { AdminInput, AdminSelect } from "../components/admin/ui/AdminInputs";
 
-export const AdminMediaPage: React.FC<{ onNavigate: (href: string) => void }> = () => {
+export const AdminMediaPage: React.FC<{ onNavigate?: (href: string) => void }> = () => {
   const { mediaAssets, addMediaAsset, deleteMediaAsset } = useData();
 
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -34,28 +39,28 @@ export const AdminMediaPage: React.FC<{ onNavigate: (href: string) => void }> = 
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-      {/* Header */}
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
-        <div>
-          <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7C2430", display: "block" }}>
-            DIGITAL ASSET MANAGEMENT
-          </span>
-          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: "0.2rem 0 0 0" }}>
-            Media Library ({mediaAssets.length})
-          </h1>
-          <p style={{ fontSize: "0.8rem", color: "#8E8276", margin: "0.25rem 0 0 0" }}>
-            Centralized repository of high-resolution saree shoots, loom photography, and editorial graphics.
-          </p>
-        </div>
+    <div className="space-y-6">
+      {/* 1. Page Header */}
+      <AdminPageHeader
+        title="Media & Photography Library"
+        description="Centralized repository of high-resolution saree shoot photography, loom videos, and editorial graphics."
+        badge={
+          <AdminBadge variant="brand" size="md">
+            {mediaAssets.length} Assets
+          </AdminBadge>
+        }
+        actions={
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 h-10 px-4 sm:px-5 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs min-h-[40px]"
+          >
+            <Plus className="w-4 h-4" /> Add Media Asset
+          </button>
+        }
+      />
 
-        <button onClick={() => setIsModalOpen(true)} className="btn-wine" style={{ padding: "0.75rem 1.35rem", fontSize: "0.825rem" }}>
-          <Plus size={16} /> Add Media Asset
-        </button>
-      </div>
-
-      {/* Category Pills */}
-      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+      {/* 2. Category Filter Pills */}
+      <div className="flex gap-2 flex-wrap">
         {[
           { id: "all", label: "All Media" },
           { id: "products", label: "Product Drapes" },
@@ -66,169 +71,134 @@ export const AdminMediaPage: React.FC<{ onNavigate: (href: string) => void }> = 
           <button
             key={cat.id}
             onClick={() => setSelectedCategory(cat.id)}
-            style={{
-              padding: "0.45rem 0.9rem",
-              fontSize: "0.78rem",
-              fontWeight: selectedCategory === cat.id ? 700 : 500,
-              backgroundColor: selectedCategory === cat.id ? "#7C2430" : "#FFFFFF",
-              color: selectedCategory === cat.id ? "#FFFFFF" : "#6F6257",
-              border: selectedCategory === cat.id ? "1px solid #7C2430" : "1px solid #D9D2C7",
-              cursor: "pointer",
-            }}
+            className={`h-9 px-3.5 text-xs font-semibold rounded-xs transition-colors ${
+              selectedCategory === cat.id
+                ? "bg-[#734E06] text-white font-bold"
+                : "bg-white text-neutral-700 border border-neutral-300 hover:bg-neutral-50"
+            }`}
           >
             {cat.label}
           </button>
         ))}
       </div>
 
-      {/* Media Grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "1.25rem" }}>
+      {/* 3. Media Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
         {filteredMedia.map((asset) => (
-          <div
-            key={asset.id}
-            style={{
-              backgroundColor: "var(--admin-surface)",
-              border: "1px solid var(--admin-border)",
-              overflow: "hidden",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <div style={{ aspectRatio: "4/3", overflow: "hidden", backgroundColor: "#EDE7DD", position: "relative" }}>
-              <img src={asset.url} alt={asset.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              <span
-                style={{
-                  position: "absolute",
-                  bottom: "0.4rem",
-                  left: "0.4rem",
-                  fontSize: "0.6rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  backgroundColor: "rgba(23,21,19,0.75)",
-                  color: "#FFFFFF",
-                  padding: "0.15rem 0.4rem",
-                }}
-              >
-                {asset.category}
-              </span>
-            </div>
+          <AdminCard key={asset.id} noPadding className="flex flex-col justify-between overflow-hidden">
+            <div>
+              <div className="aspect-[4/3] overflow-hidden bg-neutral-100 relative group">
+                <img
+                  src={asset.url}
+                  alt={asset.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <span className="absolute top-2 left-2 bg-black/70 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded-xs">
+                  {asset.category}
+                </span>
+              </div>
 
-            <div style={{ padding: "1rem", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-              <strong style={{ fontSize: "0.825rem", color: "var(--admin-text)", display: "block", marginBottom: "0.5rem" }}>
-                {asset.title}
-              </strong>
-
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "0.5rem", borderTop: "1px solid #F0EAE1" }}>
-                <button
-                  onClick={() => handleCopyUrl(asset.url, asset.id)}
-                  style={{
-                    fontSize: "0.72rem",
-                    color: copiedId === asset.id ? "#234E3E" : "#7C2430",
-                    fontWeight: 600,
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.25rem",
-                  }}
-                >
-                  {copiedId === asset.id ? <Check size={12} /> : <Copy size={12} />}
-                  <span>{copiedId === asset.id ? "Copied!" : "Copy Link"}</span>
-                </button>
-
-                <button
-                  onClick={() => deleteMediaAsset(asset.id)}
-                  style={{ background: "none", border: "none", color: "#7C2430", cursor: "pointer", padding: "0.2rem" }}
-                >
-                  <Trash2 size={13} />
-                </button>
+              <div className="p-3.5">
+                <strong className="text-xs sm:text-sm font-bold text-neutral-900 block truncate" title={asset.title}>
+                  {asset.title}
+                </strong>
+                <span className="text-xs text-neutral-400 font-mono block mt-0.5 truncate">
+                  {asset.url}
+                </span>
               </div>
             </div>
-          </div>
+
+            <div className="p-3 border-t border-neutral-100 bg-neutral-50/50 flex items-center justify-between gap-2">
+              <button
+                onClick={() => handleCopyUrl(asset.url, asset.id)}
+                className={`h-8 px-2.5 text-xs font-semibold rounded-sm border flex items-center gap-1.5 transition-colors flex-1 justify-center ${
+                  copiedId === asset.id
+                    ? "bg-emerald-50 text-emerald-800 border-emerald-300"
+                    : "bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-50"
+                }`}
+              >
+                {copiedId === asset.id ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-600" /> Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5" /> Copy URL
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={() => deleteMediaAsset(asset.id)}
+                className="h-8 w-8 flex items-center justify-center text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 rounded-sm transition-colors shrink-0"
+                title="Delete Media"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </AdminCard>
         ))}
       </div>
 
-      {/* Add Modal */}
+      {/* 4. Modal */}
       {isModalOpen && (
         <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            minHeight: "100dvh",
-            height: "100dvh",
-            backgroundColor: "rgba(0,0,0,0.6)",
-            zIndex: 70,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "1rem",
-          }}
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4 animate-in fade-in duration-150"
+          style={{ zIndex: 70 }}
           onClick={() => setIsModalOpen(false)}
         >
           <div
-            style={{
-              backgroundColor: "var(--admin-surface)",
-              padding: "2rem",
-              maxWidth: "460px",
-              width: "100%",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-            }}
+            className="bg-white border border-neutral-200 rounded-sm max-w-md w-full p-6 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-serif" style={{ fontSize: "1.4rem", margin: "0 0 1.25rem 0" }}>
-              Add Media Asset URL
+            <h3 className="font-serif text-lg font-bold text-neutral-900 m-0 pb-2 border-b border-neutral-100">
+              Add New Media Asset
             </h3>
 
-            <form onSubmit={handleAddMedia} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  Asset Title *
-                </label>
-                <input
-                  type="text"
+            <form onSubmit={handleAddMedia} className="space-y-4">
+              <AdminField label="Asset Title" required>
+                <AdminInput
                   required
                   value={newAsset.title}
                   onChange={(e) => setNewAsset({ ...newAsset, title: e.target.value })}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7" }}
+                  placeholder="e.g. Banarasi Katan Silk Red Close-Up"
                 />
-              </div>
+              </AdminField>
 
-              <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  Category
-                </label>
-                <select
-                  value={newAsset.category}
-                  onChange={(e) => setNewAsset({ ...newAsset, category: e.target.value as any })}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface)" }}
-                >
-                  <option value="products">Product Drapes</option>
-                  <option value="hero">Hero & Banners</option>
-                  <option value="craft">Craft & Looms</option>
-                  <option value="editorial">Editorial Campaign</option>
-                </select>
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  Image URL (https://...) *
-                </label>
-                <input
+              <AdminField label="Direct Image URL" required>
+                <AdminInput
                   type="url"
                   required
                   value={newAsset.url}
                   onChange={(e) => setNewAsset({ ...newAsset, url: e.target.value })}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7" }}
+                  placeholder="https://images.unsplash.com/..."
                 />
-              </div>
+              </AdminField>
 
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1rem" }}>
-                <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary" style={{ padding: "0.6rem 1rem" }}>
+              <AdminField label="Category Tag" required>
+                <AdminSelect
+                  value={newAsset.category}
+                  onChange={(e) => setNewAsset({ ...newAsset, category: e.target.value as any })}
+                >
+                  <option value="products">Product Drapes</option>
+                  <option value="hero">Hero & Banners</option>
+                  <option value="craft">Craft & Loom</option>
+                  <option value="editorial">Editorial Campaign</option>
+                </AdminSelect>
+              </AdminField>
+
+              <div className="flex items-center justify-end gap-3 pt-2 border-t border-neutral-100">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="h-10 px-4 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-sm hover:bg-neutral-50"
+                >
                   Cancel
                 </button>
-                <button type="submit" className="btn-wine" style={{ padding: "0.6rem 1.25rem" }}>
+                <button
+                  type="submit"
+                  className="h-10 px-5 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm"
+                >
                   Save Asset
                 </button>
               </div>

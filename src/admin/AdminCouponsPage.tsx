@@ -3,6 +3,11 @@ import { useData } from "../context/DataContext";
 import { Coupon } from "../types";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { Plus, Edit2, Trash2, Ticket, X } from "lucide-react";
+import { AdminPageHeader } from "../components/admin/ui/AdminPageHeader";
+import { AdminCard } from "../components/admin/ui/AdminCard";
+import { AdminBadge } from "../components/admin/ui/AdminBadge";
+import { AdminField } from "../components/admin/ui/AdminField";
+import { AdminInput, AdminSelect } from "../components/admin/ui/AdminInputs";
 
 export const AdminCouponsPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
   onNavigate,
@@ -67,248 +72,202 @@ export const AdminCouponsPage: React.FC<{ onNavigate?: (href: string) => void }>
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
+      {/* 1. Page Header */}
+      <AdminPageHeader
+        title="Privilege Coupons & Discounts"
+        description="Configure promotional vouchers, seasonal percentage discounts, and minimum order threshold rules."
+        breadcrumbs={
           <Breadcrumbs
             items={[{ label: "Admin", href: "/admin" }, { label: "Coupons & Promos" }]}
             onNavigate={onNavigate}
           />
-          <h1 className="text-xl sm:text-2xl font-serif font-bold text-neutral-900 mt-1.5 m-0">
-            Privilege Coupons & Discounts ({coupons.length})
-          </h1>
-          <p className="text-xs text-neutral-500 mt-0.5">
-            Real-time validation during checkout with minimum order threshold enforcement.
-          </p>
-        </div>
-
-        <button
-          onClick={() => handleOpenModal()}
-          className="flex items-center gap-2 px-4 py-2 bg-brand text-brand-foreground hover:bg-brand-hover text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs self-start sm:self-auto min-h-[44px]"
-        >
-          <Plus className="w-4 h-4" /> Create Coupon Code
-        </button>
-      </div>
-
-      {/* Coupons Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {coupons.map((coupon) => (
-          <div
-            key={coupon.id}
-            className="bg-white p-5 border border-neutral-200 rounded-sm shadow-xs flex flex-col justify-between space-y-4"
+        }
+        badge={
+          <AdminBadge variant="brand" size="md">
+            {coupons.length} Vouchers
+          </AdminBadge>
+        }
+        actions={
+          <button
+            onClick={() => handleOpenModal()}
+            className="flex items-center gap-2 h-10 px-4 sm:px-5 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs min-h-[40px]"
           >
-            <div>
-              <div className="flex items-start justify-between mb-3">
+            <Plus className="w-4 h-4" /> Create Coupon Code
+          </button>
+        }
+      />
+
+      {/* 2. Responsive Grid of Coupon Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+        {coupons.map((coupon) => (
+          <AdminCard key={coupon.id} noPadding className="flex flex-col justify-between">
+            <div className="p-5 space-y-4">
+              <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-sm bg-neutral-100 flex items-center justify-center text-brand">
+                  <div className="w-8 h-8 rounded-full bg-[#734E06]/10 text-[#734E06] flex items-center justify-center font-bold text-xs shrink-0">
                     <Ticket className="w-4 h-4" />
                   </div>
                   <div>
-                    <strong className="font-mono text-base font-bold text-neutral-900 tracking-wider">
+                    <strong className="font-mono text-base font-bold text-neutral-900 block tracking-wider">
                       {coupon.code}
                     </strong>
-                    <span className="text-[10px] text-neutral-400 block">ID: {coupon.id}</span>
+                    <span className="text-xs text-neutral-500 block">
+                      {coupon.discountType === "percentage" ? `${coupon.discountValue}% OFF` : `₹${coupon.discountValue} FLAT OFF`}
+                    </span>
                   </div>
                 </div>
 
                 <button
                   onClick={() => handleToggleActive(coupon)}
-                  className={`text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider border cursor-pointer ${
-                    coupon.isActive
-                      ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                      : "bg-neutral-100 text-neutral-500 border-neutral-200"
-                  }`}
+                  className="cursor-pointer"
+                  title="Click to toggle voucher activation"
                 >
-                  {coupon.isActive ? "Active" : "Inactive"}
+                  <AdminBadge variant={coupon.isActive ? "success" : "neutral"} size="sm">
+                    {coupon.isActive ? "Active" : "Disabled"}
+                  </AdminBadge>
                 </button>
               </div>
 
-              <div className="p-3 bg-neutral-50 rounded-xs border border-neutral-100 space-y-1 text-xs">
-                <div className="flex justify-between font-semibold text-neutral-900">
-                  <span>Discount Value:</span>
-                  <span className="text-brand">
-                    {coupon.discountType === "percentage" ? `${coupon.discountValue}% OFF` : `₹${coupon.discountValue} OFF`}
-                  </span>
+              <div className="p-3 bg-neutral-50 rounded-xs space-y-1.5 text-xs text-neutral-700">
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">Min. Order Value:</span>
+                  <strong className="text-neutral-900">₹{coupon.minOrderValue.toLocaleString("en-IN")}</strong>
                 </div>
-                <div className="flex justify-between text-neutral-600">
-                  <span>Min. Order Requirement:</span>
-                  <span className="font-mono">₹{coupon.minOrderValue.toLocaleString("en-IN")}</span>
-                </div>
-                {coupon.maxDiscount && coupon.maxDiscount > 0 ? (
-                  <div className="flex justify-between text-neutral-600">
-                    <span>Max Cap Discount:</span>
-                    <span className="font-mono">₹{coupon.maxDiscount.toLocaleString("en-IN")}</span>
+                {coupon.maxDiscount ? (
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">Max. Discount Cap:</span>
+                    <strong className="text-neutral-900">₹{coupon.maxDiscount.toLocaleString("en-IN")}</strong>
                   </div>
                 ) : null}
-                <div className="flex justify-between text-neutral-500 pt-1 border-t border-neutral-200">
-                  <span>Expiration Date:</span>
-                  <span className="font-mono">{coupon.expiresAt}</span>
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">Expires On:</span>
+                  <span className="font-mono text-neutral-800">{coupon.expiresAt}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">Total Redeemed:</span>
+                  <span className="font-bold text-[#734E06]">{coupon.usageCount || 0} times</span>
                 </div>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-neutral-100 flex items-center justify-between text-xs">
-              <span className="text-neutral-500 text-[11px]">
-                Redeemed: <strong>{coupon.usageCount} times</strong>
-              </span>
-
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => handleOpenModal(coupon)}
-                  className="p-1.5 text-neutral-600 hover:text-brand hover:bg-neutral-100 rounded-sm transition-colors"
-                  title="Edit Coupon"
-                >
-                  <Edit2 className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => deleteCoupon(coupon.id)}
-                  className="p-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-sm transition-colors"
-                  title="Delete Coupon"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
+            <div className="px-5 py-3 border-t border-neutral-100 bg-neutral-50/50 flex items-center justify-end gap-2">
+              <button
+                onClick={() => handleOpenModal(coupon)}
+                className="h-8 px-3 text-xs font-semibold bg-white border border-neutral-300 hover:border-[#734E06] hover:text-[#734E06] rounded-sm text-neutral-800 flex items-center gap-1.5 transition-colors"
+              >
+                <Edit2 className="w-3.5 h-3.5" /> Edit
+              </button>
+              <button
+                onClick={() => {
+                  if (confirm(`Are you sure you want to delete coupon "${coupon.code}"?`)) {
+                    deleteCoupon(coupon.id);
+                  }
+                }}
+                className="h-8 w-8 flex items-center justify-center text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 rounded-sm transition-colors"
+                title="Delete Coupon"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
             </div>
-          </div>
+          </AdminCard>
         ))}
       </div>
 
-      {/* Modal Dialog */}
+      {/* 3. Modal */}
       {isModalOpen && (
         <div
-          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4"
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4 animate-in fade-in duration-150"
           style={{ zIndex: 70 }}
+          onClick={() => setIsModalOpen(false)}
         >
           <div
-            className="bg-white border border-neutral-200 rounded-sm max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150"
+            className="bg-white border border-neutral-200 rounded-sm max-w-md w-full p-6 sm:p-7 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
-              <div className="flex items-center gap-2">
-                <Ticket className="w-5 h-5 text-brand" />
-                <h3 className="font-bold text-neutral-900 text-base m-0">
-                  {editingCoupon ? "Edit Coupon Code" : "Create New Coupon"}
-                </h3>
-              </div>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="text-neutral-400 hover:text-neutral-700 p-1"
-              >
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+              <h3 className="font-serif text-lg font-bold text-neutral-900 m-0">
+                {editingCoupon ? "Edit Coupon" : "Create Privilege Coupon"}
+              </h3>
+              <button onClick={() => setIsModalOpen(false)} className="text-neutral-400 hover:text-neutral-700 p-1">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="space-y-3.5 text-xs">
-              <div>
-                <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                  Coupon Code (UPPERCASE)
-                </label>
-                <input
-                  type="text"
+            <form onSubmit={handleSave} className="space-y-4">
+              <AdminField label="Coupon Code" required>
+                <AdminInput
                   required
                   value={form.code}
-                  onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase().replace(/\s+/g, "") })}
-                  placeholder="e.g. FESTIVE20"
-                  className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 text-sm font-mono font-bold focus:bg-white focus:border-brand outline-none"
+                  onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
+                  placeholder="e.g. EVARA10"
+                  className="uppercase font-mono font-bold"
                 />
-              </div>
+              </AdminField>
 
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                    Discount Type
-                  </label>
-                  <select
+                <AdminField label="Discount Type" required>
+                  <AdminSelect
                     value={form.discountType}
                     onChange={(e) => setForm({ ...form, discountType: e.target.value as any })}
-                    className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 text-xs focus:bg-white focus:border-brand outline-none"
                   >
                     <option value="percentage">Percentage (%)</option>
-                    <option value="fixed">Fixed INR (₹)</option>
-                  </select>
-                </div>
+                    <option value="fixed">Fixed Amount (₹)</option>
+                  </AdminSelect>
+                </AdminField>
 
-                <div>
-                  <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                    Discount Value
-                  </label>
-                  <input
+                <AdminField label="Discount Value" required>
+                  <AdminInput
                     type="number"
-                    min="1"
                     required
+                    min="1"
                     value={form.discountValue}
-                    onChange={(e) => setForm({ ...form, discountValue: parseInt(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 text-xs font-bold focus:bg-white focus:border-brand outline-none"
+                    onChange={(e) => setForm({ ...form, discountValue: Number(e.target.value) })}
                   />
-                </div>
+                </AdminField>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                    Min. Order Amount (₹)
-                  </label>
-                  <input
+                <AdminField label="Min. Order Value (₹)">
+                  <AdminInput
                     type="number"
                     min="0"
                     value={form.minOrderValue}
-                    onChange={(e) => setForm({ ...form, minOrderValue: parseInt(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 text-xs focus:bg-white focus:border-brand outline-none"
+                    onChange={(e) => setForm({ ...form, minOrderValue: Number(e.target.value) })}
                   />
-                </div>
+                </AdminField>
 
-                <div>
-                  <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                    Max. Discount Cap (₹)
-                  </label>
-                  <input
+                <AdminField label="Max. Discount Cap (₹)">
+                  <AdminInput
                     type="number"
                     min="0"
                     value={form.maxDiscount}
-                    onChange={(e) => setForm({ ...form, maxDiscount: parseInt(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 text-xs focus:bg-white focus:border-brand outline-none"
+                    onChange={(e) => setForm({ ...form, maxDiscount: Number(e.target.value) })}
                   />
-                </div>
+                </AdminField>
               </div>
 
-              <div>
-                <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                  Expiration Date
-                </label>
-                <input
+              <AdminField label="Expiry Date" required>
+                <AdminInput
                   type="date"
+                  required
                   value={form.expiresAt}
                   onChange={(e) => setForm({ ...form, expiresAt: e.target.value })}
-                  className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-sm text-neutral-900 text-xs focus:bg-white focus:border-brand outline-none"
                 />
-              </div>
+              </AdminField>
 
-              <div className="flex items-center gap-2 pt-1">
-                <input
-                  type="checkbox"
-                  id="couponActive"
-                  checked={form.isActive}
-                  onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
-                  className="w-4 h-4 text-brand rounded-xs"
-                />
-                <label htmlFor="couponActive" className="text-neutral-700 font-medium cursor-pointer">
-                  Coupon is Active and usable at Checkout
-                </label>
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-neutral-200">
+              <div className="flex items-center justify-end gap-3 pt-2 border-t border-neutral-100">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-sm hover:bg-neutral-50 transition-colors"
+                  className="h-10 px-4 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-sm hover:bg-neutral-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-brand text-brand-foreground text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-brand-hover transition-colors"
+                  className="h-10 px-5 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm"
                 >
-                  {editingCoupon ? "Save Changes" : "Create Coupon"}
+                  Save Coupon
                 </button>
               </div>
             </form>

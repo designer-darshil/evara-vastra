@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { useData } from "../context/DataContext";
 import { CraftsmanshipCMS } from "../types";
-import { Save, ArrowLeft, ExternalLink, Check } from "lucide-react";
+import { Save, ExternalLink, Check } from "lucide-react";
+import { AdminPageHeader } from "../components/admin/ui/AdminPageHeader";
+import { AdminCard } from "../components/admin/ui/AdminCard";
+import { AdminField } from "../components/admin/ui/AdminField";
+import { AdminInput, AdminTextarea } from "../components/admin/ui/AdminInputs";
 
 export const AdminCraftsmanshipCMSPage: React.FC<{ onNavigate: (href: string) => void }> = ({
   onNavigate,
@@ -24,142 +28,107 @@ export const AdminCraftsmanshipCMSPage: React.FC<{ onNavigate: (href: string) =>
   };
 
   return (
-    <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-      {/* Top Header */}
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem", borderBottom: "1px solid var(--admin-border)", paddingBottom: "1rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <button
-            type="button"
-            onClick={() => onNavigate("/admin/content")}
-            style={{ padding: "0.5rem 0.75rem", backgroundColor: "var(--admin-surface)", border: "1px solid #D9D2C7", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.8rem" }}
-          >
-            <ArrowLeft size={14} /> Content Hub
-          </button>
-          <div>
-            <h1 className="font-serif" style={{ fontSize: "1.8rem", color: "var(--admin-text)", margin: 0 }}>
-              Craftsmanship & Atelier Page Editor
-            </h1>
-            <span style={{ fontSize: "0.75rem", color: "#8E8276" }}>
-              Controls the storytelling on /craftsmanship including pit loom techniques and raw silk spinning.
-            </span>
+    <form onSubmit={handleSave} className="space-y-6 max-w-5xl">
+      {/* 1. Page Header */}
+      <AdminPageHeader
+        title="Craftsmanship & Atelier Page Editor"
+        description="Controls storytelling on /craftsmanship including pit loom techniques, pure zari sourcing, and workshop photography."
+        actions={
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <button
+              type="button"
+              onClick={() => onNavigate("/craftsmanship")}
+              className="h-10 px-3.5 border border-neutral-300 hover:bg-neutral-50 rounded-sm text-xs font-semibold text-neutral-800 flex items-center gap-1.5 transition-colors min-h-[40px]"
+            >
+              <ExternalLink className="w-3.5 h-3.5" /> View Live Page
+            </button>
+            <button
+              type="submit"
+              className="h-10 px-5 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs flex items-center gap-1.5 min-h-[40px]"
+            >
+              <Save className="w-4 h-4" /> Save Craft Story
+            </button>
           </div>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <button
-            type="button"
-            onClick={() => onNavigate("/craftsmanship")}
-            className="btn-secondary"
-            style={{ padding: "0.65rem 1rem", fontSize: "0.78rem" }}
-          >
-            <ExternalLink size={14} /> View Live Page
-          </button>
-          <button type="submit" className="btn-wine" style={{ padding: "0.65rem 1.4rem", fontSize: "0.825rem" }}>
-            <Save size={15} /> Save Craft Story
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {saveSuccess && (
-        <div style={{ backgroundColor: "rgba(35,78,62,0.1)", border: "1px solid #234E3E", color: "#234E3E", padding: "0.75rem 1.25rem", fontSize: "0.85rem", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <Check size={16} /> Craftsmanship narrative updated successfully!
+        <div className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-sm text-sm font-semibold flex items-center gap-2.5">
+          <Check className="w-5 h-5 text-emerald-700 shrink-0" />
+          <span>Craftsmanship narrative updated successfully and published live!</span>
         </div>
       )}
 
-      {/* Hero Intro */}
-      <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "var(--admin-text)", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
-          Page Header & Manifesto
-        </h3>
-
-        <div>
-          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-            Main Headline
-          </label>
-          <input
-            type="text"
-            required
-            value={form.heroHeading}
-            onChange={(e) => setForm({ ...form, heroHeading: e.target.value })}
-            style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-          />
-        </div>
-
-        <div>
-          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-            Subhead Tagline
-          </label>
-          <input
-            type="text"
-            value={form.heroSubhead}
-            onChange={(e) => setForm({ ...form, heroSubhead: e.target.value })}
-            style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-          />
-        </div>
-
-        <div>
-          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-            Intro Narrative
-          </label>
-          <textarea
-            rows={3}
-            value={form.introNarrative}
-            onChange={(e) => setForm({ ...form, introNarrative: e.target.value })}
-            style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-          />
-        </div>
-      </div>
-
-      {/* 4 Craft Steps */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-        <h3 className="font-serif" style={{ fontSize: "1.4rem", color: "var(--admin-text)", margin: 0 }}>
-          Generational Weaving Steps ({form.steps.length})
-        </h3>
-
-        {form.steps.map((step, idx) => (
-          <div key={idx} style={{ backgroundColor: "var(--admin-surface)", padding: "1.5rem", border: "1px solid var(--admin-border)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-              <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#7C2430" }}>STEP {step.step || step.stepNumber || idx + 1}</span>
-              <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  Step Title
-                </label>
-                <input
-                  type="text"
-                  value={step.title}
-                  onChange={(e) => handleStepChange(idx, "title", e.target.value)}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7" }}
-                />
-              </div>
-              <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  Description Narrative
-                </label>
-                <textarea
-                  rows={3}
-                  value={step.description}
-                  onChange={(e) => handleStepChange(idx, "description", e.target.value)}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7" }}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                Step Photography URL
-              </label>
-              <input
-                type="url"
-                value={step.image}
-                onChange={(e) => handleStepChange(idx, "image", e.target.value)}
-                style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", marginBottom: "0.5rem" }}
+      {/* 1. Page Header & Manifesto */}
+      <AdminCard title="1. Page Header & Editorial Manifesto">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <AdminField label="Main Headline" required>
+              <AdminInput
+                required
+                value={form.heroHeading}
+                onChange={(e) => setForm({ ...form, heroHeading: e.target.value })}
               />
-              <div style={{ aspectRatio: "16/10", overflow: "hidden", backgroundColor: "#EDE7DD", border: "1px solid var(--admin-border)" }}>
-                <img src={step.image} alt={step.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              </div>
-            </div>
+            </AdminField>
+
+            <AdminField label="Subhead Tagline">
+              <AdminInput
+                value={form.heroSubhead}
+                onChange={(e) => setForm({ ...form, heroSubhead: e.target.value })}
+              />
+            </AdminField>
           </div>
-        ))}
+
+          <AdminField label="Manifesto Paragraph">
+            <AdminTextarea
+              rows={3}
+              value={form.manifesto}
+              onChange={(e) => setForm({ ...form, manifesto: e.target.value })}
+            />
+          </AdminField>
+        </div>
+      </AdminCard>
+
+      {/* 2. Process Steps */}
+      <div className="space-y-4">
+        <h3 className="font-serif text-lg font-bold text-neutral-900 m-0">
+          2. Weaving Process Steps & Stages
+        </h3>
+
+        <div className="space-y-4">
+          {form.steps.map((step, idx) => (
+            <AdminCard key={idx} title={`Stage ${idx + 1}: ${step.title}`}>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <AdminField label="Step Title" required>
+                    <AdminInput
+                      required
+                      value={step.title}
+                      onChange={(e) => handleStepChange(idx, "title", e.target.value)}
+                    />
+                  </AdminField>
+
+                  <AdminField label="Visual Image URL" required>
+                    <AdminInput
+                      type="url"
+                      required
+                      value={step.image}
+                      onChange={(e) => handleStepChange(idx, "image", e.target.value)}
+                    />
+                  </AdminField>
+                </div>
+
+                <AdminField label="Craft Description">
+                  <AdminTextarea
+                    rows={3}
+                    value={step.description}
+                    onChange={(e) => handleStepChange(idx, "description", e.target.value)}
+                  />
+                </AdminField>
+              </div>
+            </AdminCard>
+          ))}
+        </div>
       </div>
     </form>
   );

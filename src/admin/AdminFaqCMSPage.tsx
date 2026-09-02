@@ -2,8 +2,13 @@ import React, { useState } from "react";
 import { useData } from "../context/DataContext";
 import { FAQItem } from "../types";
 import { Plus, Edit2, Trash2 } from "lucide-react";
+import { AdminPageHeader } from "../components/admin/ui/AdminPageHeader";
+import { AdminCard } from "../components/admin/ui/AdminCard";
+import { AdminBadge } from "../components/admin/ui/AdminBadge";
+import { AdminField } from "../components/admin/ui/AdminField";
+import { AdminInput, AdminSelect, AdminTextarea } from "../components/admin/ui/AdminInputs";
 
-export const AdminFaqCMSPage: React.FC<{ onNavigate: (href: string) => void }> = () => {
+export const AdminFaqCMSPage: React.FC<{ onNavigate?: (href: string) => void }> = () => {
   const { faqs, addFAQ, updateFAQ, deleteFAQ } = useData();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,181 +68,139 @@ export const AdminFaqCMSPage: React.FC<{ onNavigate: (href: string) => void }> =
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-      {/* Header */}
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
-        <div>
-          <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7C2430", display: "block" }}>
-            CLIENT INQUIRIES & SUPPORT
-          </span>
-          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: "0.2rem 0 0 0" }}>
-            FAQ Knowledge Base ({faqs.length})
-          </h1>
-        </div>
-
-        <button onClick={() => handleOpenModal()} className="btn-wine" style={{ padding: "0.75rem 1.35rem", fontSize: "0.825rem" }}>
-          <Plus size={16} /> Add FAQ Item
-        </button>
-      </div>
-
-      {/* FAQs List */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-        {faqs.map((faq) => (
-          <div
-            key={faq.id}
-            style={{
-              backgroundColor: "var(--admin-surface)",
-              border: "1px solid var(--admin-border)",
-              padding: "1.5rem",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              gap: "1.5rem",
-            }}
+    <div className="space-y-6 max-w-5xl">
+      {/* 1. Page Header */}
+      <AdminPageHeader
+        title="FAQ Knowledge Base"
+        description="Client inquiry knowledge base covering handloom silk care, bridal appointments, and express dispatch."
+        badge={
+          <AdminBadge variant="brand" size="md">
+            {faqs.length} Answers
+          </AdminBadge>
+        }
+        actions={
+          <button
+            onClick={() => handleOpenModal()}
+            className="flex items-center gap-2 h-10 px-4 sm:px-5 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs min-h-[40px]"
           >
-            <div style={{ flex: 1 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.4rem" }}>
-                <span
-                  style={{
-                    fontSize: "0.65rem",
-                    fontWeight: 700,
-                    textTransform: "uppercase",
-                    backgroundColor: "rgba(124, 36, 48, 0.08)",
-                    color: "#7C2430",
-                    padding: "0.15rem 0.45rem",
-                  }}
-                >
-                  {faq.category}
-                </span>
-                <span style={{ fontSize: "0.7rem", color: "#8E8276" }}>Order: #{faq.order}</span>
+            <Plus className="w-4 h-4" /> Add FAQ Item
+          </button>
+        }
+      />
+
+      {/* 2. FAQs List */}
+      <div className="space-y-4">
+        {faqs.map((faq) => {
+          const isLive = faq.isEnabled !== undefined ? faq.isEnabled : faq.isPublished;
+
+          return (
+            <AdminCard key={faq.id} className="space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                <div className="space-y-1 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <AdminBadge variant="neutral" size="sm">
+                      {faq.category}
+                    </AdminBadge>
+                    <button onClick={() => handleToggleEnable(faq)}>
+                      <AdminBadge variant={isLive ? "success" : "neutral"} size="sm">
+                        {isLive ? "Live" : "Draft"}
+                      </AdminBadge>
+                    </button>
+                  </div>
+
+                  <h3 className="font-serif text-base font-bold text-neutral-900 m-0">
+                    {faq.question}
+                  </h3>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                  <button
+                    onClick={() => handleOpenModal(faq)}
+                    className="h-8 px-3 text-xs font-semibold bg-white border border-neutral-300 hover:border-[#734E06] hover:text-[#734E06] rounded-sm text-neutral-800 flex items-center gap-1.5 transition-colors"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" /> Edit
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (confirm(`Delete FAQ: "${faq.question}"?`)) {
+                        deleteFAQ(faq.id);
+                      }
+                    }}
+                    className="h-8 w-8 flex items-center justify-center text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 rounded-sm transition-colors"
+                    title="Delete FAQ"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
 
-              <h3 className="font-serif" style={{ fontSize: "1.25rem", color: "var(--admin-text)", margin: "0 0 0.5rem 0" }}>
-                {faq.question}
-              </h3>
-              <p style={{ fontSize: "0.85rem", color: "var(--admin-text-secondary)", lineHeight: 1.6, margin: 0 }}>
+              <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed bg-neutral-50 p-3.5 rounded-xs m-0">
                 {faq.answer}
               </p>
-            </div>
-
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              {(() => {
-                const active = faq.isEnabled !== undefined ? faq.isEnabled : faq.isPublished;
-                return (
-                  <button
-                    onClick={() => handleToggleEnable(faq)}
-                    style={{
-                      fontSize: "0.7rem",
-                      fontWeight: 700,
-                      padding: "0.3rem 0.6rem",
-                      backgroundColor: active ? "rgba(35,78,62,0.12)" : "#EFECE6",
-                      color: active ? "#234E3E" : "#6F6257",
-                      border: "none",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {active ? "ACTIVE" : "HIDDEN"}
-                  </button>
-                );
-              })()}
-              <button
-                onClick={() => handleOpenModal(faq)}
-                style={{ padding: "0.4rem 0.6rem", fontSize: "0.75rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface-subtle)", cursor: "pointer" }}
-              >
-                <Edit2 size={13} />
-              </button>
-              <button
-                onClick={() => deleteFAQ(faq.id)}
-                style={{ padding: "0.4rem", color: "#7C2430", border: "1px solid #E8C8C8", backgroundColor: "var(--admin-surface-subtle)", cursor: "pointer" }}
-              >
-                <Trash2 size={13} />
-              </button>
-            </div>
-          </div>
-        ))}
+            </AdminCard>
+          );
+        })}
       </div>
 
-      {/* Modal */}
+      {/* 3. Modal */}
       {isModalOpen && (
         <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            minHeight: "100dvh",
-            height: "100dvh",
-            backgroundColor: "rgba(0,0,0,0.6)",
-            zIndex: 70,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "1rem",
-          }}
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4 animate-in fade-in duration-150"
+          style={{ zIndex: 70 }}
           onClick={() => setIsModalOpen(false)}
         >
           <div
-            style={{
-              backgroundColor: "var(--admin-surface)",
-              padding: "2rem",
-              maxWidth: "520px",
-              width: "100%",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-            }}
+            className="bg-white border border-neutral-200 rounded-sm max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-serif" style={{ fontSize: "1.5rem", margin: "0 0 1.25rem 0" }}>
-              {editingFaq ? "Edit FAQ Item" : "Create New FAQ Item"}
+            <h3 className="font-serif text-lg font-bold text-neutral-900 m-0 pb-2 border-b border-neutral-100">
+              {editingFaq ? "Edit FAQ Item" : "Create New FAQ"}
             </h3>
 
-            <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  Category
-                </label>
-                <select
+            <form onSubmit={handleSave} className="space-y-4">
+              <AdminField label="Inquiry Category" required>
+                <AdminSelect
                   value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value as any })}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface)" }}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
                 >
-                  <option value="shipping">Shipping & Express Delivery</option>
-                  <option value="sizing">Garment Sizing & Fit</option>
-                  <option value="craft">Authenticity & Craft</option>
-                  <option value="care">Silk Care & Storage</option>
-                  <option value="returns">Returns & Exchanges</option>
-                </select>
-              </div>
+                  <option value="Shipping & Delivery">Shipping & Delivery</option>
+                  <option value="Pure Silk Authenticity">Pure Silk Authenticity</option>
+                  <option value="Care & Preservation">Care & Preservation</option>
+                  <option value="Exchanges & Returns">Exchanges & Returns</option>
+                </AdminSelect>
+              </AdminField>
 
-              <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  Question *
-                </label>
-                <input
-                  type="text"
+              <AdminField label="Patron Question" required>
+                <AdminInput
                   required
                   value={form.question}
                   onChange={(e) => setForm({ ...form, question: e.target.value })}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", outline: "none" }}
+                  placeholder="e.g. How do I verify the Silk Mark on my saree?"
                 />
-              </div>
+              </AdminField>
 
-              <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  Answer *
-                </label>
-                <textarea
+              <AdminField label="Comprehensive Answer" required>
+                <AdminTextarea
                   rows={4}
                   required
                   value={form.answer}
                   onChange={(e) => setForm({ ...form, answer: e.target.value })}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", outline: "none" }}
+                  placeholder="Provide detailed, gracious answers..."
                 />
-              </div>
+              </AdminField>
 
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1rem" }}>
-                <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary" style={{ padding: "0.6rem 1rem" }}>
+              <div className="flex items-center justify-end gap-3 pt-2 border-t border-neutral-100">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="h-10 px-4 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-sm hover:bg-neutral-50"
+                >
                   Cancel
                 </button>
-                <button type="submit" className="btn-wine" style={{ padding: "0.6rem 1.25rem" }}>
+                <button
+                  type="submit"
+                  className="h-10 px-5 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm"
+                >
                   Save FAQ
                 </button>
               </div>

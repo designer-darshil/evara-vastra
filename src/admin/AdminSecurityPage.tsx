@@ -3,23 +3,24 @@ import { useData } from "../context/DataContext";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import {
   ShieldCheck,
-  Lock,
-  KeyRound,
   Eye,
   EyeOff,
   CheckCircle2,
   AlertCircle,
   Clock,
   User,
-  LogOut,
 } from "lucide-react";
-import { Button } from "../components/ui/button";
 import { validatePasswordStrength } from "../lib/auth/password";
+import { AdminPageHeader } from "../components/admin/ui/AdminPageHeader";
+import { AdminCard } from "../components/admin/ui/AdminCard";
+import { AdminField } from "../components/admin/ui/AdminField";
+import { AdminInput } from "../components/admin/ui/AdminInputs";
+import { AdminBadge } from "../components/admin/ui/AdminBadge";
 
 export const AdminSecurityPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
   onNavigate,
 }) => {
-  const { adminUser, changeAdminPassword, logoutAdmin } = useData();
+  const { adminUser, changeAdminPassword } = useData();
 
   // Form State
   const [currentPassword, setCurrentPassword] = useState("");
@@ -39,7 +40,7 @@ export const AdminSecurityPage: React.FC<{ onNavigate?: (href: string) => void }
   }
 
   // Live password requirements check
-  const hasMinLength = newPassword.length >= 12;
+  const hasMinLength = newPassword.length >= 8;
   const hasUpper = /[A-Z]/.test(newPassword);
   const hasLower = /[a-z]/.test(newPassword);
   const hasNumber = /[0-9]/.test(newPassword);
@@ -95,105 +96,99 @@ export const AdminSecurityPage: React.FC<{ onNavigate?: (href: string) => void }
 
   return (
     <div className="space-y-6 max-w-4xl">
-      {/* Header */}
-      <div>
-        <Breadcrumbs
-          items={[
-            { label: "Admin", href: "/admin" },
-            { label: "Settings", href: "/admin/settings" },
-            { label: "Security & Credentials" },
-          ]}
-          onNavigate={onNavigate}
-        />
-        <h1 className="text-xl sm:text-2xl font-serif font-bold text-neutral-900 mt-1.5 m-0 flex items-center gap-2">
-          <KeyRound className="w-6 h-6 text-[#734E06]" />
-          Account Security & Password Management
-        </h1>
-        <p className="text-xs text-neutral-500 mt-0.5">
-          Manage administrative credentials, review active session metadata, and update security parameters.
-        </p>
-      </div>
+      {/* 1. Page Header */}
+      <AdminPageHeader
+        title="Admin Account Security"
+        description="Manage your verified administrator authentication credentials, PBKDF2 encryption key, and active session status."
+        breadcrumbs={
+          <Breadcrumbs
+            items={[
+              { label: "Admin", href: "/admin" },
+              { label: "Settings", href: "/admin/settings" },
+              { label: "Security" },
+            ]}
+            onNavigate={onNavigate}
+          />
+        }
+      />
 
-      {/* Account Information Card */}
-      <div className="bg-white p-6 border border-neutral-200 rounded-sm shadow-xs space-y-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 m-0 pb-2 border-b border-neutral-100 flex items-center gap-2">
-          <User className="w-4 h-4 text-[#734E06]" /> Active Administrator Profile
-        </h3>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-          <div className="bg-neutral-50 p-3.5 rounded-sm border border-neutral-200">
-            <span className="text-[10px] uppercase font-bold text-neutral-500 block">
-              Admin Name & Email
-            </span>
-            <strong className="text-neutral-900 block mt-0.5">{adminUser.name}</strong>
-            <span className="text-neutral-600 block">{adminUser.email}</span>
+      {/* 2. Current Session & Identity Card */}
+      <AdminCard title="Active Administrator Session">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="flex items-center gap-3 p-3 bg-neutral-50 rounded-sm border border-neutral-100">
+            <div className="w-10 h-10 rounded-full bg-[#734E06]/10 text-[#734E06] flex items-center justify-center font-bold text-sm shrink-0">
+              <User className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 block">
+                Signed In User
+              </span>
+              <span className="text-sm font-bold text-neutral-900 truncate block">
+                {adminUser.name}
+              </span>
+            </div>
           </div>
 
-          <div className="bg-neutral-50 p-3.5 rounded-sm border border-neutral-200">
-            <span className="text-[10px] uppercase font-bold text-neutral-500 block">
-              Assigned Role & Privilege
-            </span>
-            <strong className="text-neutral-900 block mt-0.5 capitalize">
-              {adminUser.role.replace("_", " ")}
-            </strong>
-            <span className="text-emerald-700 font-semibold flex items-center gap-1 mt-0.5">
-              <ShieldCheck className="w-3.5 h-3.5" /> Active & Verified
-            </span>
+          <div className="flex items-center gap-3 p-3 bg-neutral-50 rounded-sm border border-neutral-100">
+            <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-sm shrink-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 block">
+                Role & Access
+              </span>
+              <AdminBadge variant="brand" size="sm">
+                {adminUser.role.toUpperCase()}
+              </AdminBadge>
+            </div>
           </div>
 
-          <div className="bg-neutral-50 p-3.5 rounded-sm border border-neutral-200">
-            <span className="text-[10px] uppercase font-bold text-neutral-500 block">
-              Last Login Session
-            </span>
-            <strong className="text-neutral-900 block mt-0.5">
-              {adminUser.lastLogin || "Active Session"}
-            </strong>
-            <span className="text-neutral-500 flex items-center gap-1 mt-0.5">
-              <Clock className="w-3.5 h-3.5" /> 8-Hour Session
-            </span>
+          <div className="flex items-center gap-3 p-3 bg-neutral-50 rounded-sm border border-neutral-100">
+            <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-sm shrink-0">
+              <Clock className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 block">
+                Last Login
+              </span>
+              <span className="text-xs font-mono text-neutral-700 truncate block">
+                {adminUser.lastLogin ? new Date(adminUser.lastLogin).toLocaleDateString() : "Active Now"}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      </AdminCard>
 
-      {/* Change Password Form */}
-      <div className="bg-white p-6 sm:p-8 border border-neutral-200 rounded-sm shadow-xs space-y-6">
-        <div className="pb-3 border-b border-neutral-100">
-          <h3 className="text-base font-bold text-neutral-900 m-0">Change Administrator Password</h3>
-          <p className="text-xs text-neutral-500 m-0 mt-0.5">
-            Passwords must be at least 12 characters and contain uppercase, lowercase, numbers, and special symbols.
-          </p>
-        </div>
+      {/* 3. Password Change Form Card */}
+      <AdminCard
+        title="Change Administrator Password"
+        subtitle="Passwords are cryptographically salted and hashed using PBKDF2 with SHA-256 (100,000 iterations)."
+      >
+        <form onSubmit={handleChangePassword} className="space-y-5">
+          {errorMessage && (
+            <div className="p-3.5 bg-red-50 border border-red-200 text-red-900 rounded-sm text-xs sm:text-sm flex items-center gap-2.5 font-medium">
+              <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
 
-        {/* Feedback Alerts */}
-        {successMessage && (
-          <div className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs rounded-sm flex items-center gap-2 font-medium">
-            <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
-            <span>{successMessage}</span>
-          </div>
-        )}
+          {successMessage && (
+            <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-sm text-xs sm:text-sm flex items-center gap-2.5 font-medium">
+              <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0" />
+              <span>{successMessage}</span>
+            </div>
+          )}
 
-        {errorMessage && (
-          <div className="p-4 bg-red-50 border border-red-300 text-red-900 text-xs rounded-sm flex items-center gap-2 font-medium">
-            <AlertCircle className="w-4 h-4 text-red-700 shrink-0" />
-            <span>{errorMessage}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleChangePassword} className="space-y-4 max-w-lg">
           {/* Current Password */}
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
-              Current Password *
-            </label>
+          <AdminField label="Current Password" required>
             <div className="relative">
-              <Lock className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
+              <AdminInput
                 type={showCurrent ? "text" : "password"}
                 required
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder="Enter current password"
-                className="w-full pl-10 pr-11 py-2 bg-white border border-neutral-300 rounded-sm text-xs text-neutral-900 focus:border-[#734E06] outline-none"
+                className="pr-10"
               />
               <button
                 type="button"
@@ -203,120 +198,92 @@ export const AdminSecurityPage: React.FC<{ onNavigate?: (href: string) => void }
                 {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-          </div>
+          </AdminField>
 
           {/* New Password */}
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
-              New Password (Min 12 Characters) *
-            </label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type={showNew ? "text" : "password"}
-                required
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter new strong password"
-                className="w-full pl-10 pr-11 py-2 bg-white border border-neutral-300 rounded-sm text-xs text-neutral-900 focus:border-[#734E06] outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => setShowNew(!showNew)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1"
-              >
-                {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <AdminField label="New Password" required>
+              <div className="relative">
+                <AdminInput
+                  type={showNew ? "text" : "password"}
+                  required
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Min 8 chars, mixed case, number, symbol"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNew(!showNew)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1"
+                >
+                  {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </AdminField>
+
+            {/* Confirm New Password */}
+            <AdminField label="Confirm New Password" required>
+              <div className="relative">
+                <AdminInput
+                  type={showConfirm ? "text" : "password"}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Re-type new password"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1"
+                >
+                  {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </AdminField>
           </div>
 
-          {/* Confirm New Password */}
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
-              Confirm New Password *
-            </label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type={showConfirm ? "text" : "password"}
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Re-enter new password"
-                className="w-full pl-10 pr-11 py-2 bg-white border border-neutral-300 rounded-sm text-xs text-neutral-900 focus:border-[#734E06] outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirm(!showConfirm)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1"
-              >
-                {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
-
-          {/* Live Requirements Indicator */}
-          {newPassword.length > 0 && (
-            <div className="p-3.5 bg-neutral-50 border border-neutral-200 rounded-sm text-[11px] space-y-1.5">
-              <span className="font-bold text-neutral-700 block uppercase tracking-wider mb-1">
-                Password Requirements:
+          {/* Live Password Complexity Checklist */}
+          {newPassword && (
+            <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-sm space-y-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-neutral-600 block">
+                Password Security Checklist:
               </span>
-              <div className="grid grid-cols-2 gap-1.5">
-                <span className={hasMinLength ? "text-emerald-700 font-semibold" : "text-neutral-500"}>
-                  {hasMinLength ? "✓" : "○"} 12+ characters
-                </span>
-                <span className={hasUpper ? "text-emerald-700 font-semibold" : "text-neutral-500"}>
-                  {hasUpper ? "✓" : "○"} Uppercase (A-Z)
-                </span>
-                <span className={hasLower ? "text-emerald-700 font-semibold" : "text-neutral-500"}>
-                  {hasLower ? "✓" : "○"} Lowercase (a-z)
-                </span>
-                <span className={hasNumber ? "text-emerald-700 font-semibold" : "text-neutral-500"}>
-                  {hasNumber ? "✓" : "○"} Number (0-9)
-                </span>
-                <span className={hasSpecial ? "text-emerald-700 font-semibold" : "text-neutral-500"}>
-                  {hasSpecial ? "✓" : "○"} Special character
-                </span>
-                <span className={passwordsMatch ? "text-emerald-700 font-semibold" : "text-neutral-500"}>
-                  {passwordsMatch ? "✓" : "○"} Passwords match
-                </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <div className={`flex items-center gap-1.5 ${hasMinLength ? "text-emerald-700 font-semibold" : "text-neutral-500"}`}>
+                  <CheckCircle2 className="w-3.5 h-3.5" /> At least 8 characters
+                </div>
+                <div className={`flex items-center gap-1.5 ${hasUpper ? "text-emerald-700 font-semibold" : "text-neutral-500"}`}>
+                  <CheckCircle2 className="w-3.5 h-3.5" /> One uppercase letter (A-Z)
+                </div>
+                <div className={`flex items-center gap-1.5 ${hasLower ? "text-emerald-700 font-semibold" : "text-neutral-500"}`}>
+                  <CheckCircle2 className="w-3.5 h-3.5" /> One lowercase letter (a-z)
+                </div>
+                <div className={`flex items-center gap-1.5 ${hasNumber ? "text-emerald-700 font-semibold" : "text-neutral-500"}`}>
+                  <CheckCircle2 className="w-3.5 h-3.5" /> One number (0-9)
+                </div>
+                <div className={`flex items-center gap-1.5 ${hasSpecial ? "text-emerald-700 font-semibold" : "text-neutral-500"}`}>
+                  <CheckCircle2 className="w-3.5 h-3.5" /> One special character (!@#$%^&*)
+                </div>
+                <div className={`flex items-center gap-1.5 ${passwordsMatch ? "text-emerald-700 font-semibold" : "text-neutral-500"}`}>
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Passwords match
+                </div>
               </div>
             </div>
           )}
 
-          {/* Actions */}
-          <div className="pt-3">
-            <Button
+          <div className="pt-2 flex items-center justify-end gap-3">
+            <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider px-6 h-10 shadow-xs"
+              className="h-11 px-6 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm shadow-xs transition-colors min-h-[44px]"
             >
               {isSubmitting ? "Updating Password..." : "Change Password"}
-            </Button>
+            </button>
           </div>
         </form>
-      </div>
-
-      {/* Session Invalidation & Logout Action */}
-      <div className="bg-white p-6 border border-neutral-200 rounded-sm shadow-xs flex items-center justify-between">
-        <div>
-          <h4 className="text-sm font-bold text-neutral-900 m-0">Sign Out of Admin Suite</h4>
-          <span className="text-xs text-neutral-500">
-            Terminate the current active session and return to the secure login prompt.
-          </span>
-        </div>
-
-        <Button
-          variant="outline"
-          onClick={() => {
-            logoutAdmin();
-            if (onNavigate) onNavigate("/admin/login");
-          }}
-          className="text-xs font-bold text-red-700 border-red-200 hover:bg-red-50 flex items-center gap-1.5"
-        >
-          <LogOut className="w-4 h-4" /> Sign Out
-        </Button>
-      </div>
+      </AdminCard>
     </div>
   );
 };

@@ -6,12 +6,13 @@ import {
   Check,
   CheckCircle2,
   Save,
-  User,
   Truck,
   RefreshCw,
   Printer,
 } from "lucide-react";
-import { Button } from "../components/ui/button";
+import { AdminPageHeader } from "../components/admin/ui/AdminPageHeader";
+import { AdminCard } from "../components/admin/ui/AdminCard";
+import { AdminBadge } from "../components/admin/ui/AdminBadge";
 
 interface AdminOrderDetailPageProps {
   orderId: string;
@@ -47,7 +48,7 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
         {onNavigate && (
           <button
             onClick={() => onNavigate("/admin/orders")}
-            className="px-4 py-2 bg-brand text-brand-foreground text-xs font-bold rounded-sm"
+            className="px-4 py-2 bg-[#734E06] text-white text-xs font-bold rounded-sm"
           >
             Return to Orders
           </button>
@@ -70,11 +71,31 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
     setTimeout(() => setIsSavedNotice(false), 3000);
   };
 
+  const getStatusBadgeVariant = (status: OrderStatus) => {
+    switch (status) {
+      case "Delivered":
+        return "success";
+      case "Shipped":
+      case "Processing":
+        return "info";
+      case "Pending":
+      case "Confirmed":
+        return "warning";
+      case "Cancelled":
+      case "Returned":
+        return "danger";
+      default:
+        return "neutral";
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* 1. Page Header */}
+      <AdminPageHeader
+        title={`Order ${order.orderNumber}`}
+        description={`Placed on ${order.date} • Reference ID: ${order.id}`}
+        breadcrumbs={
           <Breadcrumbs
             items={[
               { label: "Admin", href: "/admin" },
@@ -83,73 +104,55 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
             ]}
             onNavigate={onNavigate}
           />
-          <h1 className="text-xl sm:text-2xl font-serif font-bold text-neutral-900 mt-1.5 m-0">
-            Order {order.orderNumber}
-          </h1>
-          <span className="text-xs text-neutral-500 block mt-0.5">
-            Placed on {order.date} • Reference ID: {order.id}
-          </span>
-        </div>
-
-        <span
-          className={`text-xs font-bold px-3 py-1.5 rounded-sm uppercase tracking-wider border self-start sm:self-auto ${
-            order.status === "Delivered"
-              ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-              : order.status === "Shipped"
-              ? "bg-blue-50 text-blue-800 border-blue-200"
-              : "bg-amber-50 text-amber-800 border-amber-200"
-          }`}
-        >
-          Status: {order.status}
-        </span>
-      </div>
+        }
+        badge={
+          <AdminBadge variant={getStatusBadgeVariant(order.status)} size="md">
+            Status: {order.status}
+          </AdminBadge>
+        }
+      />
 
       {isSavedNotice && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-3 rounded-sm text-xs font-semibold flex items-center gap-2">
-          <Check className="w-4 h-4 text-emerald-700" />
-          Order status updated successfully and recorded in audit log.
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 p-4 rounded-sm text-sm font-semibold flex items-center gap-2.5">
+          <Check className="w-5 h-5 text-emerald-700 shrink-0" />
+          <span>Order status updated successfully and recorded in audit log.</span>
         </div>
       )}
 
-      {/* Main 2-Col Grid */}
+      {/* 2. Main Responsive Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        {/* Left 2 Cols: Items & History */}
+        {/* Left 2 Cols: Purchased Items & Fulfillment History */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Order Items Table Card */}
-          <div className="bg-white border border-neutral-200 rounded-sm shadow-xs overflow-hidden">
-            <div className="p-4 border-b border-neutral-100 bg-neutral-50 flex items-center justify-between">
-              <h3 className="text-sm font-bold text-neutral-900 m-0">
-                Purchased Pieces ({order.items.length})
-              </h3>
-              <span className="text-xs text-neutral-500 font-mono">
-                Total: {formatINR(order.total)}
-              </span>
-            </div>
-
-            <div className="divide-y divide-neutral-100 text-xs">
+          {/* Purchased Items Card */}
+          <AdminCard
+            title={`Purchased Pieces (${order.items.length})`}
+            subtitle={`Total: ${formatINR(order.total)}`}
+            noPadding
+          >
+            <div className="divide-y divide-neutral-100 text-sm">
               {order.items.map((item, idx) => (
-                <div key={idx} className="p-4 flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
+                <div key={idx} className="p-4 sm:p-5 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3.5">
                     <img
                       src={item.image}
                       alt={item.title}
-                      className="w-12 h-16 object-cover rounded-xs border border-neutral-200"
+                      className="w-14 h-18 object-cover rounded-xs border border-neutral-200 bg-neutral-100 shrink-0"
                     />
                     <div>
-                      <strong className="text-neutral-900 text-xs block font-bold">
+                      <strong className="text-neutral-900 text-sm block font-bold">
                         {item.title}
                       </strong>
-                      <span className="text-neutral-500 block text-[11px]">
+                      <span className="text-neutral-500 block text-xs mt-0.5">
                         Fabric: {item.fabric} {item.size ? `• Size: ${item.size}` : ""}
                       </span>
                     </div>
                   </div>
 
-                  <div className="text-right">
-                    <span className="text-neutral-900 font-bold block text-sm">
+                  <div className="text-right shrink-0">
+                    <span className="text-neutral-900 font-bold block text-sm sm:text-base">
                       {formatINR(item.price * item.quantity)}
                     </span>
-                    <span className="text-[11px] text-neutral-400">
+                    <span className="text-xs text-neutral-400 block mt-0.5">
                       {formatINR(item.price)} × {item.quantity}
                     </span>
                   </div>
@@ -158,39 +161,35 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
             </div>
 
             {/* Financial Summary */}
-            <div className="p-4 bg-neutral-50 border-t border-neutral-100 text-xs space-y-1.5">
+            <div className="p-4 sm:p-5 bg-neutral-50 border-t border-neutral-100 text-xs sm:text-sm space-y-2">
               <div className="flex justify-between text-neutral-600">
                 <span>Subtotal:</span>
                 <span className="font-semibold">{formatINR(order.subtotal)}</span>
               </div>
               {order.discount > 0 && (
                 <div className="flex justify-between text-emerald-700">
-                  <span>Discount:</span>
+                  <span>Privilege Discount:</span>
                   <span>- {formatINR(order.discount)}</span>
                 </div>
               )}
               <div className="flex justify-between text-neutral-600">
                 <span>Shipping Fee:</span>
-                <span className="text-emerald-700 font-semibold">Complimentary</span>
+                <span className="text-emerald-700 font-semibold">Complimentary Express</span>
               </div>
-              <div className="flex justify-between text-sm font-bold text-neutral-900 pt-2 border-t border-neutral-200">
+              <div className="flex justify-between text-base font-bold text-neutral-900 pt-2.5 border-t border-neutral-200">
                 <span>Total Amount:</span>
                 <span className="text-[#734E06]">{formatINR(order.total)}</span>
               </div>
             </div>
-          </div>
+          </AdminCard>
 
-          {/* Timeline / Progress */}
-          <div className="bg-white p-5 border border-neutral-200 rounded-sm shadow-xs space-y-4">
-            <h3 className="text-sm font-bold text-neutral-900 m-0 pb-2 border-b border-neutral-100">
-              Fulfillment Journey
-            </h3>
-
+          {/* Fulfillment Timeline */}
+          <AdminCard title="Fulfillment Journey & Milestone Audit">
             <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-neutral-200">
               {order.timeline && order.timeline.length > 0 ? (
                 order.timeline.map((event, idx) => (
                   <div key={idx} className="relative">
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 border ${
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 border absolute -left-[30px] top-0 ${
                       event.completed
                         ? "bg-emerald-50 border-emerald-300 text-emerald-700"
                         : "bg-neutral-100 border-neutral-300 text-neutral-400"
@@ -198,14 +197,14 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
                       <CheckCircle2 className="w-4 h-4" />
                     </div>
                     <div className="min-w-0 pt-0.5">
-                      <strong className="text-neutral-900 block font-semibold">
+                      <strong className="text-neutral-900 block font-semibold text-sm">
                         {event.title}
                       </strong>
-                      <span className="text-[11px] font-mono text-neutral-400 block">
+                      <span className="text-xs font-mono text-neutral-400 block mt-0.5">
                         {event.timestamp}
                       </span>
                       {event.note && (
-                        <p className="text-[11px] text-neutral-600 bg-neutral-50 p-2 rounded-xs border border-neutral-200 mt-1 m-0">
+                        <p className="text-xs text-neutral-700 bg-neutral-50 p-2.5 rounded-xs border border-neutral-200 mt-1.5 m-0 leading-relaxed">
                           {event.note}
                         </p>
                       )}
@@ -213,31 +212,27 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
                   </div>
                 ))
               ) : (
-                <div className="text-neutral-400 text-xs italic pl-8">
+                <div className="text-neutral-400 text-sm italic">
                   Order confirmed on {order.date}
                 </div>
               )}
             </div>
-          </div>
+          </AdminCard>
         </div>
 
-        {/* Right 1 Col: Logistics & Customer Information */}
+        {/* Right 1 Col: Status Update, Shiprocket, Customer Info */}
         <div className="space-y-6">
           {/* Status Update Form */}
-          <div className="bg-white p-5 border border-neutral-200 rounded-sm shadow-xs space-y-4">
-            <h3 className="text-sm font-bold text-neutral-900 m-0 pb-2 border-b border-neutral-100">
-              Internal Order Status
-            </h3>
-
-            <form onSubmit={handleSaveStatus} className="space-y-3 text-xs">
+          <AdminCard title="Internal Order Status">
+            <form onSubmit={handleSaveStatus} className="space-y-4">
               <div>
-                <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
                   Order State
                 </label>
                 <select
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value as OrderStatus)}
-                  className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 text-neutral-900 text-xs rounded-sm focus:bg-white focus:border-brand outline-none font-semibold cursor-pointer"
+                  className="w-full h-11 px-3 bg-white border border-neutral-300 text-neutral-900 text-sm rounded-sm focus:border-[#734E06] focus:ring-1 focus:ring-[#734E06] outline-none font-semibold cursor-pointer"
                 >
                   <option value="Pending">Pending (Awaiting Confirmation)</option>
                   <option value="Confirmed">Confirmed</option>
@@ -250,7 +245,7 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
               </div>
 
               <div>
-                <label className="block font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
                   Status Note / Memo
                 </label>
                 <input
@@ -258,35 +253,26 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
                   value={timelineNote}
                   onChange={(e) => setTimelineNote(e.target.value)}
                   placeholder="e.g. Quality inspection completed"
-                  className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 text-neutral-900 text-xs rounded-sm focus:bg-white focus:border-brand outline-none"
+                  className="w-full h-11 px-3 bg-white border border-neutral-300 text-neutral-900 text-sm rounded-sm focus:border-[#734E06] focus:ring-1 focus:ring-[#734E06] outline-none"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-2.5 bg-brand text-brand-foreground hover:bg-brand-hover text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs flex items-center justify-center gap-1.5"
+                className="w-full h-11 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs flex items-center justify-center gap-2"
               >
-                <Save className="w-3.5 h-3.5" /> Update Order Status
+                <Save className="w-4 h-4" /> Update Status
               </button>
             </form>
-          </div>
+          </AdminCard>
 
           {/* Shiprocket Logistics Card */}
-          <div className="bg-white p-5 border border-neutral-200 rounded-sm shadow-xs space-y-3 text-xs">
-            <div className="flex items-center justify-between pb-2 border-b border-neutral-100">
-              <h3 className="text-sm font-bold text-neutral-900 m-0 flex items-center gap-2">
-                <Truck className="w-4 h-4 text-[#734E06]" />
-                Shiprocket Logistics
-              </h3>
-              {relatedShipment && (
-                <span className="text-[10px] font-mono text-neutral-400">
-                  ID: #{relatedShipment.providerOrderId || "—"}
-                </span>
-              )}
-            </div>
-
+          <AdminCard
+            title="Shiprocket Logistics"
+            subtitle={relatedShipment ? `ID: #${relatedShipment.providerOrderId || "—"}` : undefined}
+          >
             {relatedShipment ? (
-              <div className="space-y-3">
+              <div className="space-y-3.5 text-xs sm:text-sm">
                 <div className="flex justify-between items-center">
                   <span className="text-neutral-500">Carrier:</span>
                   <strong className="text-neutral-900">{relatedShipment.courierName || "Pending Allocation"}</strong>
@@ -295,7 +281,7 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
                 <div className="flex justify-between items-center">
                   <span className="text-neutral-500">AWB Number:</span>
                   {relatedShipment.awb ? (
-                    <span className="font-mono text-accent font-bold">{relatedShipment.awb}</span>
+                    <span className="font-mono text-[#734E06] font-bold">{relatedShipment.awb}</span>
                   ) : (
                     <span className="text-neutral-400 italic">Not Assigned</span>
                   )}
@@ -303,15 +289,14 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
 
                 <div className="flex justify-between items-center">
                   <span className="text-neutral-500">Shipment Status:</span>
-                  <span className="font-bold px-2 py-0.5 rounded text-[10px] uppercase bg-neutral-100 text-neutral-800">
+                  <AdminBadge variant="neutral" size="sm">
                     {relatedShipment.status}
-                  </span>
+                  </AdminBadge>
                 </div>
 
-                <div className="pt-2 border-t border-neutral-100 flex flex-col gap-2">
+                <div className="pt-3 border-t border-neutral-100 flex flex-col gap-2.5">
                   {relatedShipment.status === "CREATED" && (
-                    <Button
-                      size="sm"
+                    <button
                       disabled={isShipmentBusy}
                       onClick={async () => {
                         setIsShipmentBusy(true);
@@ -321,15 +306,14 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
                           setIsShipmentBusy(false);
                         }
                       }}
-                      className="w-full bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs h-8"
+                      className="w-full h-10 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm"
                     >
                       Assign Courier & Generate AWB
-                    </Button>
+                    </button>
                   )}
 
                   {relatedShipment.status === "AWB_ASSIGNED" && (
-                    <Button
-                      size="sm"
+                    <button
                       disabled={isShipmentBusy}
                       onClick={async () => {
                         setIsShipmentBusy(true);
@@ -339,17 +323,15 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
                           setIsShipmentBusy(false);
                         }
                       }}
-                      className="w-full bg-neutral-900 hover:bg-neutral-800 text-white text-xs h-8"
+                      className="w-full h-10 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider rounded-sm"
                     >
                       Request Courier Pickup
-                    </Button>
+                    </button>
                   )}
 
                   {relatedShipment.awb && (
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
+                    <div className="flex gap-2.5">
+                      <button
                         disabled={isShipmentBusy}
                         onClick={async () => {
                           setIsShipmentBusy(true);
@@ -359,20 +341,20 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
                             setIsShipmentBusy(false);
                           }
                         }}
-                        className="flex-1 text-xs h-8"
+                        className="flex-1 h-10 border border-neutral-300 bg-white hover:bg-neutral-50 text-neutral-800 rounded-sm text-xs font-semibold flex items-center justify-center gap-1.5"
                       >
-                        <RefreshCw className={`w-3.5 h-3.5 mr-1 ${isShipmentBusy ? "animate-spin" : ""}`} />
+                        <RefreshCw className={`w-3.5 h-3.5 ${isShipmentBusy ? "animate-spin" : ""}`} />
                         Sync Tracking
-                      </Button>
+                      </button>
 
                       {relatedShipment.labelUrl && (
                         <a
                           href={relatedShipment.labelUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="flex-1 inline-flex items-center justify-center border border-neutral-300 bg-white hover:bg-neutral-50 text-neutral-800 rounded-sm text-xs font-semibold h-8"
+                          className="flex-1 h-10 inline-flex items-center justify-center border border-neutral-300 bg-white hover:bg-neutral-50 text-neutral-800 rounded-sm text-xs font-semibold gap-1.5"
                         >
-                          <Printer className="w-3.5 h-3.5 mr-1" />
+                          <Printer className="w-3.5 h-3.5" />
                           Label
                         </a>
                       )}
@@ -381,12 +363,11 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="space-y-3 text-center py-2">
-                <p className="text-neutral-500 m-0 text-xs">
+              <div className="space-y-3 text-center py-2 text-xs">
+                <p className="text-neutral-500 m-0">
                   No Shiprocket manifest currently active for this order.
                 </p>
-                <Button
-                  size="sm"
+                <button
                   disabled={isShipmentBusy}
                   onClick={async () => {
                     setIsShipmentBusy(true);
@@ -396,50 +377,48 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
                       setIsShipmentBusy(false);
                     }
                   }}
-                  className="w-full bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs h-8"
+                  className="w-full h-10 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm flex items-center justify-center gap-2"
                 >
-                  <Truck className="w-3.5 h-3.5 mr-1.5" /> Create Shiprocket Shipment
-                </Button>
+                  <Truck className="w-4 h-4" /> Create Shiprocket Shipment
+                </button>
               </div>
             )}
-          </div>
+          </AdminCard>
 
           {/* Customer Profile Card */}
-          <div className="bg-white p-5 border border-neutral-200 rounded-sm shadow-xs space-y-3 text-xs">
-            <h3 className="text-sm font-bold text-neutral-900 m-0 pb-2 border-b border-neutral-100 flex items-center gap-2">
-              <User className="w-4 h-4 text-brand" /> Customer Information
-            </h3>
+          <AdminCard title="Customer & Destination Profile">
+            <div className="space-y-3 text-xs sm:text-sm">
+              <div>
+                <strong className="text-neutral-900 text-sm sm:text-base block font-bold">
+                  {order.customerName}
+                </strong>
+                <span className="text-neutral-600 block mt-0.5">{order.customerEmail}</span>
+                <span className="text-neutral-600 block">{order.customerPhone}</span>
+              </div>
 
-            <div className="space-y-1">
-              <strong className="text-neutral-900 text-sm block font-bold">
-                {order.customerName}
-              </strong>
-              <span className="text-neutral-600 block">{order.customerEmail}</span>
-              <span className="text-neutral-600 block">{order.customerPhone}</span>
-            </div>
+              <div className="pt-2.5 border-t border-neutral-100">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 block mb-1">
+                  Shipping Destination
+                </span>
+                <p className="text-neutral-800 leading-relaxed m-0">
+                  {order.shippingAddress}
+                  <br />
+                  {order.city}, {order.state} - {order.pincode}
+                  <br />
+                  {order.country}
+                </p>
+              </div>
 
-            <div className="pt-2 border-t border-neutral-100 space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block">
-                Shipping Destination
-              </span>
-              <p className="text-neutral-800 leading-relaxed m-0">
-                {order.shippingAddress}
-                <br />
-                {order.city}, {order.state} - {order.pincode}
-                <br />
-                {order.country}
-              </p>
+              <div className="pt-2.5 border-t border-neutral-100">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 block mb-1">
+                  Payment Method
+                </span>
+                <p className="text-neutral-800 font-semibold m-0">
+                  {order.paymentMethod} ({order.paymentStatus})
+                </p>
+              </div>
             </div>
-
-            <div className="pt-2 border-t border-neutral-100 space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block">
-                Payment Method
-              </span>
-              <p className="text-neutral-800 font-semibold m-0">
-                {order.paymentMethod} ({order.paymentStatus})
-              </p>
-            </div>
-          </div>
+          </AdminCard>
         </div>
       </div>
     </div>

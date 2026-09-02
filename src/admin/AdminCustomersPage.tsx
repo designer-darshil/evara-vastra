@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { useData } from "../context/DataContext";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
-import { Search, Mail, Phone } from "lucide-react";
+import { Mail, Phone, Users } from "lucide-react";
+import { AdminPageHeader } from "../components/admin/ui/AdminPageHeader";
+import { AdminCard } from "../components/admin/ui/AdminCard";
+import { AdminToolbar } from "../components/admin/ui/AdminToolbar";
+import { AdminBadge } from "../components/admin/ui/AdminBadge";
+import { AdminEmptyState } from "../components/admin/ui/AdminEmptyState";
 
 export const AdminCustomersPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
   onNavigate,
@@ -29,135 +34,128 @@ export const AdminCustomersPage: React.FC<{ onNavigate?: (href: string) => void 
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
+      {/* 1. Page Header */}
+      <AdminPageHeader
+        title="Patron & Customer Directory"
+        description="Client profiles, lifetime order metrics, and contact registries created through boutique storefront orders."
+        breadcrumbs={
           <Breadcrumbs
-            items={[{ label: "Admin", href: "/admin" }, { label: "Customer Directory" }]}
+            items={[{ label: "Admin", href: "/admin" }, { label: "Customers" }]}
             onNavigate={onNavigate}
           />
-          <h1 className="text-xl sm:text-2xl font-serif font-bold text-neutral-900 mt-1.5 m-0">
-            Registered Customers & Patron Directory ({customers.length})
-          </h1>
-          <p className="text-xs text-neutral-500 mt-0.5">
-            Client profiles created through store purchases and VIP account registrations.
-          </p>
-        </div>
-      </div>
+        }
+        badge={
+          <AdminBadge variant="brand" size="md">
+            {customers.length} Patrons
+          </AdminBadge>
+        }
+      />
 
-      {/* Customers Table Container */}
-      <div className="bg-white border border-neutral-200 rounded-sm shadow-xs overflow-hidden">
-        {/* Search */}
-        <div className="p-4 border-b border-neutral-200">
-          <div className="relative max-w-md">
-            <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by customer name, email, phone, city..."
-              className="w-full pl-9 pr-3 py-2 text-xs bg-neutral-50 border border-neutral-300 rounded-sm focus:bg-white focus:border-brand focus:ring-1 focus:ring-brand outline-none"
-            />
-          </div>
+      {/* 2. Main Customers Table Card */}
+      <AdminCard noPadding>
+        {/* Toolbar */}
+        <div className="p-4 sm:p-5 border-b border-neutral-200">
+          <AdminToolbar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder="Search patrons by name, email, phone, city..."
+          />
         </div>
 
-        {/* Mobile View: Stacked Cards (Visible on <640px) */}
-        <div className="sm:hidden divide-y divide-neutral-200">
+        {/* Mobile View: Cards (< 768px) */}
+        <div className="md:hidden divide-y divide-neutral-100">
           {filteredCustomers.map((cust) => (
-            <div key={cust.id} className="p-4 space-y-2 bg-white">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-brand/10 text-brand flex items-center justify-center font-bold text-xs shrink-0">
+            <div key={cust.id} className="p-4 sm:p-5 space-y-3 bg-white">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-[#734E06]/10 text-[#734E06] flex items-center justify-center font-bold text-sm shrink-0">
                     {cust.name.charAt(0)}
                   </div>
                   <div>
-                    <strong className="text-xs font-bold text-neutral-900 block">{cust.name}</strong>
-                    <span className="text-[10px] text-neutral-400 font-mono">ID: {cust.id}</span>
+                    <strong className="text-sm font-bold text-neutral-900 block">{cust.name}</strong>
+                    <span className="text-xs text-neutral-400 font-mono">ID: #{cust.id}</span>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 bg-neutral-100 font-bold rounded-sm text-[10px] text-neutral-800">
-                  {cust.totalOrders} order{cust.totalOrders > 1 ? "s" : ""}
-                </span>
+                <AdminBadge variant="neutral" size="sm">
+                  {cust.totalOrders} {cust.totalOrders === 1 ? "order" : "orders"}
+                </AdminBadge>
               </div>
 
-              <div className="space-y-0.5 text-xs">
-                <span className="text-neutral-800 flex items-center gap-1">
-                  <Mail className="w-3 h-3 text-neutral-400" /> {cust.email}
+              <div className="space-y-1 text-xs text-neutral-700 bg-neutral-50 p-3 rounded-xs">
+                <span className="flex items-center gap-2">
+                  <Mail className="w-3.5 h-3.5 text-neutral-400 shrink-0" /> {cust.email}
                 </span>
-                <span className="text-neutral-500 flex items-center gap-1 font-mono text-[11px]">
-                  <Phone className="w-3 h-3 text-neutral-400" /> {cust.phone} • {cust.city}
+                <span className="flex items-center gap-2 font-mono">
+                  <Phone className="w-3.5 h-3.5 text-neutral-400 shrink-0" /> {cust.phone} • {cust.city}
                 </span>
               </div>
 
               <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-xs">
-                <span className="text-[11px] text-neutral-500 font-mono">Joined: {cust.joinedDate}</span>
-                <span className="font-mono font-bold text-neutral-900">
+                <span className="text-neutral-500">Joined: {cust.joinedDate}</span>
+                <span className="font-serif font-bold text-neutral-900 text-sm">
                   {formatINR(cust.totalSpend)}
                 </span>
               </div>
             </div>
           ))}
+
           {filteredCustomers.length === 0 && (
-            <div className="p-8 text-center text-neutral-500 text-xs">
-              No customer profiles match your search.
-            </div>
+            <AdminEmptyState
+              icon={<Users className="w-8 h-8 text-neutral-400" />}
+              title="No Patrons Found"
+              description="No customer records match your active search query."
+            />
           )}
         </div>
 
-        {/* Desktop View: Full Data Table (Visible on >=640px) */}
-        <div className="hidden sm:block overflow-x-auto">
+        {/* Desktop View: Full Table (>= 768px) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[700px]">
             <thead>
-              <tr className="bg-neutral-50 text-[11px] font-bold text-neutral-500 uppercase tracking-wider border-b border-neutral-200">
-                <th className="py-3 px-4">Customer</th>
-                <th className="py-3 px-4">Contact</th>
-                <th className="py-3 px-4">City</th>
-                <th className="py-3 px-4 text-center">Orders</th>
-                <th className="py-3 px-4">Lifetime Spend</th>
-                <th className="py-3 px-4">Registered Date</th>
+              <tr className="bg-neutral-50/80 text-xs font-bold text-neutral-600 uppercase tracking-wider border-b border-neutral-200">
+                <th className="py-3.5 px-5">Patron</th>
+                <th className="py-3.5 px-4">Contact</th>
+                <th className="py-3.5 px-4">City / State</th>
+                <th className="py-3.5 px-4 text-center">Orders</th>
+                <th className="py-3.5 px-4 text-right">Lifetime Spend</th>
+                <th className="py-3.5 px-5 text-right">Joined</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100 text-xs">
+            <tbody className="divide-y divide-neutral-100 text-sm">
               {filteredCustomers.map((cust) => (
-                <tr key={cust.id} className="hover:bg-neutral-50/80 transition-colors">
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-brand/10 text-brand flex items-center justify-center font-bold text-xs shrink-0">
+                <tr key={cust.id} className="hover:bg-neutral-50/70 transition-colors">
+                  <td className="py-3.5 px-5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-[#734E06]/10 text-[#734E06] flex items-center justify-center font-bold text-xs shrink-0">
                         {cust.name.charAt(0)}
                       </div>
                       <div>
-                        <strong className="font-semibold text-neutral-900 block">{cust.name}</strong>
-                        <span className="text-[10px] text-neutral-400 font-mono">ID: {cust.id}</span>
+                        <strong className="text-neutral-900 font-bold block">{cust.name}</strong>
+                        <span className="text-xs text-neutral-400 font-mono">#{cust.id}</span>
                       </div>
                     </div>
                   </td>
 
-                  <td className="py-3 px-4">
-                    <div className="space-y-0.5 text-[11px]">
-                      <span className="text-neutral-900 flex items-center gap-1">
-                        <Mail className="w-3 h-3 text-neutral-400" /> {cust.email}
-                      </span>
-                      <span className="text-neutral-500 flex items-center gap-1 font-mono">
-                        <Phone className="w-3 h-3 text-neutral-400" /> {cust.phone}
-                      </span>
-                    </div>
+                  <td className="py-3.5 px-4 text-xs text-neutral-600">
+                    <span className="block text-neutral-900 font-medium">{cust.email}</span>
+                    <span className="font-mono text-neutral-500 block mt-0.5">{cust.phone}</span>
                   </td>
 
-                  <td className="py-3 px-4 text-neutral-700 font-medium">
+                  <td className="py-3.5 px-4 text-neutral-700">
                     {cust.city}
                   </td>
 
-                  <td className="py-3 px-4 text-center">
-                    <span className="px-2 py-0.5 bg-neutral-100 font-bold rounded-sm text-[11px] text-neutral-800">
-                      {cust.totalOrders} order{cust.totalOrders > 1 ? "s" : ""}
-                    </span>
+                  <td className="py-3.5 px-4 text-center font-semibold text-neutral-900">
+                    <AdminBadge variant="neutral" size="sm">
+                      {cust.totalOrders}
+                    </AdminBadge>
                   </td>
 
-                  <td className="py-3 px-4 font-mono font-bold text-neutral-900">
+                  <td className="py-3.5 px-4 text-right font-serif font-bold text-neutral-900">
                     {formatINR(cust.totalSpend)}
                   </td>
 
-                  <td className="py-3 px-4 text-neutral-500 text-[11px] font-mono">
+                  <td className="py-3.5 px-5 text-right text-xs text-neutral-500 font-mono">
                     {cust.joinedDate}
                   </td>
                 </tr>
@@ -165,15 +163,19 @@ export const AdminCustomersPage: React.FC<{ onNavigate?: (href: string) => void 
 
               {filteredCustomers.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-neutral-500">
-                    No customer profiles match your search.
+                  <td colSpan={6}>
+                    <AdminEmptyState
+                      icon={<Users className="w-8 h-8 text-neutral-400" />}
+                      title="No Patrons Found"
+                      description="No customer records match your active search query."
+                    />
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-      </div>
+      </AdminCard>
     </div>
   );
 };

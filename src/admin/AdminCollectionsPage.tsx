@@ -2,8 +2,13 @@ import React, { useState } from "react";
 import { useData } from "../context/DataContext";
 import { Collection } from "../types";
 import { Plus, Edit2, Trash2 } from "lucide-react";
+import { AdminPageHeader } from "../components/admin/ui/AdminPageHeader";
+import { AdminCard } from "../components/admin/ui/AdminCard";
+import { AdminBadge } from "../components/admin/ui/AdminBadge";
+import { AdminField } from "../components/admin/ui/AdminField";
+import { AdminInput, AdminTextarea } from "../components/admin/ui/AdminInputs";
 
-export const AdminCollectionsPage: React.FC<{ onNavigate: (href: string) => void }> = () => {
+export const AdminCollectionsPage: React.FC<{ onNavigate?: (href: string) => void }> = () => {
   const { collections, addCollection, updateCollection, deleteCollection } = useData();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -75,231 +80,176 @@ export const AdminCollectionsPage: React.FC<{ onNavigate: (href: string) => void
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-      {/* Header */}
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
-        <div>
-          <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7C2430", display: "block" }}>
-            CURATED EDITS
-          </span>
-          <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: "0.2rem 0 0 0" }}>
-            Collections ({collections.length})
-          </h1>
-        </div>
-
-        <button onClick={() => handleOpenModal()} className="btn-wine" style={{ padding: "0.75rem 1.35rem", fontSize: "0.825rem" }}>
-          <Plus size={16} /> Create Collection
-        </button>
-      </div>
-
-      {/* Grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1.5rem" }}>
-        {collections.map((col) => (
-          <div
-            key={col.id}
-            style={{
-              backgroundColor: "var(--admin-surface)",
-              border: "1px solid var(--admin-border)",
-              overflow: "hidden",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
-              display: "flex",
-              flexDirection: "column",
-            }}
+    <div className="space-y-6">
+      {/* 1. Header */}
+      <AdminPageHeader
+        title="Curated Edits & Collections"
+        description="High-editorial capsules, seasonal lookbooks, and featured designer curations."
+        badge={
+          <AdminBadge variant="brand" size="md">
+            {collections.length} Collections
+          </AdminBadge>
+        }
+        actions={
+          <button
+            onClick={() => handleOpenModal()}
+            className="flex items-center gap-2 h-10 px-4 sm:px-5 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs min-h-[40px]"
           >
-            <div style={{ aspectRatio: "16/9", overflow: "hidden", backgroundColor: "#EDE7DD", position: "relative" }}>
-              <img src={col.heroImage} alt={col.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              <button
-                onClick={() => handleTogglePublish(col)}
-                style={{
-                  position: "absolute",
-                  top: "0.5rem",
-                  right: "0.5rem",
-                  fontSize: "0.65rem",
-                  fontWeight: 700,
-                  padding: "0.2rem 0.5rem",
-                  backgroundColor: col.isPublished ? "rgba(35,78,62,0.9)" : "rgba(23,21,19,0.8)",
-                  color: "#FFFFFF",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                {col.isPublished ? "PUBLISHED" : "DRAFT"}
-              </button>
-            </div>
+            <Plus className="w-4 h-4" /> Create Collection
+          </button>
+        }
+      />
 
-            <div style={{ padding: "1.25rem", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-              <div>
-                <span style={{ fontSize: "0.68rem", color: "#B18A52", fontWeight: 700, textTransform: "uppercase" }}>
-                  {col.season}
+      {/* 2. Responsive Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+        {collections.map((col) => (
+          <AdminCard key={col.id} noPadding className="flex flex-col justify-between">
+            <div>
+              <div className="aspect-[16/9] overflow-hidden bg-neutral-100 relative">
+                <img
+                  src={col.heroImage}
+                  alt={col.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-2.5 left-2.5 bg-black/70 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded-xs tracking-wider">
+                  {col.season || "Capsule"}
+                </div>
+                <button
+                  onClick={() => handleTogglePublish(col)}
+                  className={`absolute top-2.5 right-2.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-xs border shadow-xs transition-colors cursor-pointer ${
+                    col.isPublished
+                      ? "bg-emerald-600 text-white border-emerald-700"
+                      : "bg-neutral-800 text-neutral-300 border-neutral-700"
+                  }`}
+                  title="Click to toggle collection publication"
+                >
+                  {col.isPublished ? "Published" : "Draft"}
+                </button>
+              </div>
+
+              <div className="p-4 sm:p-5">
+                <span className="text-[11px] font-mono text-neutral-500 uppercase block mb-1">
+                  /{col.slug}
                 </span>
-                <h3 className="font-serif" style={{ fontSize: "1.4rem", color: "var(--admin-text)", margin: "0.2rem 0 0.4rem 0" }}>
+                <h3 className="font-serif text-lg font-bold text-neutral-900 m-0 mb-1">
                   {col.title}
                 </h3>
-                <p style={{ fontSize: "0.825rem", color: "var(--admin-text-secondary)", lineHeight: 1.4, marginBottom: "0.5rem" }}>
-                  {col.subtitle}
+                {col.subtitle && (
+                  <span className="text-xs font-medium text-[#734E06] block mb-2">
+                    {col.subtitle}
+                  </span>
+                )}
+                <p className="text-xs text-neutral-600 leading-relaxed m-0 line-clamp-2">
+                  {col.editorialStatement || col.story || "A bespoke curation of celebratory heirlooms."}
                 </p>
               </div>
-
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem", marginTop: "1rem", paddingTop: "0.75rem", borderTop: "1px solid #F0EAE1" }}>
-                <button
-                  onClick={() => handleOpenModal(col)}
-                  style={{
-                    padding: "0.4rem 0.75rem",
-                    fontSize: "0.75rem",
-                    border: "1px solid #D9D2C7",
-                    backgroundColor: "var(--admin-surface-subtle)",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.3rem",
-                  }}
-                >
-                  <Edit2 size={12} /> Edit
-                </button>
-                <button
-                  onClick={() => deleteCollection(col.id)}
-                  style={{
-                    padding: "0.4rem",
-                    color: "#7C2430",
-                    border: "1px solid #E8C8C8",
-                    backgroundColor: "var(--admin-surface-subtle)",
-                    cursor: "pointer",
-                  }}
-                >
-                  <Trash2 size={13} />
-                </button>
-              </div>
             </div>
-          </div>
+
+            <div className="px-4 sm:px-5 py-3 border-t border-neutral-100 bg-neutral-50/50 flex items-center justify-end gap-2">
+              <button
+                onClick={() => handleOpenModal(col)}
+                className="h-8 px-3 text-xs font-semibold bg-white border border-neutral-300 hover:border-[#734E06] hover:text-[#734E06] rounded-sm text-neutral-800 flex items-center gap-1.5 transition-colors"
+              >
+                <Edit2 className="w-3.5 h-3.5" /> Edit
+              </button>
+              <button
+                onClick={() => {
+                  if (confirm(`Are you sure you want to delete collection "${col.title}"?`)) {
+                    deleteCollection(col.id);
+                  }
+                }}
+                className="h-8 w-8 flex items-center justify-center text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 rounded-sm transition-colors"
+                title="Delete Collection"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </AdminCard>
         ))}
       </div>
 
-      {/* Modal */}
+      {/* 3. Create / Edit Collection Modal */}
       {isModalOpen && (
         <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            minHeight: "100dvh",
-            height: "100dvh",
-            backgroundColor: "rgba(0,0,0,0.6)",
-            zIndex: 70,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "1rem",
-          }}
+          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/60 z-modal flex items-center justify-center p-4 animate-in fade-in duration-150"
+          style={{ zIndex: 70 }}
           onClick={() => setIsModalOpen(false)}
         >
           <div
-            style={{
-              backgroundColor: "var(--admin-surface)",
-              padding: "2rem",
-              maxWidth: "520px",
-              width: "100%",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-              maxHeight: "90dvh",
-              overflowY: "auto",
-            }}
+            className="bg-white border border-neutral-200 rounded-sm max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-4 max-h-[90dvh] overflow-y-auto animate-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-serif" style={{ fontSize: "1.5rem", margin: "0 0 1.25rem 0" }}>
+            <h3 className="font-serif text-lg font-bold text-neutral-900 m-0 pb-2 border-b border-neutral-100">
               {editingCol ? "Edit Collection" : "Create New Collection"}
             </h3>
 
-            <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  Collection Title *
-                </label>
-                <input
-                  type="text"
+            <form onSubmit={handleSave} className="space-y-4">
+              <AdminField label="Collection Title" required>
+                <AdminInput
                   required
                   value={form.title}
                   onChange={(e) => handleTitleChange(e.target.value)}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", outline: "none" }}
+                  placeholder="e.g. Royal Kadwa Edit"
                 />
-              </div>
+              </AdminField>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                    URL Slug *
-                  </label>
-                  <input
-                    type="text"
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <AdminField label="URL Slug" required>
+                  <AdminInput
                     required
                     value={form.slug}
                     onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                    style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", outline: "none" }}
+                    placeholder="royal-kadwa-edit"
                   />
-                </div>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                    Season Tag
-                  </label>
-                  <input
-                    type="text"
+                </AdminField>
+
+                <AdminField label="Season / Edition">
+                  <AdminInput
                     value={form.season}
                     onChange={(e) => setForm({ ...form, season: e.target.value })}
-                    style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", outline: "none" }}
+                    placeholder="Autumn / Winter 2026"
                   />
-                </div>
+                </AdminField>
               </div>
 
-              <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  Subtitle
-                </label>
-                <input
-                  type="text"
+              <AdminField label="Subtitle / Tagline">
+                <AdminInput
                   value={form.subtitle}
                   onChange={(e) => setForm({ ...form, subtitle: e.target.value })}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", outline: "none" }}
+                  placeholder="The pinnacle of Banarasi and Gujarati loomwork"
                 />
-              </div>
+              </AdminField>
 
-              <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  Editorial Quote
-                </label>
-                <input
-                  type="text"
+              <AdminField label="Editorial Statement">
+                <AdminTextarea
+                  rows={3}
                   value={form.editorialStatement}
                   onChange={(e) => setForm({ ...form, editorialStatement: e.target.value })}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", outline: "none" }}
+                  placeholder="Artisan manifesto and narrative for this capsule edit..."
                 />
-              </div>
+              </AdminField>
 
-              <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  Hero Image URL
-                </label>
-                <input
+              <AdminField label="Cover Hero Image URL">
+                <AdminInput
                   type="url"
                   value={form.heroImage}
                   onChange={(e) => setForm({ ...form, heroImage: e.target.value })}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", outline: "none" }}
+                  placeholder="https://..."
                 />
-              </div>
+              </AdminField>
 
-              <div>
-                <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-                  Collection Story Narrative
-                </label>
-                <textarea
-                  rows={3}
-                  value={form.story}
-                  onChange={(e) => setForm({ ...form, story: e.target.value })}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid #D9D2C7", outline: "none" }}
-                />
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1rem" }}>
-                <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary" style={{ padding: "0.6rem 1rem" }}>
+              <div className="flex items-center justify-end gap-3 pt-2 border-t border-neutral-100">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="h-10 px-4 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-sm hover:bg-neutral-50 transition-colors"
+                >
                   Cancel
                 </button>
-                <button type="submit" className="btn-wine" style={{ padding: "0.6rem 1.25rem" }}>
+                <button
+                  type="submit"
+                  className="h-10 px-5 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs"
+                >
                   Save Collection
                 </button>
               </div>

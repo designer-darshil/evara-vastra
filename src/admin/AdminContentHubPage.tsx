@@ -1,5 +1,8 @@
 import React from "react";
 import { LayoutDashboard, Bell, Sparkles, Scissors, FileText, ArrowRight } from "lucide-react";
+import { AdminPageHeader } from "../components/admin/ui/AdminPageHeader";
+import { AdminCard } from "../components/admin/ui/AdminCard";
+import { AdminBadge } from "../components/admin/ui/AdminBadge";
 
 export const AdminContentHubPage: React.FC<{ onNavigate: (href: string) => void }> = ({
   onNavigate,
@@ -43,84 +46,49 @@ export const AdminContentHubPage: React.FC<{ onNavigate: (href: string) => void 
   ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-      <div>
-        <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7C2430", display: "block" }}>
-          EDITORIAL & DIGITAL BRANDING
-        </span>
-        <h1 className="font-serif" style={{ fontSize: "2.2rem", color: "var(--admin-text)", margin: "0.2rem 0 0 0" }}>
-          Content Management Hub
-        </h1>
-        <p style={{ fontSize: "0.85rem", color: "#8E8276", margin: "0.25rem 0 0 0" }}>
-          Centrally manage all customer-facing narratives, announcement ribbons, and visual assets without editing code.
-        </p>
-      </div>
+    <div className="space-y-6">
+      {/* 1. Page Header */}
+      <AdminPageHeader
+        title="Content Management Hub"
+        description="Centrally manage all customer-facing narratives, announcement ribbons, and visual assets without editing code."
+      />
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1.5rem" }}>
+      {/* 2. Responsive Module Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
         {contentModules.map((mod, idx) => {
           const Icon = mod.icon;
           return (
-            <div
+            <AdminCard
               key={idx}
-              onClick={() => onNavigate(mod.href)}
-              style={{
-                backgroundColor: "var(--admin-surface)",
-                border: "1px solid var(--admin-border)",
-                padding: "1.75rem",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
-                cursor: "pointer",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                transition: "transform 0.15s ease, box-shadow 0.15s ease",
-              }}
+              className="flex flex-col justify-between cursor-pointer hover:border-[#734E06] hover:shadow-md transition-all group"
             >
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1rem" }}>
-                  <div
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      borderRadius: "2px",
-                      backgroundColor: "rgba(124, 36, 48, 0.08)",
-                      color: "#7C2430",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Icon size={20} />
+              <div onClick={() => onNavigate(mod.href)}>
+                <div className="flex justify-between items-start mb-4">
+                  <div className="w-10 h-10 rounded-sm bg-[#734E06]/10 text-[#734E06] flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <Icon className="w-5 h-5" />
                   </div>
-                  <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#B18A52", textTransform: "uppercase" }}>
+                  <AdminBadge variant="brand" size="sm">
                     {mod.badge}
-                  </span>
+                  </AdminBadge>
                 </div>
 
-                <h3 className="font-serif" style={{ fontSize: "1.35rem", color: "var(--admin-text)", margin: "0 0 0.4rem 0" }}>
+                <h3 className="font-serif text-lg font-bold text-neutral-900 group-hover:text-[#734E06] transition-colors mb-2">
                   {mod.title}
                 </h3>
-                <p style={{ fontSize: "0.825rem", color: "var(--admin-text-secondary)", lineHeight: 1.5, margin: 0 }}>
+
+                <p className="text-xs text-neutral-600 leading-relaxed m-0">
                   {mod.description}
                 </p>
               </div>
 
               <div
-                style={{
-                  marginTop: "1.5rem",
-                  paddingTop: "1rem",
-                  borderTop: "1px solid #F0EAE1",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  fontSize: "0.78rem",
-                  fontWeight: 700,
-                  color: "#7C2430",
-                }}
+                onClick={() => onNavigate(mod.href)}
+                className="pt-4 mt-4 border-t border-neutral-100 flex items-center justify-between text-xs font-bold text-[#734E06] group-hover:translate-x-0.5 transition-transform"
               >
-                <span>Open Editor</span>
-                <ArrowRight size={14} />
+                <span>Configure Module</span>
+                <ArrowRight className="w-4 h-4" />
               </div>
-            </div>
+            </AdminCard>
           );
         })}
       </div>

@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { useData } from "../context/DataContext";
 import { HomepageCMS } from "../types";
-import { Save, ArrowLeft, ExternalLink, Check } from "lucide-react";
+import { Save, ExternalLink, Check } from "lucide-react";
+import { AdminPageHeader } from "../components/admin/ui/AdminPageHeader";
+import { AdminCard } from "../components/admin/ui/AdminCard";
+import { AdminField } from "../components/admin/ui/AdminField";
+import { AdminInput, AdminSelect, AdminTextarea } from "../components/admin/ui/AdminInputs";
 
 export const AdminHomepageCMSPage: React.FC<{ onNavigate: (href: string) => void }> = ({
   onNavigate,
@@ -29,270 +33,187 @@ export const AdminHomepageCMSPage: React.FC<{ onNavigate: (href: string) => void
   };
 
   return (
-    <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-      {/* Top Header */}
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem", borderBottom: "1px solid var(--admin-border)", paddingBottom: "1rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <button
-            type="button"
-            onClick={() => onNavigate("/admin/content")}
-            style={{ padding: "0.5rem 0.75rem", backgroundColor: "var(--admin-surface)", border: "1px solid #D9D2C7", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.8rem" }}
-          >
-            <ArrowLeft size={14} /> Content Hub
-          </button>
-          <div>
-            <h1 className="font-serif" style={{ fontSize: "1.8rem", color: "var(--admin-text)", margin: 0 }}>
-              Homepage CMS & Visual Layout
-            </h1>
-            <span style={{ fontSize: "0.75rem", color: "#8E8276" }}>
-              Controls hero imagery, editorial quotes, featured curations, and section visibility.
-            </span>
+    <form onSubmit={handleSave} className="space-y-6 max-w-5xl">
+      {/* 1. Page Header */}
+      <AdminPageHeader
+        title="Homepage Visual CMS & Layout"
+        description="Controls hero banner imagery, seasonal headline words, featured collection spotlight, and section toggles."
+        actions={
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <button
+              type="button"
+              onClick={() => onNavigate("/")}
+              className="h-10 px-3.5 border border-neutral-300 hover:bg-neutral-50 rounded-sm text-xs font-semibold text-neutral-800 flex items-center gap-1.5 transition-colors min-h-[40px]"
+            >
+              <ExternalLink className="w-3.5 h-3.5" /> View Storefront
+            </button>
+            <button
+              type="submit"
+              className="h-10 px-5 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-xs flex items-center gap-1.5 min-h-[40px]"
+            >
+              <Save className="w-4 h-4" /> Save Homepage CMS
+            </button>
           </div>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <button
-            type="button"
-            onClick={() => onNavigate("/")}
-            className="btn-secondary"
-            style={{ padding: "0.65rem 1rem", fontSize: "0.78rem" }}
-          >
-            <ExternalLink size={14} /> View Live Storefront
-          </button>
-          <button type="submit" className="btn-wine" style={{ padding: "0.65rem 1.4rem", fontSize: "0.825rem" }}>
-            <Save size={15} /> Save Homepage CMS
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {saveSuccess && (
-        <div style={{ backgroundColor: "rgba(35,78,62,0.1)", border: "1px solid #234E3E", color: "#234E3E", padding: "0.75rem 1.25rem", fontSize: "0.85rem", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <Check size={16} /> Homepage content updated successfully and reflected on the live storefront!
+        <div className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-sm text-sm font-semibold flex items-center gap-2.5">
+          <Check className="w-5 h-5 text-emerald-700 shrink-0" />
+          <span>Homepage content updated successfully and reflected live across the storefront!</span>
         </div>
       )}
 
       {/* 1. Hero Section Content */}
-      <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "var(--admin-text)", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
-          1. Hero Banner & Typography
-        </h3>
+      <AdminCard title="1. Hero Banner & Headline Typography">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <AdminField label="Hero Heading Lead" required>
+              <AdminInput
+                required
+                value={form.heroHeading}
+                onChange={(e) => setForm({ ...form, heroHeading: e.target.value })}
+                placeholder="Royal Banarasi & Surat Heritage"
+              />
+            </AdminField>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-          <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-              Hero Heading Lead *
-            </label>
-            <input
-              type="text"
-              required
-              value={form.heroHeading}
-              onChange={(e) => setForm({ ...form, heroHeading: e.target.value })}
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none" }}
-            />
+            <AdminField label="Hero Accent Word" required>
+              <AdminInput
+                required
+                value={form.heroAccentWord}
+                onChange={(e) => setForm({ ...form, heroAccentWord: e.target.value })}
+                placeholder="Heirlooms"
+                className="text-[#734E06] font-bold"
+              />
+            </AdminField>
           </div>
 
-          <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-              Hero Accent Highlight Word *
-            </label>
-            <input
-              type="text"
-              required
-              value={form.heroAccentWord}
-              onChange={(e) => setForm({ ...form, heroAccentWord: e.target.value })}
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none", color: "#7C2430", fontWeight: 700 }}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <AdminField label="Hero Season Badge Tag">
+              <AdminInput
+                value={form.heroBadge}
+                onChange={(e) => setForm({ ...form, heroBadge: e.target.value })}
+                placeholder="Festive Edit 2026"
+              />
+            </AdminField>
+
+            <AdminField label="Hero Cover Image URL" required>
+              <AdminInput
+                type="url"
+                required
+                value={form.heroImage}
+                onChange={(e) => setForm({ ...form, heroImage: e.target.value })}
+                placeholder="https://..."
+              />
+            </AdminField>
+          </div>
+
+          <AdminField label="Hero Subheading Narrative">
+            <AdminTextarea
+              rows={2}
+              value={form.heroSubheading}
+              onChange={(e) => setForm({ ...form, heroSubheading: e.target.value })}
+              placeholder="Handcrafted pure silk sarees woven by master artisans..."
             />
+          </AdminField>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <AdminField label="Primary CTA Text">
+              <AdminInput
+                value={form.primaryCtaText}
+                onChange={(e) => setForm({ ...form, primaryCtaText: e.target.value })}
+              />
+            </AdminField>
+            <AdminField label="Primary CTA Link">
+              <AdminInput
+                value={form.primaryCtaLink}
+                onChange={(e) => setForm({ ...form, primaryCtaLink: e.target.value })}
+              />
+            </AdminField>
+            <AdminField label="Secondary CTA Text">
+              <AdminInput
+                value={form.secondaryCtaText}
+                onChange={(e) => setForm({ ...form, secondaryCtaText: e.target.value })}
+              />
+            </AdminField>
+            <AdminField label="Secondary CTA Link">
+              <AdminInput
+                value={form.secondaryCtaLink}
+                onChange={(e) => setForm({ ...form, secondaryCtaLink: e.target.value })}
+              />
+            </AdminField>
           </div>
         </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-          <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-              Hero Season Badge Tag
-            </label>
-            <input
-              type="text"
-              value={form.heroBadge}
-              onChange={(e) => setForm({ ...form, heroBadge: e.target.value })}
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none" }}
-            />
-          </div>
-
-          <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-              Hero Image URL *
-            </label>
-            <input
-              type="url"
-              required
-              value={form.heroImage}
-              onChange={(e) => setForm({ ...form, heroImage: e.target.value })}
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none" }}
-            />
-          </div>
-        </div>
-
-        <div>
-          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-            Hero Subheading Narrative
-          </label>
-          <textarea
-            rows={2}
-            value={form.heroSubheading}
-            onChange={(e) => setForm({ ...form, heroSubheading: e.target.value })}
-            style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", outline: "none" }}
-          />
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "1rem" }}>
-          <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-              Primary CTA Text
-            </label>
-            <input
-              type="text"
-              value={form.primaryCtaText}
-              onChange={(e) => setForm({ ...form, primaryCtaText: e.target.value })}
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-            />
-          </div>
-          <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-              Primary CTA Link
-            </label>
-            <input
-              type="text"
-              value={form.primaryCtaLink}
-              onChange={(e) => setForm({ ...form, primaryCtaLink: e.target.value })}
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-            />
-          </div>
-          <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-              Secondary CTA Text
-            </label>
-            <input
-              type="text"
-              value={form.secondaryCtaText}
-              onChange={(e) => setForm({ ...form, secondaryCtaText: e.target.value })}
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-            />
-          </div>
-          <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-              Secondary CTA Link
-            </label>
-            <input
-              type="text"
-              value={form.secondaryCtaLink}
-              onChange={(e) => setForm({ ...form, secondaryCtaLink: e.target.value })}
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-            />
-          </div>
-        </div>
-      </div>
+      </AdminCard>
 
       {/* 2. Featured Collection Section */}
-      <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1rem" }}>
-        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "var(--admin-text)", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
-          2. Featured Collection Spotlight
-        </h3>
-
-        <div>
-          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-            Select Spotlight Collection
-          </label>
-          <select
+      <AdminCard title="2. Featured Collection Spotlight">
+        <AdminField label="Select Spotlight Collection">
+          <AdminSelect
             value={form.featuredCollectionSlug}
             onChange={(e) => setForm({ ...form, featuredCollectionSlug: e.target.value })}
-            style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7", backgroundColor: "var(--admin-surface)" }}
           >
             {collections.map((col) => (
               <option key={col.id} value={col.slug}>
                 {col.title} ({col.season})
               </option>
             ))}
-          </select>
-        </div>
-      </div>
+          </AdminSelect>
+        </AdminField>
+      </AdminCard>
 
       {/* 3. Brand Story Manifesto */}
-      <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1rem" }}>
-        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "var(--admin-text)", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
-          3. Brand Story Manifesto Section
-        </h3>
-
-        <div>
-          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-            Manifesto Quote Headline
-          </label>
-          <input
-            type="text"
-            value={form.manifestoQuote}
-            onChange={(e) => setForm({ ...form, manifestoQuote: e.target.value })}
-            style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-          />
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-          <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-              Paragraph 1
-            </label>
-            <textarea
-              rows={3}
-              value={form.manifestoNarrative1}
-              onChange={(e) => setForm({ ...form, manifestoNarrative1: e.target.value })}
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
+      <AdminCard title="3. Brand Story Manifesto Section">
+        <div className="space-y-4">
+          <AdminField label="Manifesto Quote Headline">
+            <AdminInput
+              value={form.manifestoQuote}
+              onChange={(e) => setForm({ ...form, manifestoQuote: e.target.value })}
             />
-          </div>
-          <div>
-            <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", color: "var(--admin-text-secondary)", marginBottom: "0.3rem" }}>
-              Paragraph 2
-            </label>
-            <textarea
-              rows={3}
-              value={form.manifestoNarrative2}
-              onChange={(e) => setForm({ ...form, manifestoNarrative2: e.target.value })}
-              style={{ width: "100%", padding: "0.75rem", border: "1px solid #D9D2C7" }}
-            />
+          </AdminField>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <AdminField label="Paragraph 1">
+              <AdminTextarea
+                rows={3}
+                value={form.manifestoNarrative1}
+                onChange={(e) => setForm({ ...form, manifestoNarrative1: e.target.value })}
+              />
+            </AdminField>
+            <AdminField label="Paragraph 2">
+              <AdminTextarea
+                rows={3}
+                value={form.manifestoNarrative2}
+                onChange={(e) => setForm({ ...form, manifestoNarrative2: e.target.value })}
+              />
+            </AdminField>
           </div>
         </div>
-      </div>
+      </AdminCard>
 
       {/* 4. Section Visibility Toggles */}
-      <div style={{ backgroundColor: "var(--admin-surface)", padding: "2rem", border: "1px solid var(--admin-border)", display: "flex", flexDirection: "column", gap: "1rem" }}>
-        <h3 className="font-serif" style={{ fontSize: "1.35rem", margin: "0 0 0.5rem 0", color: "var(--admin-text)", borderBottom: "1px solid #F0EAE1", paddingBottom: "0.5rem" }}>
-          4. Homepage Section Visibility Controls
-        </h3>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
+      <AdminCard title="4. Homepage Section Visibility Controls">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {Object.entries(form.sectionVisibility).map(([secKey, isVisible]) => (
             <label
               key={secKey}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "0.75rem 1rem",
-                backgroundColor: isVisible ? "#FAF8F5" : "#F4F1EA",
-                border: isVisible ? "1px solid #D9D2C7" : "1px solid #E0DBD0",
-                cursor: "pointer",
-              }}
+              className={`flex items-center justify-between p-3.5 border rounded-xs cursor-pointer transition-colors ${
+                isVisible ? "bg-amber-50/50 border-[#734E06]/30 text-neutral-900" : "bg-neutral-50 border-neutral-200 text-neutral-600"
+              }`}
             >
-              <span style={{ fontSize: "0.825rem", textTransform: "capitalize", fontWeight: isVisible ? 600 : 400 }}>
+              <span className="text-xs font-semibold capitalize">
                 {secKey.replace(/([A-Z])/g, " $1")}
               </span>
               <input
                 type="checkbox"
                 checked={isVisible}
                 onChange={() => handleToggleSection(secKey as any)}
-                style={{ accentColor: "#7C2430", width: "16px", height: "16px" }}
+                className="w-4 h-4 text-[#734E06] rounded-xs"
               />
             </label>
           ))}
         </div>
-      </div>
+      </AdminCard>
     </form>
   );
 };
