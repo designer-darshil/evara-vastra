@@ -41,12 +41,12 @@ export const AdminLookbookPage: React.FC<{ onNavigate?: (href: string) => void }
         season: "Autumn / Winter 2026",
         location: "Mumbai Atelier",
         narrative: "",
-        image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=1200&auto=format&fit=crop",
-        productSlug: products[0]?.slug || "raga-silk-saree",
-        productTitle: products[0]?.title || "Raga Katan Silk Saree",
-        productPrice: products[0]?.price || 14800,
-        productFabric: products[0]?.fabric || "Pure Katan Silk",
-        stylingDetails: ["Traditional Nivi drape", "Polki choker"],
+        image: "",
+        productSlug: products[0]?.slug || "",
+        productTitle: products[0]?.title || "",
+        productPrice: products[0]?.price || 0,
+        productFabric: products[0]?.fabric || "",
+        stylingDetails: [],
         isPublished: true,
       });
     }

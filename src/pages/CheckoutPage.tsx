@@ -36,14 +36,14 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
 
   // Form State
   const [formData, setFormData] = useState({
-    firstName: "Devika",
-    lastName: "Srinivasan",
-    email: "devika.s@example.com",
-    phone: "+91 98201 44520",
-    address: "Bungalow 4, Pali Hill Road",
-    city: "Mumbai",
-    state: "Maharashtra",
-    pincode: "400050",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    pincode: "",
     country: "India",
     shippingMethod: "standard",
     paymentMethod: "fastrr_upi",
@@ -324,6 +324,7 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
                         <Input
                           type="text"
                           required
+                          placeholder="e.g. Devika"
                           value={formData.firstName}
                           onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                           className="bg-neutral-50 focus:bg-white text-neutral-900 border-neutral-300 rounded-sm"
@@ -336,6 +337,7 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
                         <Input
                           type="text"
                           required
+                          placeholder="e.g. Srinivasan"
                           value={formData.lastName}
                           onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                           className="bg-neutral-50 focus:bg-white text-neutral-900 border-neutral-300 rounded-sm"
@@ -348,6 +350,7 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
                         <Input
                           type="email"
                           required
+                          placeholder="name@example.com"
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                           className="bg-neutral-50 focus:bg-white text-neutral-900 border-neutral-300 rounded-sm"
@@ -360,6 +363,7 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
                         <Input
                           type="tel"
                           required
+                          placeholder="+91 98201 44520"
                           value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                           className="bg-neutral-50 focus:bg-white text-neutral-900 border-neutral-300 rounded-sm"
@@ -389,6 +393,7 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
                         <Input
                           type="text"
                           required
+                          placeholder="Flat, House no., Building, Apartment, Street"
                           value={formData.address}
                           onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                           className="bg-neutral-50 focus:bg-white text-neutral-900 border-neutral-300 rounded-sm"
@@ -403,6 +408,7 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
                           <Input
                             type="text"
                             required
+                            placeholder="e.g. Mumbai"
                             value={formData.city}
                             onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                             className="bg-neutral-50 focus:bg-white text-neutral-900 border-neutral-300 rounded-sm"
@@ -415,6 +421,7 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
                           <Input
                             type="text"
                             required
+                            placeholder="e.g. Maharashtra"
                             value={formData.state}
                             onChange={(e) => setFormData({ ...formData, state: e.target.value })}
                             className="bg-neutral-50 focus:bg-white text-neutral-900 border-neutral-300 rounded-sm"
@@ -428,6 +435,7 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
                             type="text"
                             maxLength={6}
                             required
+                            placeholder="e.g. 400050"
                             value={formData.pincode}
                             onChange={(e) =>
                               setFormData({ ...formData, pincode: e.target.value.replace(/\D/g, "") })

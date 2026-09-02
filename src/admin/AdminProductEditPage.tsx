@@ -54,13 +54,13 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
     code: "",
     category: "silk",
     collection: "silk-edit",
-    price: 12500,
-    compareAtPrice: 15500,
-    fabric: "Pure Mulberry Silk",
-    color: "Wine",
-    colorHex: "#7C2430",
-    occasions: ["wedding", "festive"],
-    craft: "Handwoven Kadwa Pit Loom",
+    price: undefined,
+    compareAtPrice: undefined,
+    fabric: "",
+    color: "",
+    colorHex: "#734E06",
+    occasions: ["festive"],
+    craft: "",
     shortDescription: "",
     description: "",
     featured: false,
@@ -71,20 +71,20 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
     status: "published" as ProductStatus,
     images: [],
     details: {
-      length: "5.5 metres",
-      width: "45 inches (1.14 m)",
-      weaveType: "Handloom Kadwa Weave",
-      zariType: "Antique Tested Gold Zari",
-      weight: "540 grams",
-      origin: "Varanasi, Uttar Pradesh",
-      craftTime: "14 days on handloom",
-      care: "Professional dry clean only. Wrap in breathable cotton muslin.",
-      palluDetails: "Richly woven geometric and floral jaal in gold zari",
-      borderDetails: "3-inch temple border with delicate chevron selvedge",
-      boxIncludes: "Garment / Saree, Cotton Preservation Pouch, Artisan Card",
+      length: "",
+      width: "",
+      weaveType: "",
+      zariType: "",
+      weight: "",
+      origin: "",
+      craftTime: "",
+      care: "",
+      palluDetails: "",
+      borderDetails: "",
+      boxIncludes: "",
     },
-    stylingNotes: "Pair with handcrafted gold jewellery and statement footwear.",
-    drapeTip: "Make 5–6 structured pleats at the waist for an upright, commanding silhouette.",
+    stylingNotes: "",
+    drapeTip: "",
     seoTitle: "",
     seoDescription: "",
   });
@@ -93,9 +93,7 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
   const [mediaItems, setMediaItems] = useState<ManagedMediaItem[]>([]);
 
   // Variants State
-  const [variants, setVariants] = useState<ProductVariantState[]>([
-    { id: "var-1", size: "Free Size (5.5m + 0.8m Blouse)", color: "Wine", sku: "EV-SILK-WINE-FS", price: 12500, inventory: 10 },
-  ]);
+  const [variants, setVariants] = useState<ProductVariantState[]>([]);
 
   // UI state
   const [isSaving, setIsSaving] = useState(false);
@@ -704,25 +702,29 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <AdminField label="Weight (g)">
                   <AdminInput
-                    value={formData.details?.weight || "550 grams"}
+                    placeholder="e.g. 550 grams"
+                    value={formData.details?.weight || ""}
                     onChange={(e) => updateDetailsField("weight", e.target.value)}
                   />
                 </AdminField>
                 <AdminField label="Length">
                   <AdminInput
-                    value={formData.details?.length || "5.5 metres"}
+                    placeholder="e.g. 5.5 metres"
+                    value={formData.details?.length || ""}
                     onChange={(e) => updateDetailsField("length", e.target.value)}
                   />
                 </AdminField>
                 <AdminField label="Width">
                   <AdminInput
-                    value={formData.details?.width || "45 inches"}
+                    placeholder="e.g. 45 inches"
+                    value={formData.details?.width || ""}
                     onChange={(e) => updateDetailsField("width", e.target.value)}
                   />
                 </AdminField>
                 <AdminField label="Origin City">
                   <AdminInput
-                    value={formData.details?.origin || "Surat, Gujarat"}
+                    placeholder="e.g. Surat, Gujarat"
+                    value={formData.details?.origin || ""}
                     onChange={(e) => updateDetailsField("origin", e.target.value)}
                   />
                 </AdminField>
@@ -833,9 +835,9 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
                 <AdminInput
                   type="number"
                   required
-                  value={formData.price || ""}
-                  onChange={(e) => updateField("price", Number(e.target.value))}
-                  placeholder="12500"
+                  value={formData.price !== undefined ? formData.price : ""}
+                  onChange={(e) => updateField("price", e.target.value ? Number(e.target.value) : undefined as any)}
+                  placeholder="e.g. 12500"
                   className="font-bold text-base"
                 />
               </AdminField>
@@ -843,9 +845,9 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
               <AdminField label="Compare-at Price (MRP) (₹)">
                 <AdminInput
                   type="number"
-                  value={formData.compareAtPrice || ""}
+                  value={formData.compareAtPrice !== undefined ? formData.compareAtPrice : ""}
                   onChange={(e) => updateField("compareAtPrice", e.target.value ? Number(e.target.value) : undefined)}
-                  placeholder="15500"
+                  placeholder="e.g. 15500"
                 />
               </AdminField>
 
@@ -874,8 +876,9 @@ export const AdminProductEditPage: React.FC<AdminProductEditPageProps> = ({
               <AdminField label="Available Quantity in Atelier">
                 <AdminInput
                   type="number"
-                  value={formData.inventoryCount || 0}
+                  value={formData.inventoryCount !== undefined ? formData.inventoryCount : ""}
                   onChange={(e) => updateField("inventoryCount", Number(e.target.value))}
+                  placeholder="e.g. 10"
                 />
               </AdminField>
             </div>
