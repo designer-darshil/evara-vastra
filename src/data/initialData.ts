@@ -602,7 +602,7 @@ export const initialAdminUsers: AdminUser[] = [
   {
     id: "admin-1",
     email: "admin@evaravastra.com",
-    passwordHash: "pbkdf2$100000$a8f3b9c2d1e0456789abcdef01234567$c8424aaf93f263a71f7edc528683cc431501ede454eec3cfd8838a888d566fd9",
+    passwordHash: "pbkdf2$100000$a8f3b9c2d1e0456789abcdef01234567$969661548b2a8eaa2e38b01156f7e5fb2ce93cf7f6d291230e2aa85ebc510502",
     name: "Aarav Mehta (Director)",
     role: "superadmin",
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
@@ -615,7 +615,7 @@ export const initialAdminUsers: AdminUser[] = [
   {
     id: "admin-2",
     email: "store@evaravastra.com",
-    passwordHash: "pbkdf2$100000$a8f3b9c2d1e0456789abcdef01234567$c8424aaf93f263a71f7edc528683cc431501ede454eec3cfd8838a888d566fd9",
+    passwordHash: "pbkdf2$100000$a8f3b9c2d1e0456789abcdef01234567$969661548b2a8eaa2e38b01156f7e5fb2ce93cf7f6d291230e2aa85ebc510502",
     name: "Pooja Shah (Store Admin)",
     role: "admin",
     avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop",
@@ -628,7 +628,7 @@ export const initialAdminUsers: AdminUser[] = [
   {
     id: "admin-3",
     email: "fulfillment@evaravastra.com",
-    passwordHash: "pbkdf2$100000$a8f3b9c2d1e0456789abcdef01234567$c8424aaf93f263a71f7edc528683cc431501ede454eec3cfd8838a888d566fd9",
+    passwordHash: "pbkdf2$100000$a8f3b9c2d1e0456789abcdef01234567$969661548b2a8eaa2e38b01156f7e5fb2ce93cf7f6d291230e2aa85ebc510502",
     name: "Rohan Patel (Order Manager)",
     role: "order_manager",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
@@ -641,7 +641,7 @@ export const initialAdminUsers: AdminUser[] = [
   {
     id: "admin-4",
     email: "editor@evaravastra.com",
-    passwordHash: "pbkdf2$100000$a8f3b9c2d1e0456789abcdef01234567$c8424aaf93f263a71f7edc528683cc431501ede454eec3cfd8838a888d566fd9",
+    passwordHash: "pbkdf2$100000$a8f3b9c2d1e0456789abcdef01234567$969661548b2a8eaa2e38b01156f7e5fb2ce93cf7f6d291230e2aa85ebc510502",
     name: "Ananya Desai (Content Lead)",
     role: "content_manager",
     avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop",

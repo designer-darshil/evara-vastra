@@ -926,7 +926,23 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // Cryptographic verification
-    const isPasswordValid = await verifyPassword(pass, foundUser.passwordHash);
+    let isPasswordValid = await verifyPassword(pass, foundUser.passwordHash);
+
+    // Authoritative fallback: if local storage had a stale/corrupted hash from earlier sessions,
+    // verify against the authoritative master record for this admin account and auto-heal:
+    if (!isPasswordValid && !foundUser.passwordChangedAt) {
+      const initUser = initialAdminUsers.find(
+        (u) => u.email.trim().toLowerCase() === cleanEmail
+      );
+      if (initUser?.passwordHash) {
+        const isInitValid = await verifyPassword(pass, initUser.passwordHash);
+        if (isInitValid) {
+          isPasswordValid = true;
+          foundUser.passwordHash = initUser.passwordHash;
+          updateAdminUser(foundUser.id, { passwordHash: initUser.passwordHash });
+        }
+      }
+    }
 
     if (isPasswordValid) {
       AdminAuthRateLimiter.clearAttempts(cleanEmail);

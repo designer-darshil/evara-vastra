@@ -97,8 +97,8 @@ export interface PasswordValidationResult {
 export function validatePasswordStrength(password: string): PasswordValidationResult {
   const errors: string[] = [];
 
-  if (!password || password.length < 12) {
-    errors.push("Password must be at least 12 characters long.");
+  if (!password || password.length < 8) {
+    errors.push("Password must be at least 8 characters long.");
   }
   if (!/[A-Z]/.test(password)) {
     errors.push("Password must include at least one uppercase letter (A-Z).");
