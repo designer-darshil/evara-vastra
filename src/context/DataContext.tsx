@@ -100,7 +100,21 @@ interface DataContextType {
 
   // Orders
   orders: Order[];
-  addOrder: (order: Omit<Order, "id" | "orderNumber" | "date" | "timeline">) => Order;
+  addOrder: (order: Omit<Order, "id" | "orderNumber" | "date" | "timeline"> & { id?: string; orderNumber?: string }) => Order;
+  syncOrderPaymentResult: (details: {
+    orderId: string;
+    paymentId?: string;
+    transactionId?: string;
+    status: "Paid" | "Pending" | "Failed" | "Cancelled" | "Refunded" | "Cash on Delivery";
+    methodLabel?: string;
+    fastrrOrderId?: string;
+    customer?: any;
+    items?: any;
+    subtotal?: number;
+    shippingFee?: number;
+    discount?: number;
+    total?: number;
+  }) => Order;
   updateOrderStatus: (id: string, status: OrderStatus, note?: string) => void;
   deleteOrder: (id: string) => void;
 
@@ -524,10 +538,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // ORDER ACTIONS
-  const addOrder = (orderData: Omit<Order, "id" | "orderNumber" | "date" | "timeline">): Order => {
+  const addOrder = (
+    orderData: Omit<Order, "id" | "orderNumber" | "date" | "timeline"> & {
+      id?: string;
+      orderNumber?: string;
+    }
+  ): Order => {
     const randomNum = Math.floor(10000 + Math.random() * 90000);
-    const orderNumber = `EV-${randomNum}`;
-    const id = `ord-${Date.now()}`;
+    const orderNumber = orderData.orderNumber || `EV-${randomNum}`;
+    const id = orderData.id || `ord-${Date.now()}`;
     const date = new Date().toISOString().split("T")[0];
 
     const newOrder: Order = {
@@ -535,12 +554,16 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id,
       orderNumber,
       date,
+      checkoutProvider: orderData.checkoutProvider || "Shiprocket / Fastrr Checkout",
+      shippingProvider: orderData.shippingProvider || "Shiprocket",
       timeline: [
         {
           title: "Order Placed & Registered in Atelier Database",
           timestamp: "Just now",
           completed: true,
-          note: `Payment: ${orderData.paymentMethod} (${orderData.paymentStatus})`,
+          note: `Payment: ${orderData.paymentMethod} (${orderData.paymentStatus}) • Gateway: ${
+            orderData.checkoutProvider || "Shiprocket / Fastrr Checkout"
+          }`,
         },
         {
           title: "Quality Check & Handloom Packing",
@@ -576,6 +599,102 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return newOrder;
+  };
+
+  /**
+   * Idempotent Order Synchronization
+   * Ensures repeated webhook delivery or customer return callbacks update
+   * the exact order without creating duplicates.
+   */
+  const syncOrderPaymentResult = (details: {
+    orderId: string;
+    paymentId?: string;
+    transactionId?: string;
+    status: "Paid" | "Pending" | "Failed" | "Cancelled" | "Refunded" | "Cash on Delivery";
+    methodLabel?: string;
+    fastrrOrderId?: string;
+    customer?: any;
+    items?: any;
+    subtotal?: number;
+    shippingFee?: number;
+    discount?: number;
+    total?: number;
+  }): Order => {
+    const existing = orders.find(
+      (o) =>
+        o.id === details.orderId ||
+        o.orderNumber === details.orderId ||
+        (details.fastrrOrderId && o.shiprocketOrderId === details.fastrrOrderId) ||
+        (details.paymentId && o.paymentId === details.paymentId)
+    );
+
+    const now = new Date().toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    if (existing) {
+      // Idempotently update payment status and IDs without duplication
+      const updatedOrder: Order = {
+        ...existing,
+        paymentStatus: details.status,
+        paymentMethod: details.methodLabel || existing.paymentMethod,
+        paymentId: details.paymentId || existing.paymentId,
+        transactionId: details.transactionId || existing.transactionId,
+        shiprocketOrderId: details.fastrrOrderId || existing.shiprocketOrderId,
+        checkoutProvider: "Shiprocket / Fastrr Checkout",
+        timeline: [
+          ...existing.timeline,
+          {
+            title: `Payment status authoritative update: ${details.status}`,
+            timestamp: now,
+            completed: true,
+            note: `Verified by Shiprocket / Fastrr Checkout (${details.paymentId || "Direct"})`,
+          },
+        ],
+      };
+
+      setOrders((prev) => prev.map((o) => (o.id === existing.id ? updatedOrder : o)));
+      return updatedOrder;
+    }
+
+    // If order doesn't exist yet, create authoritatively
+    const orderItems = details.items || [];
+    const customer = details.customer || {};
+    const subtotal = details.subtotal || 0;
+    const shippingFee = details.shippingFee || 0;
+    const discount = details.discount || 0;
+    const total = details.total || (subtotal + shippingFee - discount);
+
+    return addOrder({
+      id: details.orderId,
+      orderNumber: details.orderId.startsWith("EV-") ? details.orderId : `EV-${Math.floor(10000 + Math.random() * 90000)}`,
+      status: details.status === "Paid" || details.status === "Cash on Delivery" ? "Confirmed" : "Pending",
+      subtotal,
+      shippingFee,
+      discount,
+      total,
+      paymentMethod: details.methodLabel || "Shiprocket / Fastrr Checkout",
+      paymentStatus: details.status,
+      checkoutProvider: "Shiprocket / Fastrr Checkout",
+      shippingProvider: "Shiprocket",
+      paymentId: details.paymentId,
+      transactionId: details.transactionId,
+      shiprocketOrderId: details.fastrrOrderId,
+      customerName: customer.name || `${customer.firstName || "Patron"} ${customer.lastName || ""}`.trim(),
+      customerEmail: customer.email || "patron@evaravastra.com",
+      customerPhone: customer.phone || "+91 99999 00000",
+      shippingAddress: customer.address || "Order via Shiprocket Fastrr",
+      city: customer.city || "Mumbai",
+      state: customer.state || "Maharashtra",
+      pincode: customer.pincode || "400001",
+      country: customer.country || "India",
+      trackingNumber: `FSTR-${Math.floor(10000000 + Math.random() * 90000000)}`,
+      carrier: "Blue Dart Express",
+      items: orderItems,
+    });
   };
 
   const updateOrderStatus = (id: string, status: OrderStatus, note?: string) => {
@@ -1297,6 +1416,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         orders,
         addOrder,
+        syncOrderPaymentResult,
         updateOrderStatus,
         deleteOrder,
 

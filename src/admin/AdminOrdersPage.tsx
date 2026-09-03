@@ -76,6 +76,22 @@ export const AdminOrdersPage: React.FC<{ onNavigate?: (href: string) => void }> 
     }
   };
 
+  const getPaymentBadgeVariant = (paymentStatus: string) => {
+    switch (paymentStatus) {
+      case "Paid":
+        return "success";
+      case "Pending":
+        return "warning";
+      case "Failed":
+      case "Cancelled":
+        return "danger";
+      case "Cash on Delivery":
+        return "brand";
+      default:
+        return "neutral";
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* 1. Page Header */}
@@ -137,19 +153,32 @@ export const AdminOrdersPage: React.FC<{ onNavigate?: (href: string) => void }> 
                     {o.date} • {o.customerName}
                   </span>
                 </div>
-                <AdminBadge variant={getStatusBadgeVariant(o.status)} size="sm">
-                  {o.status}
-                </AdminBadge>
-              </div>
-
-              <div className="flex items-center justify-between text-xs text-neutral-600 bg-neutral-50 p-2.5 rounded-xs border border-neutral-100">
-                <span>{o.items.length} {o.items.length === 1 ? "item" : "items"} ({o.city}, {o.state})</span>
                 <span className="font-bold text-[#734E06] text-sm">{formatINR(o.total)}</span>
               </div>
 
+              {/* Visually Separated Payment and Shipping Statuses */}
+              <div className="grid grid-cols-2 gap-2 text-xs bg-neutral-50 p-3 rounded-xs border border-neutral-200">
+                <div className="space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-neutral-500 block">
+                    Payment (Shiprocket Fastrr)
+                  </span>
+                  <AdminBadge variant={getPaymentBadgeVariant(o.paymentStatus)} size="sm">
+                    {o.paymentStatus}
+                  </AdminBadge>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-neutral-500 block">
+                    Shipping (Shiprocket)
+                  </span>
+                  <AdminBadge variant={getStatusBadgeVariant(o.status)} size="sm">
+                    {o.status}
+                  </AdminBadge>
+                </div>
+              </div>
+
               <div className="pt-2 border-t border-neutral-100 flex items-center justify-between gap-2">
-                <span className="text-[11px] font-mono text-neutral-500 uppercase">
-                  {o.paymentMethod}
+                <span className="text-[11px] font-mono text-neutral-500 truncate">
+                  {o.carrier || "Blue Dart"} • {o.trackingNumber || "Pending AWB"}
                 </span>
 
                 <div className="flex items-center gap-2">
@@ -157,7 +186,7 @@ export const AdminOrdersPage: React.FC<{ onNavigate?: (href: string) => void }> 
                     onClick={() => handleOpenStatusModal(o)}
                     className="h-9 px-3 text-xs font-semibold bg-white border border-neutral-300 hover:border-[#734E06] hover:text-[#734E06] rounded-sm text-neutral-800 transition-colors"
                   >
-                    Update
+                    Status
                   </button>
                   {onNavigate && (
                     <button
@@ -183,14 +212,14 @@ export const AdminOrdersPage: React.FC<{ onNavigate?: (href: string) => void }> 
 
         {/* 4. Desktop View: Proportional Data Table (>= 768px) */}
         <div className="hidden md:block overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[760px]">
+          <table className="w-full text-left border-collapse min-w-[850px]">
             <thead>
               <tr className="bg-neutral-50/80 text-xs font-bold text-neutral-600 uppercase tracking-wider border-b border-neutral-200">
                 <th className="py-3.5 px-5">Order #</th>
                 <th className="py-3.5 px-4">Customer & City</th>
-                <th className="py-3.5 px-4">Date</th>
-                <th className="py-3.5 px-4">Amount</th>
-                <th className="py-3.5 px-4 text-center">Status</th>
+                <th className="py-3.5 px-4">Amount & Date</th>
+                <th className="py-3.5 px-4">Payment (Fastrr)</th>
+                <th className="py-3.5 px-4">Shipping (Shiprocket)</th>
                 <th className="py-3.5 px-5 text-right">Actions</th>
               </tr>
             </thead>
@@ -215,23 +244,37 @@ export const AdminOrdersPage: React.FC<{ onNavigate?: (href: string) => void }> 
                     </span>
                   </td>
 
-                  <td className="py-3.5 px-4 text-xs text-neutral-600">
-                    {o.date}
-                  </td>
-
                   <td className="py-3.5 px-4">
                     <span className="font-bold text-neutral-900 block">
                       {formatINR(o.total)}
                     </span>
-                    <span className="text-[11px] font-mono text-neutral-500 uppercase">
-                      {o.paymentMethod}
+                    <span className="text-xs text-neutral-500 block">
+                      {o.date}
                     </span>
                   </td>
 
-                  <td className="py-3.5 px-4 text-center">
-                    <AdminBadge variant={getStatusBadgeVariant(o.status)} size="sm">
-                      {o.status}
-                    </AdminBadge>
+                  {/* Payment Column: Clearly labeled Shiprocket / Fastrr */}
+                  <td className="py-3.5 px-4">
+                    <div className="space-y-1">
+                      <AdminBadge variant={getPaymentBadgeVariant(o.paymentStatus)} size="sm">
+                        {o.paymentStatus}
+                      </AdminBadge>
+                      <span className="text-[11px] text-neutral-500 block font-mono">
+                        {o.checkoutProvider || "Shiprocket / Fastrr"}
+                      </span>
+                    </div>
+                  </td>
+
+                  {/* Shipping Column: Clearly labeled Shiprocket */}
+                  <td className="py-3.5 px-4">
+                    <div className="space-y-1">
+                      <AdminBadge variant={getStatusBadgeVariant(o.status)} size="sm">
+                        {o.status}
+                      </AdminBadge>
+                      <span className="text-[11px] text-neutral-500 block">
+                        Shiprocket Logistics
+                      </span>
+                    </div>
                   </td>
 
                   <td className="py-3.5 px-5 text-right">

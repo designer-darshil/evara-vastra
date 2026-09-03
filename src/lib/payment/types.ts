@@ -2,9 +2,16 @@
 // FASTRR CHECKOUT / SHIPROCKET PAYMENT TYPES & INTERFACES
 // ==========================================================
 
-export type PaymentStatus = "PENDING" | "AUTHORIZED" | "PAID" | "FAILED" | "CANCELLED";
+export type PaymentStatus = "PENDING" | "AUTHORIZED" | "PAID" | "FAILED" | "CANCELLED" | "REFUNDED" | "COD";
 
-export type PaymentMethodType = "upi" | "card" | "netbanking" | "wallet" | "cod";
+export type PaymentMethodType = "upi" | "card" | "netbanking" | "wallet" | "cod" | "fastrr_checkout";
+
+export type CheckoutDiagnosticCode =
+  | "CHECKOUT_INIT_FAILED"
+  | "CHECKOUT_AUTH_FAILED"
+  | "CHECKOUT_CALLBACK_FAILED"
+  | "WEBHOOK_VERIFICATION_FAILED"
+  | "ORDER_CREATION_FAILED";
 
 export interface PaymentItem {
   id: string;
@@ -17,14 +24,14 @@ export interface PaymentItem {
 
 export interface CustomerBillingDetails {
   firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  address: string;
-  city: string;
-  state: string;
-  pincode: string;
-  country: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  country?: string;
 }
 
 export interface PaymentIntent {
@@ -33,13 +40,14 @@ export interface PaymentIntent {
   amount: number;
   currency: string;
   status: PaymentStatus;
-  customer: CustomerBillingDetails;
+  customer?: CustomerBillingDetails;
   items: PaymentItem[];
   paymentMethod?: PaymentMethodType;
   fastrrOrderId?: string;
-  checkoutUrl?: string;
+  checkoutUrl: string;
   createdAt: string;
   expiresAt?: string;
+  checkoutProvider: "Shiprocket / Fastrr Checkout";
 }
 
 export interface PaymentResult {
@@ -52,33 +60,50 @@ export interface PaymentResult {
   method?: string;
   error?: string;
   timestamp: string;
+  checkoutProvider: "Shiprocket / Fastrr Checkout";
+  fastrrOrderId?: string;
 }
 
 export interface PaymentVerificationRequest {
   orderId: string;
-  paymentId: string;
+  paymentId?: string;
+  transactionId?: string;
   signature?: string;
   status?: string;
 }
 
 export interface FastrrWebhookEvent {
-  event: "payment.success" | "payment.failed" | "order.paid" | "order.cancelled";
+  event: "payment.success" | "payment.failed" | "order.paid" | "order.cancelled" | "order.cod_confirmed";
   data: {
     order_id: string;
-    payment_id: string;
+    payment_id?: string;
+    transaction_id?: string;
     amount: number;
     currency: string;
-    payment_method: string;
+    payment_method?: string;
     transaction_time: string;
-    customer_phone: string;
+    customer_phone?: string;
+    customer_email?: string;
+    customer_name?: string;
+    shipping_address?: {
+      line1?: string;
+      city?: string;
+      state?: string;
+      pincode?: string;
+      country?: string;
+    };
   };
   signature?: string;
 }
 
 export interface PaymentProviderConfig {
-  appId: string;
-  authToken: string;
-  webhookSecret: string;
+  apiKey: string;
+  apiPassword?: string; // Server-side only
+  sharedSecret?: string; // Server-side only
+  storefrontToken: string;
+  domain: string;
   environment: "test" | "production";
   isConfigured: boolean;
+  isEnabled: boolean;
 }
+

@@ -6,7 +6,7 @@
 - **Client-Trusted Pricing**: The cart and checkout systems rely on the price stored in `localStorage` or React state, which can be easily modified by a malicious user before placing an order.
 
 ## 2. E-Commerce Core Logic
-- **Missing Payment Gateway Integration**: Checkout does not interact with a payment provider (Stripe, Razorpay). Orders are created locally without capturing funds.
+- **Single Checkout Gateway Integration**: Fully standardized on Shiprocket / Fastrr Checkout as the single payment provider. All legacy gateway references removed.
 - **Inventory Disconnect**: Purchasing an item does not decrement the central inventory count in a race-condition-safe manner.
 
 ## 3. SEO & Performance

@@ -334,6 +334,8 @@ export interface OrderTimelineEvent {
   note?: string;
 }
 
+export type PaymentStatusType = "Paid" | "Pending" | "Failed" | "Cancelled" | "Refunded" | "Cash on Delivery";
+
 export interface Order {
   id: string;
   orderNumber: string;
@@ -348,7 +350,12 @@ export interface Order {
   pincode: string;
   country: string;
   paymentMethod: string;
-  paymentStatus: "Paid" | "Pending" | "Cash on Delivery" | "Refunded";
+  paymentStatus: PaymentStatusType;
+  checkoutProvider?: string;
+  shippingProvider?: string;
+  paymentId?: string;
+  transactionId?: string;
+  shiprocketOrderId?: string;
   trackingNumber?: string;
   carrier?: string;
   items: OrderItem[];

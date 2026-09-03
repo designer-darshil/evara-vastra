@@ -1,5 +1,5 @@
 // ==========================================================
-// UNIVERSAL PAYMENT PROVIDER ABSTRACTION
+// SINGLE PAYMENT PROVIDER: SHIPROCKET / FASTRR CHECKOUT
 // ==========================================================
 
 import {
@@ -19,15 +19,16 @@ export interface PaymentProvider {
     orderId: string;
     amount: number;
     currency?: string;
-    customer: CustomerBillingDetails;
+    customer?: CustomerBillingDetails;
     items: PaymentItem[];
     paymentMethod?: string;
   }): Promise<PaymentIntent>;
   verifyPayment(request: PaymentVerificationRequest): Promise<PaymentResult>;
+  testConnection(): Promise<{ success: boolean; message: string; latencyMs: number }>;
 }
 
 export class FastrrPaymentProviderAdapter implements PaymentProvider {
-  public readonly name = "Shiprocket fastrr Checkout";
+  public readonly name = "Shiprocket / Fastrr Checkout";
 
   public getConfig(): PaymentProviderConfig {
     return FastrrCheckoutClient.getConfig();
@@ -37,7 +38,7 @@ export class FastrrPaymentProviderAdapter implements PaymentProvider {
     orderId: string;
     amount: number;
     currency?: string;
-    customer: CustomerBillingDetails;
+    customer?: CustomerBillingDetails;
     items: PaymentItem[];
     paymentMethod?: string;
   }): Promise<PaymentIntent> {
@@ -47,7 +48,12 @@ export class FastrrPaymentProviderAdapter implements PaymentProvider {
   public async verifyPayment(request: PaymentVerificationRequest): Promise<PaymentResult> {
     return FastrrCheckoutClient.verifyPayment(request);
   }
+
+  public async testConnection(): Promise<{ success: boolean; message: string; latencyMs: number }> {
+    return FastrrCheckoutClient.testConnection();
+  }
 }
 
-// Canonical singleton export
+// Canonical singleton export — Strictly ONE checkout integration
 export const paymentProvider: PaymentProvider = new FastrrPaymentProviderAdapter();
+

@@ -255,14 +255,14 @@ export const CartPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
               <div className="flex flex-col gap-4 mt-2">
                 <Button
                   onClick={() => handleNav("/checkout")}
-                  className="w-full h-14 text-[15px] tracking-wide uppercase font-bold"
+                  className="w-full h-14 text-[15px] tracking-wide uppercase font-bold bg-[#734E06] hover:bg-[#5a3c04] text-white rounded-sm"
                 >
-                  Proceed to Secure Checkout <ArrowRight className="w-4 h-4 ml-2" />
+                  Proceed to Checkout <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
 
                 <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground font-medium">
-                  <ShieldCheck className="w-4 h-4 text-primary" />
-                  <span>256-Bit Encrypted Secure Checkout</span>
+                  <ShieldCheck className="w-4 h-4 text-[#734E06]" />
+                  <span>256-Bit Encrypted • Powered by Shiprocket Fastrr Checkout</span>
                 </div>
               </div>
             </div>

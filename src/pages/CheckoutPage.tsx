@@ -1,59 +1,41 @@
-import React, { useState } from "react";
-import { useShop, CartItem } from "../context/ShopContext";
+import React, { useState, useEffect, useCallback } from "react";
+import { useShop } from "../context/ShopContext";
 import { useData } from "../context/DataContext";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import {
-  CheckCircle2,
-  ArrowRight,
-  CreditCard,
-  Smartphone,
-  Building,
-  Truck,
   Lock,
   Loader2,
   AlertCircle,
-  X,
-  Zap,
+  ArrowRight,
+  ExternalLink,
+  ShieldCheck,
+  ShoppingBag,
+  RotateCcw,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Card, CardContent } from "../components/ui/card";
-import { useNavigate } from "react-router-dom";
-import { cn } from "../lib/utils";
-import { paymentProvider } from "../lib/payment";
+import { useNavigate, useLocation } from "react-router-dom";
+import { paymentProvider, PaymentIntent } from "../lib/payment";
 
 export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = ({
   onNavigate,
 }) => {
   const { cart, cartSubtotal, clearCart, showToast } = useShop();
-  const { addOrder, siteSettings } = useData();
+  const { syncOrderPaymentResult } = useData();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleNav = (href: string) => {
-    if (onNavigate) onNavigate(href);
-    else navigate(href);
-  };
+  const handleNav = useCallback(
+    (href: string) => {
+      if (onNavigate) onNavigate(href);
+      else navigate(href);
+    },
+    [onNavigate, navigate]
+  );
 
-  // Form State
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    state: "",
-    pincode: "",
-    country: "India",
-    shippingMethod: "standard",
-    paymentMethod: "fastrr_upi",
-  });
-
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [isFastrrModalOpen, setIsFastrrModalOpen] = useState(false);
-  const [activeIntent, setActiveIntent] = useState<any | null>(null);
-  const [paymentError, setPaymentError] = useState<string | null>(null);
-  const [confirmedOrder, setConfirmedOrder] = useState<any | null>(null);
+  const [isInitializing, setIsInitializing] = useState(false);
+  const [activeIntent, setActiveIntent] = useState<PaymentIntent | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isProcessingCallback, setIsProcessingCallback] = useState(false);
 
   const formatINR = (amount: number) =>
     new Intl.NumberFormat("en-IN", {
@@ -62,52 +44,98 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
       maximumFractionDigits: 0,
     }).format(amount);
 
-  const shippingCost = formData.shippingMethod === "express" ? 450 : 0;
-  const grandTotal = cartSubtotal + shippingCost;
+  const grandTotal = cartSubtotal;
 
-  // 1. Initial Order & Payment Intent Creation
-  const handleInitiateFastrrCheckout = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.firstName || !formData.address || !formData.pincode || !formData.phone) {
-      showToast("Please fill in required contact and delivery details.", "info");
+  // Handle Authoritative Return Callback (e.g. from Shiprocket / Fastrr redirect)
+  const handleCheckoutCallback = useCallback(
+    async (orderId: string, paymentId: string, statusParam: string) => {
+      setIsProcessingCallback(true);
+      setErrorMessage(null);
+
+      try {
+        const verification = await paymentProvider.verifyPayment({
+          orderId,
+          paymentId,
+          status: statusParam,
+        });
+
+        if (!verification.success) {
+          throw new Error(
+            verification.error || "Payment could not be completed. Please try again."
+          );
+        }
+
+        // Synchronize order idempotently in atelier database
+        const finalStatus = verification.status === "COD" ? "Cash on Delivery" : "Paid";
+        const orderItems = cart.map((item) => ({
+          id: item.product.id,
+          slug: item.product.slug,
+          title: item.product.title,
+          price: item.product.price,
+          quantity: item.quantity,
+          image: item.product.images[0],
+          fabric: item.product.fabric,
+          size: item.selectedSize,
+        }));
+
+        syncOrderPaymentResult({
+          orderId,
+          paymentId: verification.paymentId,
+          transactionId: verification.transactionId,
+          status: finalStatus,
+          methodLabel: verification.method || "Shiprocket / Fastrr Checkout",
+          fastrrOrderId: verification.fastrrOrderId,
+          items: orderItems,
+          subtotal: cartSubtotal,
+          shippingFee: 0,
+          discount: 0,
+          total: grandTotal,
+        });
+
+        // Clear cart ONLY after authoritative success
+        clearCart();
+        showToast("Payment verified via Shiprocket Fastrr Checkout!", "info");
+        handleNav(`/order-confirmation/${orderId}`);
+      } catch (err: any) {
+        setErrorMessage(err?.message || "Payment could not be completed. Please try again.");
+      } finally {
+        setIsProcessingCallback(false);
+      }
+    },
+    [cart, cartSubtotal, clearCart, grandTotal, handleNav, showToast, syncOrderPaymentResult]
+  );
+
+  // Check URL parameters for returning customer callbacks
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const orderIdParam = params.get("order_id");
+    const paymentIdParam = params.get("payment_id");
+    const statusParam = params.get("status");
+
+    if (orderIdParam && (statusParam === "success" || statusParam === "paid" || statusParam === "cod")) {
+      handleCheckoutCallback(orderIdParam, paymentIdParam || `pay_${Date.now()}`, statusParam);
+    } else if (statusParam === "failed" || statusParam === "cancelled") {
+      setErrorMessage("Payment could not be completed. Please try again.");
+    }
+  }, [location.search, handleCheckoutCallback]);
+
+  // Initiate Shiprocket / Fastrr Checkout Session
+  const handleLaunchFastrrCheckout = async () => {
+    if (cart.length === 0) {
+      showToast("Your shopping bag is empty.", "info");
+      handleNav("/cart");
       return;
     }
 
-    setPaymentError(null);
-    setIsProcessingPayment(true);
+    setIsInitializing(true);
+    setErrorMessage(null);
 
     try {
-      const orderId = `EV-${Math.floor(100000 + Math.random() * 900000)}`;
+      const generatedOrderId = `EV-${Math.floor(10000 + Math.random() * 90000)}`;
 
-      // If user selected Cash on Delivery and COD is enabled in store settings
-      if (formData.paymentMethod === "cod") {
-        if (!siteSettings.codAvailable) {
-          throw new Error("Cash on Delivery is currently disabled in store configuration.");
-        }
-        finalizeOrder({
-          orderId,
-          paymentId: `cod_${Date.now()}`,
-          paymentStatus: "Cash on Delivery",
-          paymentMethodLabel: "Cash on Delivery (Pay upon Doorstep Arrival)",
-        });
-        return;
-      }
-
-      // Initialize fastrr Checkout Intent
       const intent = await paymentProvider.createPaymentIntent({
-        orderId,
+        orderId: generatedOrderId,
         amount: grandTotal,
-        customer: {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          address: formData.address,
-          city: formData.city,
-          state: formData.state,
-          pincode: formData.pincode,
-          country: formData.country,
-        },
         items: cart.map((i) => ({
           id: i.product.id,
           name: i.product.title,
@@ -115,674 +143,243 @@ export const CheckoutPage: React.FC<{ onNavigate?: (href: string) => void }> = (
           quantity: i.quantity,
           image: i.product.images[0],
         })),
-        paymentMethod: formData.paymentMethod,
       });
 
       setActiveIntent(intent);
-      setIsFastrrModalOpen(true);
     } catch (err: any) {
-      setPaymentError(err?.message || "Failed to initialize payment gateway. Please try again.");
+      setErrorMessage(
+        err?.message || "Failed to initialize Shiprocket Fastrr Checkout. Please try again."
+      );
     } finally {
-      setIsProcessingPayment(false);
+      setIsInitializing(false);
     }
   };
 
-  // 2. Fastrr Modal Payment Execution & Verification
-  const handleExecutePayment = async (selectedMethod: string) => {
+  // Auto-initiate checkout intent on page load if cart has items and no return callback
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (!params.get("status") && cart.length > 0 && !activeIntent && !isInitializing) {
+      handleLaunchFastrrCheckout();
+    }
+  }, [cart.length]);
+
+  // Simulation handlers for test/demo mode
+  const handleSimulatePatronSuccess = () => {
     if (!activeIntent) return;
-    setIsProcessingPayment(true);
-    setPaymentError(null);
-
-    try {
-      // Simulate fastrr payment processing
-      const paymentId = `pay_fastrr_${Date.now()}`;
-      const verification = await paymentProvider.verifyPayment({
-        orderId: activeIntent.orderId,
-        paymentId,
-      });
-
-      if (!verification.success) {
-        throw new Error(verification.error || "Payment was declined by the bank or gateway timeout.");
-      }
-
-      const methodLabel =
-        selectedMethod === "fastrr_upi"
-          ? "Instant UPI via Fastrr (PhonePe / GPay)"
-          : selectedMethod === "fastrr_card"
-          ? "Credit/Debit Card via Fastrr"
-          : "Net Banking via Fastrr";
-
-      setIsFastrrModalOpen(false);
-      finalizeOrder({
-        orderId: activeIntent.orderId,
-        paymentId: verification.paymentId || paymentId,
-        paymentStatus: "Paid",
-        paymentMethodLabel: methodLabel,
-      });
-    } catch (err: any) {
-      setPaymentError(err?.message || "Payment could not be completed.");
-    } finally {
-      setIsProcessingPayment(false);
-    }
+    handleCheckoutCallback(activeIntent.orderId, `pay_fstr_${Date.now()}`, "paid");
   };
 
-  // 3. Finalize and Save Order to DataContext
-  const finalizeOrder = (details: {
-    orderId: string;
-    paymentId: string;
-    paymentStatus: "Pending" | "Paid" | "Cash on Delivery" | "Refunded";
-    paymentMethodLabel: string;
-  }) => {
-    const orderItems = cart.map((item) => ({
-      id: item.product.id,
-      slug: item.product.slug,
-      title: item.product.title,
-      price: item.product.price,
-      quantity: item.quantity,
-      image: item.product.images[0],
-      fabric: item.product.fabric,
-      size: item.selectedSize,
-    }));
-
-    const createdOrder = addOrder({
-      status: "Confirmed",
-      subtotal: cartSubtotal,
-      shippingFee: shippingCost,
-      discount: 0,
-      total: grandTotal,
-      paymentMethod: details.paymentMethodLabel,
-      paymentStatus: details.paymentStatus,
-      customerName: `${formData.firstName} ${formData.lastName}`,
-      customerEmail: formData.email,
-      customerPhone: formData.phone,
-      shippingAddress: formData.address,
-      city: formData.city,
-      state: formData.state,
-      pincode: formData.pincode,
-      country: formData.country,
-      trackingNumber: `FSTR-${Math.floor(10000000 + Math.random() * 90000000)}`,
-      carrier: "Blue Dart Express Insured Air",
-      items: orderItems,
-    });
-
-    setConfirmedOrder(createdOrder);
-    clearCart();
-    showToast(`Payment verified! Order ${createdOrder.orderNumber} confirmed.`, "info");
-    window.scrollTo(0, 0);
+  const handleSimulateCODSuccess = () => {
+    if (!activeIntent) return;
+    handleCheckoutCallback(activeIntent.orderId, `cod_${Date.now()}`, "cod");
   };
+
+  const handleSimulatePatronDecline = () => {
+    setErrorMessage("Payment could not be completed. Please try again.");
+  };
+
+  if (cart.length === 0 && !isProcessingCallback) {
+    return (
+      <div className="bg-background min-h-[80dvh] py-12">
+        <div className="container max-w-2xl mx-auto px-4 text-center space-y-6">
+          <div className="w-16 h-16 bg-amber-50 text-[#734E06] rounded-full flex items-center justify-center mx-auto border border-amber-200">
+            <ShoppingBag className="w-8 h-8" />
+          </div>
+          <h2 className="font-serif text-3xl font-bold text-neutral-900 m-0">
+            Your Shopping Bag is Empty
+          </h2>
+          <p className="text-sm text-neutral-600">
+            Please add handcrafted silk sarees to your bag before proceeding to checkout.
+          </p>
+          <Button
+            onClick={() => handleNav("/shop")}
+            className="h-12 px-8 bg-[#734E06] hover:bg-[#5a3c04] text-white uppercase tracking-wider text-xs font-bold rounded-sm"
+          >
+            Explore Sarees
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-background min-h-[85dvh] py-8 sm:py-12">
-      <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container max-w-4xl mx-auto px-4 sm:px-6">
         <Breadcrumbs
-          items={[{ label: "Cart", href: "/cart" }, { label: "Checkout & Payment" }]}
+          items={[{ label: "Cart", href: "/cart" }, { label: "Shiprocket Fastrr Checkout" }]}
           onNavigate={handleNav}
         />
 
-        {/* Order Confirmation Screen */}
-        {confirmedOrder ? (
-          <div className="max-w-2xl mx-auto bg-white border border-neutral-200 p-8 sm:p-10 rounded-sm shadow-sm space-y-6 text-center mt-6">
-            <div className="w-16 h-16 bg-emerald-50 text-emerald-700 rounded-full flex items-center justify-center mx-auto border border-emerald-200">
-              <CheckCircle2 className="w-8 h-8" />
-            </div>
-
+        {/* Processing Callback View */}
+        {isProcessingCallback ? (
+          <div className="bg-white border border-neutral-200 p-10 rounded-sm shadow-sm text-center space-y-5 mt-6">
+            <Loader2 className="w-10 h-10 text-[#734E06] animate-spin mx-auto" />
             <div>
-              <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#734E06] block mb-1">
-                TRANSACTION VERIFIED & CONFIRMED
-              </span>
-              <h2 className="font-serif text-3xl font-bold text-neutral-900 m-0">
-                Thank You, {confirmedOrder.customerName}!
-              </h2>
-              <p className="text-sm text-neutral-600 mt-1">
-                Your order <strong>{confirmedOrder.orderNumber}</strong> has been received by the atelier.
+              <h3 className="font-serif text-2xl font-bold text-neutral-900 m-0">
+                Authorizing Payment Result...
+              </h3>
+              <p className="text-xs text-neutral-500 mt-1.5">
+                Receiving authoritative confirmation from Shiprocket / Fastrr Checkout.
               </p>
             </div>
-
-            <div className="bg-neutral-50 p-5 rounded-sm border border-neutral-200 text-left text-xs space-y-3">
-              <div className="flex justify-between border-b border-neutral-200 pb-2">
-                <span className="text-neutral-500 font-medium">Payment Status:</span>
-                <span className="font-bold text-emerald-800 uppercase">
-                  ✓ {confirmedOrder.paymentStatus}
+          </div>
+        ) : errorMessage ? (
+          /* Checkout Failure / Cancelled State */
+          <div className="bg-white border border-red-200 p-8 sm:p-10 rounded-sm shadow-sm space-y-6 mt-6">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-red-50 text-red-700 rounded-full flex items-center justify-center shrink-0 border border-red-200">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div className="flex-1">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-red-700 block mb-1">
+                  Transaction Notice
                 </span>
-              </div>
-              <div className="flex justify-between border-b border-neutral-200 pb-2">
-                <span className="text-neutral-500 font-medium">Payment Method:</span>
-                <span className="font-bold text-neutral-900">{confirmedOrder.paymentMethod}</span>
-              </div>
-              <div className="flex justify-between border-b border-neutral-200 pb-2">
-                <span className="text-neutral-500 font-medium">Total Paid:</span>
-                <strong className="text-sm font-bold text-[#734E06]">
-                  {formatINR(confirmedOrder.total)}
-                </strong>
-              </div>
-              <div className="pt-1">
-                <span className="text-neutral-500 font-medium block mb-1">Delivery Destination:</span>
-                <p className="text-neutral-800 m-0 leading-relaxed font-semibold">
-                  {confirmedOrder.shippingAddress}, {confirmedOrder.city}, {confirmedOrder.state} - {confirmedOrder.pincode}
+                <h3 className="font-serif text-2xl font-bold text-neutral-900 m-0">
+                  {errorMessage}
+                </h3>
+                <p className="text-sm text-neutral-600 mt-2 leading-relaxed">
+                  Your payment authorization could not be completed by the bank or was cancelled.
+                  Your items remain securely saved in your bag, and your account has not been charged.
                 </p>
               </div>
             </div>
 
+            <div className="bg-neutral-50 p-4 rounded-sm border border-neutral-200 text-xs text-neutral-600 flex items-center justify-between">
+              <span>Saved Items in Bag: <strong>{cart.length} pieces</strong></span>
+              <span>Subtotal: <strong className="text-neutral-900 font-bold">{formatINR(grandTotal)}</strong></span>
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <Button
-                onClick={() => handleNav("/account/orders")}
-                className="flex-1 bg-[#734E06] hover:bg-[#5a3c04] text-white text-xs font-bold uppercase tracking-wider h-11"
+                onClick={() => {
+                  setErrorMessage(null);
+                  handleLaunchFastrrCheckout();
+                }}
+                className="flex-1 h-12 bg-[#734E06] hover:bg-[#5a3c04] text-white uppercase tracking-wider text-xs font-bold rounded-sm flex items-center justify-center gap-2"
               >
-                Track In My Orders <ArrowRight className="w-4 h-4 ml-1.5" />
+                <RotateCcw className="w-4 h-4" /> Retry Checkout
               </Button>
               <Button
                 variant="outline"
-                onClick={() => handleNav("/shop")}
-                className="flex-1 text-xs font-bold uppercase tracking-wider h-11"
+                onClick={() => handleNav("/cart")}
+                className="flex-1 h-12 border-neutral-300 text-neutral-800 text-xs uppercase tracking-wider font-bold rounded-sm"
               >
-                Continue Shopping
+                Return to Cart
               </Button>
             </div>
           </div>
-        ) : cart.length === 0 ? (
-          <div className="text-center py-20 bg-white border border-neutral-200 rounded-sm p-8 max-w-lg mx-auto shadow-xs">
-            <h2 className="font-serif text-2xl font-bold mb-2">Your Bag is Empty</h2>
-            <p className="text-sm text-neutral-500 mb-6">
-              Please select pieces from our catalog before proceeding to checkout.
-            </p>
-            <Button
-              onClick={() => handleNav("/shop")}
-              className="bg-[#734E06] hover:bg-[#5a3c04] text-white"
-            >
-              Explore Saree Catalog
-            </Button>
-          </div>
         ) : (
-          /* Main Checkout Grid */
-          <form onSubmit={handleInitiateFastrrCheckout} className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-              {/* Left 2 Columns: Information & Payment Option */}
-              <div className="lg:col-span-2 space-y-6">
-                {/* Error Banner */}
-                {paymentError && (
-                  <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-sm flex items-start gap-2.5">
-                    <AlertCircle className="w-4 h-4 text-red-700 shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="block font-bold">Payment Notification</strong>
-                      <p className="m-0 mt-0.5">{paymentError}</p>
-                    </div>
-                  </div>
-                )}
+          /* Active Checkout Gateway Screen */
+          <div className="bg-white border border-neutral-200 rounded-sm shadow-sm p-6 sm:p-10 mt-6 space-y-8">
+            <div className="text-center max-w-xl mx-auto space-y-3">
+              <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#734E06] block">
+                EVARA VASTRA ATELIER CHECKOUT
+              </span>
+              <h2 className="font-serif text-3xl font-bold text-neutral-900 m-0">
+                Shiprocket / Fastrr Checkout
+              </h2>
+              <p className="text-sm text-neutral-600 leading-relaxed">
+                You are checking out with Evara Vastra’s official single checkout engine. All payment options
+                (UPI, Cards, Net Banking, and COD) and delivery addresses are securely managed directly inside
+                Shiprocket Fastrr Checkout.
+              </p>
+            </div>
 
-                {/* 1. Contact Details */}
-                <Card className="bg-white border-neutral-200 rounded-sm shadow-xs">
-                  <CardContent className="p-6 sm:p-8">
-                    <h3 className="font-serif text-xl sm:text-2xl font-bold text-neutral-900 m-0 mb-5">
-                      1. Contact Information
-                    </h3>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs uppercase font-bold text-neutral-600 mb-1.5">
-                          First Name *
-                        </label>
-                        <Input
-                          type="text"
-                          required
-                          placeholder="e.g. Devika"
-                          value={formData.firstName}
-                          onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                          className="bg-neutral-50 focus:bg-white text-neutral-900 border-neutral-300 rounded-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs uppercase font-bold text-neutral-600 mb-1.5">
-                          Last Name *
-                        </label>
-                        <Input
-                          type="text"
-                          required
-                          placeholder="e.g. Srinivasan"
-                          value={formData.lastName}
-                          onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                          className="bg-neutral-50 focus:bg-white text-neutral-900 border-neutral-300 rounded-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs uppercase font-bold text-neutral-600 mb-1.5">
-                          Email Address *
-                        </label>
-                        <Input
-                          type="email"
-                          required
-                          placeholder="name@example.com"
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          className="bg-neutral-50 focus:bg-white text-neutral-900 border-neutral-300 rounded-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs uppercase font-bold text-neutral-600 mb-1.5">
-                          Phone Number (for SMS Tracking) *
-                        </label>
-                        <Input
-                          type="tel"
-                          required
-                          placeholder="+91 98201 44520"
-                          value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          className="bg-neutral-50 focus:bg-white text-neutral-900 border-neutral-300 rounded-sm"
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* 2. Shipping Destination */}
-                <Card className="bg-white border-neutral-200 rounded-sm shadow-xs">
-                  <CardContent className="p-6 sm:p-8">
-                    <div className="flex items-center justify-between mb-5">
-                      <h3 className="font-serif text-xl sm:text-2xl font-bold text-neutral-900 m-0">
-                        2. Delivery Address
-                      </h3>
-                      <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-sm border border-emerald-200">
-                        ✓ Complimentary Pan-India Delivery
-                      </span>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-xs uppercase font-bold text-neutral-600 mb-1.5">
-                          Street Address / House / Flat *
-                        </label>
-                        <Input
-                          type="text"
-                          required
-                          placeholder="Flat, House no., Building, Apartment, Street"
-                          value={formData.address}
-                          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                          className="bg-neutral-50 focus:bg-white text-neutral-900 border-neutral-300 rounded-sm"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div>
-                          <label className="block text-xs uppercase font-bold text-neutral-600 mb-1.5">
-                            City *
-                          </label>
-                          <Input
-                            type="text"
-                            required
-                            placeholder="e.g. Mumbai"
-                            value={formData.city}
-                            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                            className="bg-neutral-50 focus:bg-white text-neutral-900 border-neutral-300 rounded-sm"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs uppercase font-bold text-neutral-600 mb-1.5">
-                            State *
-                          </label>
-                          <Input
-                            type="text"
-                            required
-                            placeholder="e.g. Maharashtra"
-                            value={formData.state}
-                            onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                            className="bg-neutral-50 focus:bg-white text-neutral-900 border-neutral-300 rounded-sm"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs uppercase font-bold text-neutral-600 mb-1.5">
-                            PIN Code *
-                          </label>
-                          <Input
-                            type="text"
-                            maxLength={6}
-                            required
-                            placeholder="e.g. 400050"
-                            value={formData.pincode}
-                            onChange={(e) =>
-                              setFormData({ ...formData, pincode: e.target.value.replace(/\D/g, "") })
-                            }
-                            className="bg-neutral-50 focus:bg-white text-neutral-900 border-neutral-300 rounded-sm"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* 3. Fastrr Payment Method Options */}
-                <Card className="bg-white border-neutral-200 rounded-sm shadow-xs">
-                  <CardContent className="p-6 sm:p-8">
-                    <div className="flex items-center justify-between mb-5">
-                      <h3 className="font-serif text-xl sm:text-2xl font-bold text-neutral-900 m-0">
-                        3. Payment Method
-                      </h3>
-                      <span className="flex items-center gap-1 text-[11px] font-bold text-[#734E06] bg-amber-50 px-2.5 py-1 rounded-sm border border-amber-200">
-                        <Zap className="w-3 h-3 fill-current" /> fastrr 1-Click Checkout
-                      </span>
-                    </div>
-
-                    <div className="space-y-3">
-                      <label
-                        className={cn(
-                          "flex items-center gap-3.5 p-4 border rounded-sm cursor-pointer transition-all",
-                          formData.paymentMethod === "fastrr_upi"
-                            ? "border-[#734E06] bg-amber-50/40 shadow-xs"
-                            : "border-neutral-200 bg-white hover:bg-neutral-50"
-                        )}
-                      >
-                        <input
-                          type="radio"
-                          name="paymentMethod"
-                          checked={formData.paymentMethod === "fastrr_upi"}
-                          onChange={() => setFormData({ ...formData, paymentMethod: "fastrr_upi" })}
-                          className="w-4 h-4 text-[#734E06] accent-[#734E06]"
-                        />
-                        <Smartphone className="w-5 h-5 text-[#734E06]" />
-                        <div className="flex-1">
-                          <span className="text-sm font-bold text-neutral-900 block">
-                            Instant UPI via fastrr (GPay / PhonePe / Paytm / BHIM)
-                          </span>
-                          <span className="text-[11px] text-neutral-500">
-                            Fastest payment. 100% encrypted and protected by Shiprocket.
-                          </span>
-                        </div>
-                      </label>
-
-                      <label
-                        className={cn(
-                          "flex items-center gap-3.5 p-4 border rounded-sm cursor-pointer transition-all",
-                          formData.paymentMethod === "fastrr_card"
-                            ? "border-[#734E06] bg-amber-50/40 shadow-xs"
-                            : "border-neutral-200 bg-white hover:bg-neutral-50"
-                        )}
-                      >
-                        <input
-                          type="radio"
-                          name="paymentMethod"
-                          checked={formData.paymentMethod === "fastrr_card"}
-                          onChange={() => setFormData({ ...formData, paymentMethod: "fastrr_card" })}
-                          className="w-4 h-4 text-[#734E06] accent-[#734E06]"
-                        />
-                        <CreditCard className="w-5 h-5 text-[#734E06]" />
-                        <div className="flex-1">
-                          <span className="text-sm font-bold text-neutral-900 block">
-                            Credit / Debit Cards (Visa, Mastercard, RuPay, Amex)
-                          </span>
-                          <span className="text-[11px] text-neutral-500">
-                            Safe 3D-Secure 2.0 card checkout.
-                          </span>
-                        </div>
-                      </label>
-
-                      <label
-                        className={cn(
-                          "flex items-center gap-3.5 p-4 border rounded-sm cursor-pointer transition-all",
-                          formData.paymentMethod === "fastrr_netbanking"
-                            ? "border-[#734E06] bg-amber-50/40 shadow-xs"
-                            : "border-neutral-200 bg-white hover:bg-neutral-50"
-                        )}
-                      >
-                        <input
-                          type="radio"
-                          name="paymentMethod"
-                          checked={formData.paymentMethod === "fastrr_netbanking"}
-                          onChange={() =>
-                            setFormData({ ...formData, paymentMethod: "fastrr_netbanking" })
-                          }
-                          className="w-4 h-4 text-[#734E06] accent-[#734E06]"
-                        />
-                        <Building className="w-5 h-5 text-[#734E06]" />
-                        <div className="flex-1">
-                          <span className="text-sm font-bold text-neutral-900 block">
-                            Net Banking (All Major Indian Banks)
-                          </span>
-                          <span className="text-[11px] text-neutral-500">
-                            HDFC, ICICI, SBI, Axis, Kotak and 50+ banks.
-                          </span>
-                        </div>
-                      </label>
-
-                      {siteSettings.codAvailable && (
-                        <label
-                          className={cn(
-                            "flex items-center gap-3.5 p-4 border rounded-sm cursor-pointer transition-all",
-                            formData.paymentMethod === "cod"
-                              ? "border-[#734E06] bg-amber-50/40 shadow-xs"
-                              : "border-neutral-200 bg-white hover:bg-neutral-50"
-                          )}
-                        >
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            checked={formData.paymentMethod === "cod"}
-                            onChange={() => setFormData({ ...formData, paymentMethod: "cod" })}
-                            className="w-4 h-4 text-[#734E06] accent-[#734E06]"
-                          />
-                          <Truck className="w-5 h-5 text-[#734E06]" />
-                          <div className="flex-1">
-                            <span className="text-sm font-bold text-neutral-900 block">
-                              Cash on Delivery (COD)
-                            </span>
-                            <span className="text-[11px] text-neutral-500">
-                              Pay in cash or UPI when your saree arrives at your doorstep.
-                            </span>
-                          </div>
-                        </label>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+            {/* Cart Summary Header */}
+            <div className="bg-neutral-50 p-5 rounded-sm border border-neutral-200 space-y-3 text-xs">
+              <div className="flex justify-between items-center pb-2 border-b border-neutral-200">
+                <span className="text-neutral-500 font-medium">Selected Pieces:</span>
+                <span className="font-bold text-neutral-900">{cart.length} Handcrafted Sarees</span>
               </div>
+              <div className="flex justify-between items-center pb-2 border-b border-neutral-200">
+                <span className="text-neutral-500 font-medium">Pan-India Express Shipping:</span>
+                <span className="font-bold text-emerald-800 uppercase">Complimentary</span>
+              </div>
+              <div className="flex justify-between items-center pt-1 text-sm font-bold">
+                <span className="text-neutral-900">Total Payable:</span>
+                <span className="text-[#734E06] text-base">{formatINR(grandTotal)}</span>
+              </div>
+            </div>
 
-              {/* Right Column: Order Summary & Primary Payment Button */}
-              <div className="bg-white p-6 sm:p-8 border border-neutral-200 shadow-sm rounded-sm sticky top-24 space-y-6">
-                <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
-                  <h4 className="font-serif text-xl font-bold text-neutral-900 m-0">
-                    Order Summary
-                  </h4>
-                  <span className="text-xs text-neutral-500 font-mono">
-                    {cart.length} items
-                  </span>
-                </div>
-
-                <div className="flex flex-col gap-3.5 max-h-[300px] overflow-y-auto pr-1">
-                  {cart.map((item: CartItem) => (
-                    <div key={item.product.id} className="flex gap-3 items-center text-xs">
-                      <img
-                        src={item.product.images[0]}
-                        alt={item.product.title}
-                        className="w-12 h-16 object-cover bg-neutral-100 rounded-xs border border-neutral-200"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <strong className="block text-neutral-900 truncate font-semibold">
-                          {item.product.title}
-                        </strong>
-                        <span className="text-neutral-500 block">
-                          Qty: {item.quantity} {item.selectedSize ? `• ${item.selectedSize}` : ""}
-                        </span>
-                      </div>
-                      <span className="font-bold text-neutral-900">
-                        {formatINR(item.product.price * item.quantity)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="border-t border-neutral-200 pt-4 space-y-2 text-xs text-neutral-600">
-                  <div className="flex justify-between">
-                    <span>Subtotal:</span>
-                    <strong className="text-neutral-900 font-semibold">{formatINR(cartSubtotal)}</strong>
-                  </div>
-                  <div className="flex justify-between text-emerald-700 font-semibold">
-                    <span>Pan-India Shipping:</span>
-                    <span>Complimentary</span>
-                  </div>
-                  <div className="flex justify-between text-base font-bold text-neutral-900 border-t border-neutral-200 pt-3 mt-2">
-                    <span>Grand Total:</span>
-                    <span className="text-[#734E06] text-lg">{formatINR(grandTotal)}</span>
-                  </div>
-                </div>
-
-                {/* Primary Authoritative Payment Action */}
-                <Button
-                  type="submit"
-                  disabled={isProcessingPayment}
-                  className="w-full h-13 bg-[#734E06] hover:bg-[#5a3c04] text-white text-sm font-bold uppercase tracking-wider rounded-sm shadow-md transition-all flex items-center justify-center gap-2"
-                >
-                  {isProcessingPayment ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" /> Launching Payment...
-                    </>
-                  ) : formData.paymentMethod === "cod" ? (
-                    `Place COD Order (${formatINR(grandTotal)})`
-                  ) : (
-                    <>
-                      <Zap className="w-4 h-4 fill-current" />
-                      Pay with fastrr ({formatINR(grandTotal)})
-                    </>
-                  )}
-                </Button>
-
-                <div className="pt-2 text-center space-y-2">
-                  <p className="text-[11px] text-neutral-500 m-0 flex items-center justify-center gap-1.5 font-medium">
-                    <Lock className="w-3.5 h-3.5 text-neutral-400" />
-                    256-bit Encrypted Checkout • Powered by Shiprocket fastrr
+            {/* Launch Status / Primary Launch Button */}
+            <div className="space-y-4">
+              {isInitializing ? (
+                <div className="py-8 text-center space-y-3">
+                  <Loader2 className="w-8 h-8 text-[#734E06] animate-spin mx-auto" />
+                  <p className="text-xs font-semibold text-neutral-600">
+                    Connecting to Shiprocket Fastrr Secure Checkout session...
                   </p>
                 </div>
-              </div>
-            </div>
-          </form>
-        )}
-      </div>
+              ) : activeIntent ? (
+                <div className="space-y-4 text-center">
+                  <a
+                    href={activeIntent.checkoutUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full h-14 bg-[#734E06] hover:bg-[#5a3c04] text-white text-sm font-bold uppercase tracking-wider rounded-sm shadow-md transition-all flex items-center justify-center gap-2.5"
+                  >
+                    Proceed to Fastrr Checkout ({formatINR(grandTotal)})
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
 
-      {/* Fastrr Checkout Popup Modal */}
-      {isFastrrModalOpen && activeIntent && (
-        <div
-          className="fixed inset-0 min-h-[100dvh] h-[100dvh] bg-black/75 z-modal flex items-center justify-center p-4"
-          style={{ zIndex: 70 }}
-          onClick={() => {
-            if (!isProcessingPayment) setIsFastrrModalOpen(false);
-          }}
-        >
-          <div
-            className="bg-white max-w-md w-full rounded-sm shadow-2xl overflow-hidden border border-neutral-200 flex flex-col animate-in zoom-in-95 duration-200"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Fastrr Header */}
-            <div className="bg-neutral-900 text-white p-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-[#734E06] flex items-center justify-center text-white font-bold text-xs">
-                  ⚡
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold m-0 tracking-wide">fastrr Checkout</h4>
-                  <span className="text-[10px] text-neutral-400 block -mt-0.5">
-                    Powered by Shiprocket
-                  </span>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                disabled={isProcessingPayment}
-                onClick={() => setIsFastrrModalOpen(false)}
-                className="w-7 h-7 rounded-full text-neutral-400 hover:text-white flex items-center justify-center"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-6 space-y-5 text-xs">
-              <div className="bg-neutral-50 p-4 rounded-sm border border-neutral-200 flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-neutral-500 block">
-                    Paying Evara Vastra
-                  </span>
-                  <span className="text-neutral-900 font-semibold text-xs">
-                    Order Ref: #{activeIntent.orderId}
-                  </span>
-                </div>
-                <strong className="text-base font-bold text-[#734E06]">
-                  {formatINR(activeIntent.amount)}
-                </strong>
-              </div>
-
-              <div className="space-y-3">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-700 block">
-                  Select Fastrr Payment Method:
-                </span>
-
-                <button
-                  type="button"
-                  disabled={isProcessingPayment}
-                  onClick={() => handleExecutePayment("fastrr_upi")}
-                  className="w-full p-3.5 bg-white border border-neutral-300 hover:border-[#734E06] rounded-sm text-left flex items-center justify-between transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <Smartphone className="w-5 h-5 text-[#734E06]" />
-                    <div>
-                      <strong className="block text-neutral-900 text-xs group-hover:text-[#734E06]">
-                        Instant UPI (GPay / PhonePe / Paytm)
-                      </strong>
-                      <span className="text-[10px] text-neutral-500">1-click direct app approval</span>
+                  {/* Sandbox / Interactive Testing Console */}
+                  <div className="pt-6 border-t border-neutral-200 text-left bg-neutral-50/70 p-5 rounded-sm border">
+                    <span className="text-[11px] font-mono font-bold uppercase text-neutral-500 block mb-2">
+                      Test Simulation Console (Shiprocket Fastrr Sandbox)
+                    </span>
+                    <p className="text-xs text-neutral-600 mb-4">
+                      Simulate official Fastrr customer response to test end-to-end payment status and order synchronization:
+                    </p>
+                    <div className="flex flex-wrap gap-2.5">
+                      <Button
+                        size="sm"
+                        onClick={handleSimulatePatronSuccess}
+                        className="bg-emerald-800 hover:bg-emerald-900 text-white text-xs"
+                      >
+                        ✓ Simulate Paid (UPI/Card)
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={handleSimulateCODSuccess}
+                        className="bg-amber-800 hover:bg-amber-900 text-white text-xs"
+                      >
+                        ✓ Simulate COD Selection
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleSimulatePatronDecline}
+                        className="border-red-300 text-red-700 hover:bg-red-50 text-xs"
+                      >
+                        ✕ Simulate Payment Declined
+                      </Button>
                     </div>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-neutral-400 group-hover:translate-x-1 transition-transform" />
-                </button>
-
-                <button
-                  type="button"
-                  disabled={isProcessingPayment}
-                  onClick={() => handleExecutePayment("fastrr_card")}
-                  className="w-full p-3.5 bg-white border border-neutral-300 hover:border-[#734E06] rounded-sm text-left flex items-center justify-between transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <CreditCard className="w-5 h-5 text-[#734E06]" />
-                    <div>
-                      <strong className="block text-neutral-900 text-xs group-hover:text-[#734E06]">
-                        Credit or Debit Card
-                      </strong>
-                      <span className="text-[10px] text-neutral-500">Visa, Mastercard, RuPay, Amex</span>
-                    </div>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-neutral-400 group-hover:translate-x-1 transition-transform" />
-                </button>
-
-                <button
-                  type="button"
-                  disabled={isProcessingPayment}
-                  onClick={() => handleExecutePayment("fastrr_netbanking")}
-                  className="w-full p-3.5 bg-white border border-neutral-300 hover:border-[#734E06] rounded-sm text-left flex items-center justify-between transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <Building className="w-5 h-5 text-[#734E06]" />
-                    <div>
-                      <strong className="block text-neutral-900 text-xs group-hover:text-[#734E06]">
-                        Net Banking
-                      </strong>
-                      <span className="text-[10px] text-neutral-500">HDFC, ICICI, SBI, Axis & all banks</span>
-                    </div>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-neutral-400 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </div>
-
-              {isProcessingPayment && (
-                <div className="p-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-sm flex items-center justify-center gap-2 font-semibold">
-                  <Loader2 className="w-4 h-4 animate-spin text-[#734E06]" />
-                  Authorizing transaction with patron bank...
                 </div>
+              ) : (
+                <Button
+                  onClick={handleLaunchFastrrCheckout}
+                  className="w-full h-14 bg-[#734E06] hover:bg-[#5a3c04] text-white text-sm font-bold uppercase tracking-wider rounded-sm shadow-md transition-all flex items-center justify-center gap-2"
+                >
+                  Proceed to Checkout <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
               )}
             </div>
 
-            {/* Modal Footer */}
-            <div className="p-3 bg-neutral-100 border-t border-neutral-200 text-center text-[10px] text-neutral-500 font-medium flex items-center justify-center gap-1">
-              <Lock className="w-3 h-3 text-neutral-400" />
-              Verified Fastrr Merchant • PCI-DSS Level 1 Certified
+            {/* Trust and Single Provider Assurance */}
+            <div className="pt-4 border-t border-neutral-100 flex flex-col sm:flex-row items-center justify-between text-[11px] text-neutral-500 gap-3">
+              <div className="flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5 text-neutral-400" />
+                <span>256-Bit TLS Encryption • PCI-DSS Level 1</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#734E06]" />
+                <span className="font-semibold text-neutral-700">Official Shiprocket / Fastrr Checkout</span>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

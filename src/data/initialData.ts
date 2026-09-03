@@ -769,7 +769,7 @@ export const initialFAQs: FAQItem[] = [
     id: "faq-2",
     category: "Payments & Offers",
     question: "How do I claim the 10% Prepaid Discount?",
-    answer: "Pay via UPI (GPay, PhonePe, Paytm) or Net Banking / Cards at checkout, and the 10% instant discount applies automatically to your cart total.",
+    answer: "Complete payment via UPI, Cards, or Net Banking inside Shiprocket Fastrr Checkout, and the prepaid discount applies automatically.",
     order: 2,
     isPublished: true,
   },

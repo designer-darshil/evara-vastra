@@ -411,11 +411,65 @@ export const AdminOrderDetailPage: React.FC<AdminOrderDetailPageProps> = ({
 
               <div className="pt-2.5 border-t border-neutral-100">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 block mb-1">
-                  Payment Method
+                  Recipient Contact
                 </span>
                 <p className="text-neutral-800 font-semibold m-0">
-                  {order.paymentMethod} ({order.paymentStatus})
+                  {order.customerEmail} • {order.customerPhone}
                 </p>
+              </div>
+            </div>
+          </AdminCard>
+
+          {/* Dedicated Shiprocket / Fastrr Checkout Card */}
+          <AdminCard title="Payment & Checkout Engine">
+            <div className="space-y-3 text-xs sm:text-sm">
+              <div className="flex justify-between items-center">
+                <span className="text-neutral-500">Checkout Provider:</span>
+                <strong className="text-neutral-900 font-semibold">
+                  {order.checkoutProvider || "Shiprocket / Fastrr Checkout"}
+                </strong>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <span className="text-neutral-500">Payment Status:</span>
+                <AdminBadge
+                  variant={
+                    order.paymentStatus === "Paid"
+                      ? "success"
+                      : order.paymentStatus === "Pending"
+                      ? "warning"
+                      : order.paymentStatus === "Cash on Delivery"
+                      ? "brand"
+                      : "danger"
+                  }
+                  size="sm"
+                >
+                  {order.paymentStatus}
+                </AdminBadge>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <span className="text-neutral-500">Selected Method:</span>
+                <span className="font-medium text-neutral-900">{order.paymentMethod}</span>
+              </div>
+
+              {order.shiprocketOrderId && (
+                <div className="flex justify-between items-center">
+                  <span className="text-neutral-500">Fastrr Order ID:</span>
+                  <span className="font-mono text-neutral-800">{order.shiprocketOrderId}</span>
+                </div>
+              )}
+
+              {order.paymentId && (
+                <div className="flex justify-between items-center">
+                  <span className="text-neutral-500">Payment Ref:</span>
+                  <span className="font-mono text-xs text-neutral-600">{order.paymentId}</span>
+                </div>
+              )}
+
+              <div className="pt-2 border-t border-neutral-100 flex justify-between items-center font-bold text-neutral-900">
+                <span>Grand Total Captured:</span>
+                <span className="text-[#734E06] text-sm">{formatINR(order.total)}</span>
               </div>
             </div>
           </AdminCard>

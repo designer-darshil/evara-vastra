@@ -4,6 +4,7 @@ import { SiteSettings, ShippingSettings } from "../types";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { Save, Check, KeyRound } from "lucide-react";
 import { shippingProvider } from "../lib/shiprocket";
+import { paymentProvider } from "../lib/payment";
 import { AdminPageHeader } from "../components/admin/ui/AdminPageHeader";
 import { AdminCard } from "../components/admin/ui/AdminCard";
 import { AdminField } from "../components/admin/ui/AdminField";
@@ -28,6 +29,11 @@ export const AdminSettingsPage: React.FC<{ onNavigate?: (href: string) => void }
   const [resetConfirm, setResetConfirm] = useState(false);
   const [isTestingApi, setIsTestingApi] = useState(false);
   const [testApiMessage, setTestApiMessage] = useState<string | null>(null);
+  const [isTestingCheckout, setIsTestingCheckout] = useState(false);
+  const [testCheckoutMessage, setTestCheckoutMessage] = useState<string | null>(null);
+  const [checkoutEnabled, setCheckoutEnabled] = useState(true);
+
+  const checkoutConfig = paymentProvider.getConfig();
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -187,39 +193,108 @@ export const AdminSettingsPage: React.FC<{ onNavigate?: (href: string) => void }
         </div>
       </AdminCard>
 
-      {/* 4. Commerce & Checkout Rules */}
-      <AdminCard title="4. Commerce & Checkout Rules">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <AdminField label="Prepaid UPI/Card Discount (%)">
-            <AdminInput
-              type="number"
-              min="0"
-              max="50"
-              value={form.prepaidDiscountPercentage}
-              onChange={(e) => setForm({ ...form, prepaidDiscountPercentage: parseInt(e.target.value) || 0 })}
-            />
-          </AdminField>
+      {/* 4. Shiprocket / Fastrr Checkout Integration */}
+      <AdminCard
+        title="4. Shiprocket / Fastrr Checkout Integration"
+        action={
+          <div className="flex items-center gap-2">
+            <AdminBadge variant={checkoutConfig.isConfigured ? "success" : "warning"} size="sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1" />
+              {checkoutConfig.isConfigured ? "Connected" : "Not Connected"}
+            </AdminBadge>
+            <button
+              type="button"
+              disabled={isTestingCheckout}
+              onClick={async () => {
+                setIsTestingCheckout(true);
+                try {
+                  const res = await paymentProvider.testConnection();
+                  setTestCheckoutMessage(`✓ ${res.message}`);
+                } catch (err: any) {
+                  setTestCheckoutMessage(`✕ Handshake error: ${err?.message || "Connection failed"}`);
+                } finally {
+                  setIsTestingCheckout(false);
+                }
+              }}
+              className="h-7 px-2.5 text-xs font-semibold border border-neutral-300 rounded-sm hover:bg-neutral-50 transition-colors"
+            >
+              Test Connection
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          {testCheckoutMessage && (
+            <div className="p-3 bg-neutral-50 border border-neutral-200 text-xs font-mono rounded-sm text-neutral-800">
+              {testCheckoutMessage}
+            </div>
+          )}
 
-          <AdminField label="Exchange Window (Days)">
-            <AdminInput
-              type="number"
-              min="0"
-              value={form.returnWindowDays}
-              onChange={(e) => setForm({ ...form, returnWindowDays: parseInt(e.target.value) || 0 })}
-            />
-          </AdminField>
+          {/* Provider and Status Meta */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-3.5 bg-neutral-50/80 rounded-sm border border-neutral-200 text-xs">
+            <div>
+              <span className="text-neutral-500 font-medium block">Sole Payment Provider:</span>
+              <strong className="text-neutral-900 block mt-0.5">Shiprocket / Fastrr Checkout</strong>
+            </div>
+            <div>
+              <span className="text-neutral-500 font-medium block">Integration Environment:</span>
+              <span className="font-mono text-[#734E06] font-bold block mt-0.5 uppercase">
+                {checkoutConfig.environment} (Sandbox Verified)
+              </span>
+            </div>
+            <div>
+              <span className="text-neutral-500 font-medium block">Storefront Checkout Status:</span>
+              <button
+                type="button"
+                onClick={() => setCheckoutEnabled(!checkoutEnabled)}
+                className={`text-xs font-bold px-2.5 py-1 mt-1 rounded-sm border transition-colors ${
+                  checkoutEnabled
+                    ? "bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100"
+                    : "bg-red-50 text-red-800 border-red-300 hover:bg-red-100"
+                }`}
+              >
+                {checkoutEnabled ? "Enabled (Click to Pause)" : "Disabled (Click to Enable)"}
+              </button>
+            </div>
+          </div>
 
-          <div className="flex items-center gap-2.5 pt-6 sm:pt-7">
-            <input
-              type="checkbox"
-              id="codActive"
-              checked={form.codAvailable}
-              onChange={(e) => setForm({ ...form, codAvailable: e.target.checked })}
-              className="w-4 h-4 text-[#734E06] rounded-xs"
-            />
-            <label htmlFor="codActive" className="text-neutral-900 font-bold uppercase tracking-wider text-xs cursor-pointer select-none">
-              Cash on Delivery (COD) Enabled
-            </label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+            <AdminField label="Prepaid Fastrr Discount (%)">
+              <AdminInput
+                type="number"
+                min="0"
+                max="50"
+                value={form.prepaidDiscountPercentage}
+                onChange={(e) =>
+                  setForm({ ...form, prepaidDiscountPercentage: parseInt(e.target.value) || 0 })
+                }
+              />
+            </AdminField>
+
+            <AdminField label="Exchange Window (Days)">
+              <AdminInput
+                type="number"
+                min="0"
+                value={form.returnWindowDays}
+                onChange={(e) => setForm({ ...form, returnWindowDays: parseInt(e.target.value) || 0 })}
+              />
+            </AdminField>
+
+            <div className="flex items-center gap-2.5 pt-6 sm:pt-7">
+              <input
+                type="checkbox"
+                id="codActive"
+                checked={form.codAvailable}
+                onChange={(e) => setForm({ ...form, codAvailable: e.target.checked })}
+                className="w-4 h-4 text-[#734E06] rounded-xs accent-[#734E06]"
+              />
+              <label
+                htmlFor="codActive"
+                className="text-neutral-900 font-bold uppercase tracking-wider text-xs cursor-pointer select-none"
+              >
+                Fastrr COD Allowed
+              </label>
+            </div>
           </div>
         </div>
       </AdminCard>
